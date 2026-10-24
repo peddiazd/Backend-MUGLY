@@ -1,3 +1,4 @@
+
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
@@ -21,6 +22,9 @@ def crear_app():
     # Inicializar extensiones
     db.init_app(app)
     migrate.init_app(app, db)
+
+    # Registrar modelos de pedidos
+    from app.dominios.pedidos.modelos import Pedido, DetallePedido
 
     CORS(
         app,
@@ -66,6 +70,17 @@ def crear_app():
     app.register_blueprint(
         productos_ctrl.productos_bp,
         url_prefix=f"/api/{API_VERSION}/productos",
+    )
+
+    # Registrar modulo de pedidos
+    from app.dominios.pedidos import controladores as pedidos_ctrl
+    from app.dominios.pedidos.servicios import PedidoServicio
+
+    pedidos_ctrl.pedido_servicio = PedidoServicio()
+
+    app.register_blueprint(
+        pedidos_ctrl.pedidos_bp,
+        url_prefix=f"/api/{API_VERSION}/pedidos",
     )
 
     # Endpoint de salud
@@ -135,5 +150,25 @@ def crear_app():
             "success": False,
             "error": {"message": str(error)},
         }, 404
+
+    # Errores propios del modulo de pedidos
+    from app.dominios.pedidos.servicios import (
+        PedidoNoEncontradoError,
+        ProductoPedidoNoDisponibleError,
+    )
+
+    @app.errorhandler(PedidoNoEncontradoError)
+    def pedido_no_encontrado(error):
+        return {
+            "success": False,
+            "error": {"message": str(error)},
+        }, 404
+
+    @app.errorhandler(ProductoPedidoNoDisponibleError)
+    def producto_pedido_no_disponible(error):
+        return {
+            "success": False,
+            "error": {"message": str(error)},
+        }, 400
 
     return app

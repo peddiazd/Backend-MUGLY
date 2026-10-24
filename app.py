@@ -1,4 +1,3 @@
-
 from app import crear_app
 
 # Crear la aplicación

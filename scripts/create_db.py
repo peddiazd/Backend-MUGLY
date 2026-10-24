@@ -1,4 +1,3 @@
-
 """
 Script para crear la base de datos mugly_db si no existe.
 
@@ -26,14 +25,10 @@ DB_CHARSET = os.getenv("DB_CHARSET", "utf8mb4").strip()
 errores = []
 
 if not DB_USER:
-    errores.append(
-        "DB_USER no está definida. Configúrala en tu archivo .env"
-    )
+    errores.append("DB_USER no está definida. Configúrala en tu archivo .env")
 
 if not DB_NAME:
-    errores.append(
-        "DB_NAME no está definida. Configúrala en tu archivo .env"
-    )
+    errores.append("DB_NAME no está definida. Configúrala en tu archivo .env")
 
 if errores:
     print("\nError de configuración de base de datos:", file=sys.stderr)

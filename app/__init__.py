@@ -54,6 +54,20 @@ def crear_app():
         url_prefix=f"/api/{API_VERSION}/admin",
     )
 
+    # Registrar modulo de productos
+    from app.dominios.productos import controladores as productos_ctrl
+    from app.dominios.productos.servicios import (
+        ProductoServicio,
+        ProductoNoEncontradoError,
+    )
+
+    productos_ctrl.producto_servicio = ProductoServicio()
+
+    app.register_blueprint(
+        productos_ctrl.productos_bp,
+        url_prefix=f"/api/{API_VERSION}/productos",
+    )
+
     # Endpoint de salud
     @app.route("/health", methods=["GET"])
     def health():
@@ -113,5 +127,13 @@ def crear_app():
             "success": False,
             "error": {"message": str(error)},
         }, 403
+
+    # Error propio del modulo de productos
+    @app.errorhandler(ProductoNoEncontradoError)
+    def producto_no_encontrado(error):
+        return {
+            "success": False,
+            "error": {"message": str(error)},
+        }, 404
 
     return app

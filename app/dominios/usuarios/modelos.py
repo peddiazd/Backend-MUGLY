@@ -31,9 +31,7 @@ class Usuario(db.Model):
             "id": self.id,
             "correo": self.correo,
             "fecha_creacion": (
-                self.fecha_creacion.isoformat()
-                if self.fecha_creacion
-                else None
+                self.fecha_creacion.isoformat() if self.fecha_creacion else None
             ),
             "rol": self.rol,
         }

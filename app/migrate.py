@@ -1,4 +1,3 @@
-
 """
 Flask-Migrate: la extensión se inicializa dentro del app factory.
 

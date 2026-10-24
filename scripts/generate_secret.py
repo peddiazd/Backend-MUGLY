@@ -1,4 +1,3 @@
-
 """
 Script para generar una SECRET_KEY segura para Flask.
 

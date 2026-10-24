@@ -4,7 +4,7 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-# Ruta raíz del proyecto
+# Ruta raiz del proyecto
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Cargar variables del archivo .env
@@ -29,3 +29,10 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     CORS_ALLOWED_ORIGINS = os.getenv("CORS_ALLOWED_ORIGINS", "")
+
+    # Configuracion especial para pruebas automatizadas
+    if os.getenv("FLASK_TESTING", "").lower() == "true":
+        TESTING = True
+        SECRET_KEY = os.getenv("SECRET_KEY", "test-key-for-pytest")
+        JWT_EXP_MINUTES = int(os.getenv("JWT_EXP_MINUTES", "15"))
+        SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"

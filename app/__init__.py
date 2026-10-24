@@ -22,12 +22,31 @@ def crear_app():
     # Inicializar extensiones
     db.init_app(app)
     migrate.init_app(app, db)
-    CORS(app, origins=app.config["CORS_ALLOWED_ORIGINS"] or [
-        "http://localhost:3000",
-        "http://localhost:5173",
-    ])
 
-    # Endpoint de salud (público, sin autenticación)
+    CORS(
+        app,
+        origins=app.config["CORS_ALLOWED_ORIGINS"] or [
+            "http://localhost:3000",
+            "http://localhost:5173",
+        ],
+    )
+
+    # Registrar modulo de usuarios
+    from app.dominios.usuarios.controladores import usuarios_bp
+    from app.dominios.usuarios.servicios import UsuarioServicio
+    from app.dominios.usuarios import controladores as usuarios_ctrl
+
+    usuarios_ctrl.usuario_servicio = UsuarioServicio(
+        secret_key=app.config["SECRET_KEY"],
+        jwt_exp_minutes=app.config.get("JWT_EXP_MINUTES", 15),
+    )
+
+    app.register_blueprint(
+        usuarios_bp,
+        url_prefix=f"/api/{API_VERSION}/usuarios",
+    )
+
+    # Endpoint de salud
     @app.route("/health", methods=["GET"])
     def health():
         return {
@@ -50,5 +69,33 @@ def crear_app():
             "success": False,
             "error": {"message": "Error interno del servidor"},
         }, 500
+
+    # Errores propios del modulo de usuarios
+    from app.dominios.usuarios.servicios import (
+        CorreoYaRegistradoError,
+        CredencialesInvalidasError,
+        UsuarioNoEncontradoError,
+    )
+
+    @app.errorhandler(CorreoYaRegistradoError)
+    def correo_duplicado(error):
+        return {
+            "success": False,
+            "error": {"message": str(error)},
+        }, 400
+
+    @app.errorhandler(CredencialesInvalidasError)
+    def credenciales_invalidas(error):
+        return {
+            "success": False,
+            "error": {"message": str(error)},
+        }, 401
+
+    @app.errorhandler(UsuarioNoEncontradoError)
+    def usuario_no_encontrado(error):
+        return {
+            "success": False,
+            "error": {"message": str(error)},
+        }, 404
 
     return app

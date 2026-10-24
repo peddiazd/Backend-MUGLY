@@ -19,6 +19,10 @@ class UsuarioNoEncontradoError(Exception):
     pass
 
 
+class PermisoDenegadoError(Exception):
+    pass
+
+
 def _generar_access_token(usuario, secret_key, exp_minutes):
     ahora = datetime.now(timezone.utc)
 
@@ -42,9 +46,7 @@ class UsuarioServicio:
 
         existente = UsuarioRepositorio.obtener_por_correo(correo)
         if existente:
-            raise CorreoYaRegistradoError(
-                f"El correo {correo} ya está registrado."
-            )
+            raise CorreoYaRegistradoError(f"El correo {correo} ya está registrado.")
 
         contrasena_hash = generate_password_hash(datos["contrasena"])
         usuario = Usuario(correo=correo, contrasena=contrasena_hash)
@@ -61,15 +63,11 @@ class UsuarioServicio:
         contrasena = datos.get("contrasena")
 
         if not correo or not contrasena:
-            raise CredencialesInvalidasError(
-                "Correo y contraseña son obligatorios."
-            )
+            raise CredencialesInvalidasError("Correo y contraseña son obligatorios.")
 
         usuario = UsuarioRepositorio.obtener_por_correo(correo)
 
-        if not usuario or not check_password_hash(
-            usuario.contrasena, contrasena
-        ):
+        if not usuario or not check_password_hash(usuario.contrasena, contrasena):
             raise CredencialesInvalidasError("Credenciales inválidas.")
 
         access_token = _generar_access_token(
@@ -87,7 +85,7 @@ class UsuarioServicio:
         perfil = UsuarioRepositorio.obtener_perfil_por_usuario_id(usuario_id)
 
         if not perfil:
-            return None
+            raise UsuarioNoEncontradoError("Perfil no encontrado.")
 
         return perfil.to_dict()
 
@@ -108,3 +106,22 @@ class UsuarioServicio:
 
         UsuarioRepositorio.guardar_perfil(perfil)
         return perfil.to_dict()
+
+    def listar_todos_los_usuarios(self):
+        """Devuelve todos los usuarios sin datos sensibles."""
+        usuarios = UsuarioRepositorio.listar_todos()
+        return [usuario.to_dict() for usuario in usuarios]
+
+    def promover_a_admin(self, correo):
+        """Promueve un usuario existente al rol de administrador."""
+        usuario = UsuarioRepositorio.obtener_por_correo(correo)
+
+        if not usuario:
+            raise UsuarioNoEncontradoError(
+                f"No se encontro ningun usuario con correo {correo}."
+            )
+
+        usuario.rol = "admin"
+        UsuarioRepositorio.actualizar_usuario()
+
+        return usuario

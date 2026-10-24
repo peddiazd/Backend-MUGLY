@@ -1,4 +1,3 @@
-
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
@@ -25,14 +24,18 @@ def crear_app():
 
     CORS(
         app,
-        origins=app.config["CORS_ALLOWED_ORIGINS"] or [
+        origins=app.config["CORS_ALLOWED_ORIGINS"]
+        or [
             "http://localhost:3000",
             "http://localhost:5173",
         ],
     )
 
-    # Registrar modulo de usuarios
-    from app.dominios.usuarios.controladores import usuarios_bp
+    # Registrar modulos de usuarios y administracion
+    from app.dominios.usuarios.controladores import (
+        usuarios_bp,
+        admin_bp,
+    )
     from app.dominios.usuarios.servicios import UsuarioServicio
     from app.dominios.usuarios import controladores as usuarios_ctrl
 
@@ -44,6 +47,11 @@ def crear_app():
     app.register_blueprint(
         usuarios_bp,
         url_prefix=f"/api/{API_VERSION}/usuarios",
+    )
+
+    app.register_blueprint(
+        admin_bp,
+        url_prefix=f"/api/{API_VERSION}/admin",
     )
 
     # Endpoint de salud
@@ -75,6 +83,7 @@ def crear_app():
         CorreoYaRegistradoError,
         CredencialesInvalidasError,
         UsuarioNoEncontradoError,
+        PermisoDenegadoError,
     )
 
     @app.errorhandler(CorreoYaRegistradoError)
@@ -97,5 +106,12 @@ def crear_app():
             "success": False,
             "error": {"message": str(error)},
         }, 404
+
+    @app.errorhandler(PermisoDenegadoError)
+    def permiso_denegado(error):
+        return {
+            "success": False,
+            "error": {"message": str(error)},
+        }, 403
 
     return app

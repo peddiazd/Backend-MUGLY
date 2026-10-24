@@ -21,14 +21,20 @@ class UsuarioRepositorio:
 
     @staticmethod
     def obtener_perfil_por_usuario_id(usuario_id):
-        return (
-            db.session.query(PerfilUsuario)
-            .filter_by(usuario_id=usuario_id)
-            .first()
-        )
+        return db.session.query(PerfilUsuario).filter_by(usuario_id=usuario_id).first()
 
     @staticmethod
     def guardar_perfil(perfil):
         db.session.add(perfil)
         db.session.commit()
         return perfil
+
+    @staticmethod
+    def listar_todos():
+        """Consulta todos los usuarios registrados."""
+        return db.session.query(Usuario).all()
+
+    @staticmethod
+    def actualizar_usuario():
+        """Guarda los cambios realizados a un usuario."""
+        db.session.commit()

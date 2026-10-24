@@ -1,4 +1,3 @@
-
 """
 Configuracion de pruebas y fixtures compartidos.
 """
@@ -47,6 +46,42 @@ def usuario_auth(client):
         json={"correo": email, "contrasena": "123456"},
     )
 
+    resp = client.post(
+        "/api/v1/usuarios/login",
+        json={"correo": email, "contrasena": "123456"},
+    )
+
+    datos = json.loads(resp.data)
+    token = datos["data"]["access_token"]
+
+    return {
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/json",
+    }
+
+
+@pytest.fixture
+def admin_auth(client):
+    """Crea un usuario administrador y devuelve sus cabeceras."""
+
+    email = f"admin-{uuid.uuid4().hex[:8]}@ejemplo.com"
+
+    # Registrar un usuario normal
+    client.post(
+        "/api/v1/usuarios/registro",
+        json={"correo": email, "contrasena": "123456"},
+    )
+
+    # Promoverlo a administrador mediante el servicio
+    from app.dominios.usuarios.servicios import UsuarioServicio
+
+    servicio = UsuarioServicio(
+        secret_key=client.application.config["SECRET_KEY"],
+        jwt_exp_minutes=client.application.config.get("JWT_EXP_MINUTES", 15),
+    )
+    servicio.promover_a_admin(email)
+
+    # Iniciar sesión como administrador
     resp = client.post(
         "/api/v1/usuarios/login",
         json={"correo": email, "contrasena": "123456"},

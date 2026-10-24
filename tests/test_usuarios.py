@@ -1,4 +1,3 @@
-
 import json
 
 
@@ -184,3 +183,38 @@ class TestPerfil:
         assert datos["data"]["telefono"] == "+34600333444"
         assert datos["data"]["nombre"] == "Ana"
         assert datos["data"]["apellido"] == "Garcia"
+
+
+class TestAutorizacionAdmin:
+    """Pruebas de autorizacion para endpoints de administrador."""
+
+    def test_admin_sin_token(self, client):
+        """Sin token debe responder 401."""
+        resp = client.get("/api/v1/admin/usuarios")
+
+        assert resp.status_code == 401
+
+    def test_admin_con_usuario_normal(self, client, usuario_auth):
+        """Un usuario normal debe recibir 403."""
+        resp = client.get(
+            "/api/v1/admin/usuarios",
+            headers=usuario_auth,
+        )
+
+        assert resp.status_code == 403
+
+    def test_admin_con_admin(self, client, admin_auth):
+        """Un administrador debe recibir 200 y la lista de usuarios."""
+        resp = client.get(
+            "/api/v1/admin/usuarios",
+            headers=admin_auth,
+        )
+        datos = json.loads(resp.data)
+
+        assert resp.status_code == 200
+        assert datos["success"] is True
+        assert isinstance(datos["data"], list)
+
+        # Verificar que no se expongan contrasenas
+        for usuario in datos["data"]:
+            assert "contrasena" not in usuario

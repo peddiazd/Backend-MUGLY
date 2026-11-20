@@ -4,6 +4,7 @@ from marshmallow import ValidationError
 from app.dominios.usuarios.dtos import (
     RegistroUsuarioDTO,
     ActualizarPerfilDTO,
+    AdminActualizarUsuarioDTO,
 )
 from app.seguridad import requiere_token, requiere_admin
 
@@ -159,5 +160,51 @@ def listar_usuarios(usuario_id):
                 "data": lista,
             }
         ),
+        200,
+    )
+
+
+@admin_bp.route("/usuarios/<int:cliente_id>", methods=["GET"])
+@requiere_admin
+def obtener_usuario(usuario_id, cliente_id):
+    """Consultar un usuario con su perfil (solo admin)."""
+    datos = usuario_servicio.obtener_usuario_admin(cliente_id)
+
+    return (
+        jsonify({"success": True, "message": "Detalle del usuario.", "data": datos}),
+        200,
+    )
+
+
+@admin_bp.route("/usuarios/<int:cliente_id>", methods=["PATCH"])
+@requiere_admin
+def actualizar_usuario(usuario_id, cliente_id):
+    """Editar el perfil de un usuario y activarlo o desactivarlo (solo admin)."""
+    datos = request.get_json(silent=True) or {}
+
+    try:
+        datos_validados = AdminActualizarUsuarioDTO().load(datos)
+    except ValidationError as err:
+        return (
+            jsonify(
+                {
+                    "success": False,
+                    "error": {
+                        "message": "Datos de entrada inválidos.",
+                        "details": err.messages,
+                    },
+                }
+            ),
+            400,
+        )
+
+    resultado = usuario_servicio.actualizar_usuario_admin(
+        usuario_id,
+        cliente_id,
+        datos_validados,
+    )
+
+    return (
+        jsonify({"success": True, "message": "Usuario actualizado.", "data": resultado}),
         200,
     )

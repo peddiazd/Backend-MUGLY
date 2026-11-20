@@ -39,16 +39,19 @@ El sistema está organizado en capas que separan la presentación, la lógica de
 
 | Tabla | Campos principales | Relaciones |
 |-------|-------------------|------------|
-| `usuarios` | id (PK), correo (UK), contrasena, fecha_creacion, rol | 1:1 con `perfiles`, 1:N con `pedidos` |
+| `usuarios` | id (PK), correo (UK), contrasena, fecha_creacion, rol, activo | 1:1 con `perfiles`, 1:N con `pedidos` |
 | `perfiles` | id (PK), nombre, apellido, telefono, usuario_id (FK, UK) | N:1 con `usuarios` |
-| `productos` | id (PK), nombre, descripcion, precio, disponible, cantidad_stock | 1:N con `detalles_pedido` |
-| `pedidos` | id (PK), usuario_id (FK), estado, estado_pago, total, fecha_creacion | N:1 con `usuarios`, 1:N con `detalles_pedido` |
+| `productos` | id (PK), nombre, descripcion, precio, disponible, cantidad_stock, imagen | 1:N con `detalles_pedido` |
+| `pedidos` | id (PK), usuario_id (FK), estado, tipo, descripcion, transportadora, numero_guia, total, fecha_creacion | N:1 con `usuarios`, 1:N con `detalles_pedido` e `historial_estados_pedido` |
 | `detalles_pedido` | id (PK), pedido_id (FK), producto_id (FK), cantidad, precio_unitario | N:1 con `pedidos`, N:1 con `productos` |
+| `historial_estados_pedido` | id (PK), pedido_id (FK), estado, fecha, usuario_id (FK) | N:1 con `pedidos` |
 
-### Estados de pedido
+### Estados de pedido (ADR-004)
 
-- `estado`: `pendiente` (por defecto)
-- `estado_pago`: `pendiente` (por defecto), `confirmado`, `rechazado`
+`pendiente` → `pagado` → `enviado` → `entregado`. Un pedido `pendiente` también puede pasar a `cancelado`.
+
+- `tipo`: `catalogo` (compra desde el catálogo) o `personalizado` (acordado por WhatsApp y registrado por el administrador).
+- Cada cambio de estado queda en `historial_estados_pedido` con fecha y usuario.
 
 ---
 
@@ -66,32 +69,49 @@ Prefijo base: `/api/v1`
 | POST | `/login` | Iniciar sesion y obtener JWT | No | - |
 | GET | `/perfil` | Obtener perfil autenticado | Si (token) | usuario |
 | PATCH | `/perfil` | Actualizar perfil parcial | Si (token) | usuario |
-| GET | `/admin/usuarios` | Listar todos los usuarios | Si (token) | admin |
+
+Un usuario desactivado recibe `403` al iniciar sesión o al usar su token.
 
 ### Productos (`/productos`)
 
 | Método | Endpoint | Descripcion | Auth | Rol |
 |--------|----------|-------------|------|-----|
-| GET | `` | Listar todos los productos | No | - |
-| GET | `/:id` | Obtener detalle de producto | No | - |
+| GET | `` | Catálogo: solo productos disponibles | No | - |
+| GET | `/:id` | Detalle de un producto disponible | No | - |
 | POST | `` | Crear producto | Si (token) | admin |
-| PATCH | `/:id` | Actualizar producto parcial | Si (token) | admin |
-| DELETE | `/:id` | Eliminar producto | Si (token) | admin |
+| PATCH | `/:id` | Actualizar producto e inventario | Si (token) | admin |
+| DELETE | `/:id` | Eliminar (204) o retirar si tiene pedidos (200) | Si (token) | admin |
+| POST | `/:id/imagen` | Subir foto (multipart, campo `imagen`; JPG/PNG/WEBP, máx. 5 MB) | Si (token) | admin |
 
 ### Pedidos (`/pedidos`)
 
 | Método | Endpoint | Descripcion | Auth | Rol |
 |--------|----------|-------------|------|-----|
-| POST | `` | Crear pedido | Si (token) | usuario |
+| POST | `` | Crear pedido (queda `pendiente`) | Si (token) | usuario |
 | GET | `` | Listar pedidos del usuario | Si (token) | usuario |
-| GET | `/:id` | Obtener detalle de pedido propio | Si (token) | usuario |
-| POST | `/:id/resultado-pago` | Registrar resultado de pago | Si (token) | usuario |
+| GET | `/:id` | Detalle de pedido propio (estado, envío, historial) | Si (token) | usuario |
 
-### Salud
+### Administración (`/admin`)
+
+| Método | Endpoint | Descripcion |
+|--------|----------|-------------|
+| GET | `/usuarios` | Listar usuarios |
+| GET | `/usuarios/:id` | Detalle de usuario con perfil |
+| PATCH | `/usuarios/:id` | Editar perfil y activar/desactivar (`activo`) |
+| GET | `/productos` | Todos los productos, incluidos los no disponibles |
+| GET | `/pedidos` | Todos los pedidos |
+| GET | `/pedidos/:id` | Detalle de cualquier pedido |
+| PATCH | `/pedidos/:id/estado` | Cambiar estado (`pagado` descuenta inventario; `enviado` exige `transportadora` y `numero_guia`) |
+| POST | `/pedidos/personalizados` | Registrar pedido personalizado (`usuario_id`, `descripcion`, `total`) |
+
+Todas requieren token de un usuario con rol `admin`.
+
+### Otros
 
 | Método | Endpoint | Descripcion | Auth |
 |--------|----------|-------------|------|
 | GET | `/health` | Health check del servicio | No |
+| GET | `/uploads/:archivo` | Imagen de producto | No |
 
 ### Formato de respuesta
 
@@ -133,11 +153,10 @@ En caso de error:
 
 ![Flujo de pedido](./flujo_pedido.png)
 
-1. **Crear pedido:** El usuario autenticado envia una lista de productos con cantidades. El sistema valida que cada producto exista, este disponible y tenga stock suficiente. Se crea el pedido con estado `pendiente` y `estado_pago = pendiente`. **El stock no se descuenta todavia.**
-2. **Registro de pago:** El sistema recibe el resultado (`confirmado` o `rechazado`).
-   - Si `rechazado`: se establece `estado_pago = rechazado`.
-   - Si `confirmado`: se descuenta el stock de cada producto y se establece `estado_pago = confirmado`.
-3. Se utiliza bloqueo `SELECT ... FOR UPDATE` para evitar condiciones de carrera.
+1. **Crear pedido:** El usuario autenticado envia una lista de productos con cantidades. El sistema valida que cada producto exista, este disponible y tenga stock suficiente. Se crea el pedido en estado `pendiente`. **El stock no se descuenta todavia.**
+2. **Pago por WhatsApp:** No hay pasarela en esta version (D8). El cliente coordina el pago por WhatsApp y el **administrador** registra la confirmacion: `pendiente → pagado`. En ese momento se descuenta el stock una sola vez. Si el pago no se concreta, el administrador lo pasa a `cancelado`.
+3. **Envio:** El administrador pasa el pedido a `enviado` indicando transportadora y numero de guia, y luego a `entregado`. El cliente ve el estado, la transportadora y la guia.
+4. Se utiliza bloqueo `SELECT ... FOR UPDATE` para evitar condiciones de carrera al descontar inventario.
 
 ---
 
@@ -271,7 +290,7 @@ export FLASK_TESTING=true     # Linux/Mac
 python -m pytest -q
 ```
 
-Se esperan **41 pruebas pasando**.
+Se esperan **65 pruebas pasando**.
 
 ---
 

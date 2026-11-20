@@ -39,7 +39,7 @@ def _extraer_y_validar_token():
             current_app.config["SECRET_KEY"],
             algorithms=["HS256"],
         )
-        return int(payload["sub"]), None
+        usuario_id = int(payload["sub"])
 
     except jwt.ExpiredSignatureError:
         return None, (
@@ -47,11 +47,35 @@ def _extraer_y_validar_token():
             401,
         )
 
-    except jwt.InvalidTokenError:
+    except (jwt.InvalidTokenError, KeyError, ValueError):
         return None, (
             jsonify({"success": False, "error": {"message": "Token invalido."}}),
             401,
         )
+
+    # El token debe pertenecer a un usuario existente y activo.
+    from app.dominios.usuarios.repositorios import UsuarioRepositorio
+
+    usuario = UsuarioRepositorio.obtener_por_id(usuario_id)
+
+    if not usuario:
+        return None, (
+            jsonify({"success": False, "error": {"message": "Token invalido."}}),
+            401,
+        )
+
+    if not usuario.activo:
+        return None, (
+            jsonify(
+                {
+                    "success": False,
+                    "error": {"message": "La cuenta está desactivada."},
+                }
+            ),
+            403,
+        )
+
+    return usuario_id, None
 
 
 def requiere_token(f):

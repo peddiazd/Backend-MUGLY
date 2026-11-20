@@ -23,6 +23,14 @@ class PermisoDenegadoError(Exception):
     pass
 
 
+class CuentaDesactivadaError(Exception):
+    """La cuenta fue desactivada por un administrador."""
+
+
+class OperacionNoPermitidaError(Exception):
+    """La operacion solicitada no esta permitida."""
+
+
 def _generar_access_token(usuario, secret_key, exp_minutes):
     ahora = datetime.now(timezone.utc)
 
@@ -70,6 +78,11 @@ class UsuarioServicio:
         if not usuario or not check_password_hash(usuario.contrasena, contrasena):
             raise CredencialesInvalidasError("Credenciales inválidas.")
 
+        if not usuario.activo:
+            raise CuentaDesactivadaError(
+                "La cuenta está desactivada. Contacte al administrador."
+            )
+
         access_token = _generar_access_token(
             usuario,
             self.secret_key,
@@ -111,6 +124,46 @@ class UsuarioServicio:
         """Devuelve todos los usuarios sin datos sensibles."""
         usuarios = UsuarioRepositorio.listar_todos()
         return [usuario.to_dict() for usuario in usuarios]
+
+    def obtener_usuario_admin(self, usuario_id):
+        """Devuelve un usuario con su perfil (vista administrativa)."""
+        usuario = UsuarioRepositorio.obtener_por_id(usuario_id)
+
+        if not usuario:
+            raise UsuarioNoEncontradoError(
+                f"Usuario con ID {usuario_id} no encontrado."
+            )
+
+        datos = usuario.to_dict()
+        datos["perfil"] = usuario.perfil.to_dict() if usuario.perfil else None
+        return datos
+
+    def actualizar_usuario_admin(self, admin_id, usuario_id, datos):
+        """Permite al administrador editar el perfil y activar o desactivar."""
+        usuario = UsuarioRepositorio.obtener_por_id(usuario_id)
+
+        if not usuario:
+            raise UsuarioNoEncontradoError(
+                f"Usuario con ID {usuario_id} no encontrado."
+            )
+
+        # Evita que el administrador se bloquee a si mismo.
+        if datos.get("activo") is False and usuario.id == admin_id:
+            raise OperacionNoPermitidaError(
+                "No puede desactivar su propia cuenta."
+            )
+
+        if datos.get("activo") is not None:
+            usuario.activo = datos["activo"]
+
+        perfil = usuario.perfil or PerfilUsuario(usuario_id=usuario.id)
+
+        for campo in ("nombre", "apellido", "telefono"):
+            if datos.get(campo) is not None:
+                setattr(perfil, campo, datos[campo])
+
+        UsuarioRepositorio.guardar_perfil(perfil)
+        return self.obtener_usuario_admin(usuario_id)
 
     def promover_a_admin(self, correo):
         """Promueve un usuario existente al rol de administrador."""

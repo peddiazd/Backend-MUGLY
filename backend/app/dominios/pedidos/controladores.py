@@ -2,13 +2,10 @@
 from flask import Blueprint, jsonify, request
 from marshmallow import ValidationError
 
-from app.dominios.pedidos.dtos import CrearPedidoDTO
-from app.dominios.pedidos.servicios import (
-    PedidoServicio,
-    PedidoNoEncontradoError,
-    ProductoPedidoNoDisponibleError,
-    PedidoPagoYaProcesadoError,
-    ResultadoPagoInvalidoError,
+from app.dominios.pedidos.dtos import (
+    CrearPedidoDTO,
+    CambiarEstadoPedidoDTO,
+    CrearPedidoPersonalizadoDTO,
 )
 from app.dominios.usuarios.controladores import admin_bp
 from app.seguridad import requiere_token, requiere_admin
@@ -19,39 +16,31 @@ pedidos_bp = Blueprint("pedidos", __name__)
 pedido_servicio = None
 
 
+def _error_validacion(err):
+    return (
+        jsonify({
+            "success": False,
+            "error": {
+                "message": "Datos de entrada inválidos.",
+                "details": err.messages,
+            },
+        }),
+        400,
+    )
+
+
 @pedidos_bp.route("", methods=["POST"])
 @requiere_token
 def crear_pedido(usuario_id):
-    """Crear un pedido para el usuario autenticado."""
+    """Crear un pedido pendiente para el usuario autenticado."""
     datos = request.get_json(silent=True) or {}
 
     try:
         datos_validados = CrearPedidoDTO().load(datos)
     except ValidationError as err:
-        return (
-            jsonify({
-                "success": False,
-                "error": {
-                    "message": "Datos de entrada inválidos.",
-                    "details": err.messages,
-                },
-            }),
-            400,
-        )
+        return _error_validacion(err)
 
-    try:
-        pedido = pedido_servicio.crear_pedido(
-            usuario_id,
-            datos_validados,
-        )
-    except ProductoPedidoNoDisponibleError as err:
-        return (
-            jsonify({
-                "success": False,
-                "error": {"message": str(err)},
-            }),
-            400,
-        )
+    pedido = pedido_servicio.crear_pedido(usuario_id, datos_validados)
 
     return (
         jsonify({
@@ -101,64 +90,9 @@ def obtener_pedido(usuario_id, pedido_id):
     )
 
 
-@pedidos_bp.route(
-    "/<int:pedido_id>/resultado-pago",
-    methods=["POST"],
-)
-@requiere_token
-def registrar_resultado_pago(usuario_id, pedido_id):
-    """
-    Registrar el resultado del pago de un pedido propio.
-
-    Esta ruta es provisional: no sustituye la verificación
-    de autenticidad que deberá realizar la futura pasarela.
-    """
-    pedido = pedido_servicio.obtener_pedido_usuario(
-        pedido_id,
-        usuario_id,
-    )
-
-    datos = request.get_json(silent=True) or {}
-    resultado = datos.get("resultado")
-
-    try:
-        pedido_actualizado = pedido_servicio.registrar_resultado_pago(
-            pedido["id"],
-            resultado,
-        )
-    except PedidoPagoYaProcesadoError as err:
-        return (
-            jsonify({
-                "success": False,
-                "error": {"message": str(err)},
-            }),
-            400,
-        )
-    except ResultadoPagoInvalidoError as err:
-        return (
-            jsonify({
-                "success": False,
-                "error": {"message": str(err)},
-            }),
-            400,
-        )
-    except ProductoPedidoNoDisponibleError as err:
-        return (
-            jsonify({
-                "success": False,
-                "error": {"message": str(err)},
-            }),
-            400,
-        )
-
-    return (
-        jsonify({
-            "success": True,
-            "message": "Resultado del pago registrado.",
-            "data": pedido_actualizado,
-        }),
-        200,
-    )
+# ============================================================
+# Rutas administrativas de pedidos
+# ============================================================
 
 
 @admin_bp.route("/pedidos", methods=["GET"])
@@ -174,4 +108,77 @@ def listar_todos_los_pedidos(usuario_id):
             "data": lista,
         }),
         200,
+    )
+
+
+@admin_bp.route("/pedidos/<int:pedido_id>", methods=["GET"])
+@requiere_admin
+def obtener_pedido_admin(usuario_id, pedido_id):
+    """Consultar cualquier pedido (solo administradores)."""
+    pedido = pedido_servicio.obtener_pedido_admin(pedido_id)
+
+    return (
+        jsonify({
+            "success": True,
+            "message": "Detalle del pedido.",
+            "data": pedido,
+        }),
+        200,
+    )
+
+
+@admin_bp.route("/pedidos/<int:pedido_id>/estado", methods=["PATCH"])
+@requiere_admin
+def cambiar_estado_pedido(usuario_id, pedido_id):
+    """
+    Cambiar el estado de un pedido (solo administradores).
+
+    Confirmar el pago (pendiente → pagado) descuenta el inventario.
+    """
+    datos = request.get_json(silent=True) or {}
+
+    try:
+        datos_validados = CambiarEstadoPedidoDTO().load(datos)
+    except ValidationError as err:
+        return _error_validacion(err)
+
+    pedido = pedido_servicio.cambiar_estado(
+        pedido_id,
+        usuario_id,
+        datos_validados,
+    )
+
+    return (
+        jsonify({
+            "success": True,
+            "message": "Estado del pedido actualizado.",
+            "data": pedido,
+        }),
+        200,
+    )
+
+
+@admin_bp.route("/pedidos/personalizados", methods=["POST"])
+@requiere_admin
+def crear_pedido_personalizado(usuario_id):
+    """Registrar un pedido personalizado acordado por WhatsApp (solo admin)."""
+    datos = request.get_json(silent=True) or {}
+
+    try:
+        datos_validados = CrearPedidoPersonalizadoDTO().load(datos)
+    except ValidationError as err:
+        return _error_validacion(err)
+
+    pedido = pedido_servicio.crear_pedido_personalizado(
+        usuario_id,
+        datos_validados,
+    )
+
+    return (
+        jsonify({
+            "success": True,
+            "message": "Pedido personalizado registrado.",
+            "data": pedido,
+        }),
+        201,
     )

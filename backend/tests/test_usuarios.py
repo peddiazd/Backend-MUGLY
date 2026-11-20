@@ -218,3 +218,110 @@ class TestAutorizacionAdmin:
         # Verificar que no se expongan contrasenas
         for usuario in datos["data"]:
             assert "contrasena" not in usuario
+
+
+class TestGestionClientes:
+    """Gestion de clientes por el administrador (MUG-17)."""
+
+    def registrar(self, client):
+        import uuid
+
+        correo = f"cli-{uuid.uuid4().hex[:8]}@ejemplo.com"
+        client.post(
+            "/api/v1/usuarios/registro",
+            json={"correo": correo, "contrasena": "123456"},
+        )
+        login = client.post(
+            "/api/v1/usuarios/login",
+            json={"correo": correo, "contrasena": "123456"},
+        )
+        datos = json.loads(login.data)["data"]
+        return correo, datos["usuario"]["id"], {
+            "Authorization": f"Bearer {datos['access_token']}"
+        }
+
+    def test_admin_consulta_detalle_de_cliente(self, client, admin_auth):
+        _, cliente_id, _ = self.registrar(client)
+
+        resp = client.get(
+            f"/api/v1/admin/usuarios/{cliente_id}", headers=admin_auth
+        )
+        datos = json.loads(resp.data)["data"]
+
+        assert resp.status_code == 200
+        assert datos["activo"] is True
+        assert datos["perfil"]["usuario_id"] == cliente_id
+
+    def test_admin_edita_datos_del_cliente(self, client, admin_auth):
+        _, cliente_id, _ = self.registrar(client)
+
+        resp = client.patch(
+            f"/api/v1/admin/usuarios/{cliente_id}",
+            headers=admin_auth,
+            json={"nombre": "Laura", "telefono": "3001234567"},
+        )
+        datos = json.loads(resp.data)["data"]
+
+        assert resp.status_code == 200
+        assert datos["perfil"]["nombre"] == "Laura"
+        assert datos["perfil"]["telefono"] == "3001234567"
+
+    def test_cliente_desactivado_no_inicia_sesion_ni_usa_su_token(
+        self, client, admin_auth
+    ):
+        correo, cliente_id, token_cliente = self.registrar(client)
+
+        resp = client.patch(
+            f"/api/v1/admin/usuarios/{cliente_id}",
+            headers=admin_auth,
+            json={"activo": False},
+        )
+        assert resp.status_code == 200
+        assert json.loads(resp.data)["data"]["activo"] is False
+
+        login = client.post(
+            "/api/v1/usuarios/login",
+            json={"correo": correo, "contrasena": "123456"},
+        )
+        assert login.status_code == 403
+
+        perfil = client.get("/api/v1/usuarios/perfil", headers=token_cliente)
+        assert perfil.status_code == 403
+
+    def test_cliente_reactivado_vuelve_a_entrar(self, client, admin_auth):
+        correo, cliente_id, _ = self.registrar(client)
+        url = f"/api/v1/admin/usuarios/{cliente_id}"
+
+        client.patch(url, headers=admin_auth, json={"activo": False})
+        client.patch(url, headers=admin_auth, json={"activo": True})
+
+        login = client.post(
+            "/api/v1/usuarios/login",
+            json={"correo": correo, "contrasena": "123456"},
+        )
+        assert login.status_code == 200
+
+    def test_admin_no_se_desactiva_a_si_mismo(self, client, admin_auth):
+        perfil = client.get("/api/v1/usuarios/perfil", headers=admin_auth)
+        admin_id = json.loads(perfil.data)["data"]["usuario_id"]
+
+        resp = client.patch(
+            f"/api/v1/admin/usuarios/{admin_id}",
+            headers=admin_auth,
+            json={"activo": False},
+        )
+
+        assert resp.status_code == 400
+
+    def test_cliente_no_gestiona_otros_clientes(self, client, usuario_auth):
+        resp = client.patch(
+            "/api/v1/admin/usuarios/1",
+            headers=usuario_auth,
+            json={"activo": False},
+        )
+
+        assert resp.status_code == 403
+
+    def test_usuario_inexistente(self, client, admin_auth):
+        resp = client.get("/api/v1/admin/usuarios/99999", headers=admin_auth)
+        assert resp.status_code == 404

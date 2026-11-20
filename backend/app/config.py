@@ -29,6 +29,10 @@ class Config:
 
     CORS_ALLOWED_ORIGINS = os.getenv("CORS_ALLOWED_ORIGINS", "")
 
+    # Imagenes de productos (ADR-006): carpeta y tamano maximo (5 MB)
+    UPLOAD_FOLDER = str(BASE_DIR / "uploads")
+    MAX_CONTENT_LENGTH = 5 * 1024 * 1024
+
     # Configuracion especial para pruebas automatizadas
     if os.getenv("FLASK_TESTING", "").lower() == "true":
         TESTING = True

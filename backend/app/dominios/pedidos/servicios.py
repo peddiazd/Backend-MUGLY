@@ -2,7 +2,11 @@
 from decimal import Decimal
 
 from app import db
-from app.dominios.pedidos.modelos import Pedido, DetallePedido
+from app.dominios.pedidos.modelos import (
+    Pedido,
+    DetallePedido,
+    HistorialEstadoPedido,
+)
 from app.dominios.pedidos.repositorios import PedidoRepositorio
 from app.dominios.productos.modelos import Producto
 
@@ -15,23 +19,39 @@ class ProductoPedidoNoDisponibleError(Exception):
     """Error cuando un producto no existe o no tiene stock suficiente."""
 
 
-class PedidoPagoYaProcesadoError(Exception):
-    """Error cuando un pedido ya tiene un resultado de pago."""
+class TransicionEstadoInvalidaError(Exception):
+    """Error cuando el cambio de estado no está permitido."""
 
 
-class ResultadoPagoInvalidoError(Exception):
-    """Error cuando el resultado del pago no es válido."""
+class DatosEnvioRequeridosError(Exception):
+    """Error cuando se envía un pedido sin transportadora o guía."""
+
+
+# Transiciones permitidas (MGL-REQ-002, RF17)
+TRANSICIONES = {
+    "pendiente": {"pagado", "cancelado"},
+    "pagado": {"enviado"},
+    "enviado": {"entregado"},
+    "entregado": set(),
+    "cancelado": set(),
+}
 
 
 class PedidoServicio:
     """Lógica de negocio para los pedidos de MUGLY."""
 
     def crear_pedido(self, usuario_id, datos):
-        """Crea un pedido validando disponibilidad e inventario."""
+        """
+        Crea un pedido pendiente validando disponibilidad e inventario.
+
+        No descuenta stock: eso ocurre cuando el administrador
+        confirma el pago (D1, D3).
+        """
 
         pedido = Pedido(
             usuario_id=usuario_id,
             estado="pendiente",
+            tipo="catalogo",
             total=Decimal("0.00"),
         )
 
@@ -70,20 +90,42 @@ class PedidoServicio:
             total += precio * cantidad
 
         pedido.total = total
+        pedido.historial.append(
+            HistorialEstadoPedido(estado="pendiente", usuario_id=usuario_id)
+        )
         return PedidoRepositorio.guardar(pedido)
 
-    def registrar_resultado_pago(self, pedido_id, resultado):
-        """
-        Registra el resultado recibido de la pasarela.
+    def crear_pedido_personalizado(self, admin_id, datos):
+        """Registra un pedido personalizado acordado por WhatsApp (D4a)."""
+        from app.dominios.usuarios.repositorios import UsuarioRepositorio
+        from app.dominios.usuarios.servicios import UsuarioNoEncontradoError
 
-        Esta operación debe ser invocada únicamente por un proceso
-        de confianza que haya verificado el resultado del pago.
-        """
-
-        if resultado not in ("confirmado", "rechazado"):
-            raise ResultadoPagoInvalidoError(
-                "El resultado del pago debe ser confirmado o rechazado."
+        if not UsuarioRepositorio.obtener_por_id(datos["usuario_id"]):
+            raise UsuarioNoEncontradoError(
+                f"Usuario con ID {datos['usuario_id']} no encontrado."
             )
+
+        pedido = Pedido(
+            usuario_id=datos["usuario_id"],
+            estado="pendiente",
+            tipo="personalizado",
+            descripcion=datos["descripcion"],
+            total=datos["total"],
+        )
+        pedido.historial.append(
+            HistorialEstadoPedido(estado="pendiente", usuario_id=admin_id)
+        )
+        PedidoRepositorio.guardar(pedido)
+        return self._serializar_pedido(pedido)
+
+    def cambiar_estado(self, pedido_id, admin_id, datos):
+        """
+        Cambia el estado de un pedido según las transiciones permitidas.
+
+        pendiente → pagado descuenta el inventario una sola vez (RF16).
+        pagado → enviado exige transportadora y guía (RF19, RF20).
+        """
+        nuevo = datos["estado"]
 
         try:
             pedido = (
@@ -98,57 +140,65 @@ class PedidoServicio:
                     f"Pedido con ID {pedido_id} no encontrado."
                 )
 
-            if pedido.estado_pago != "pendiente":
-                raise PedidoPagoYaProcesadoError(
-                    "El pedido ya tiene un resultado de pago registrado."
+            if nuevo not in TRANSICIONES[pedido.estado]:
+                raise TransicionEstadoInvalidaError(
+                    f"No se puede pasar un pedido de '{pedido.estado}' "
+                    f"a '{nuevo}'."
                 )
 
-            if resultado == "rechazado":
-                pedido.estado_pago = "rechazado"
-                db.session.commit()
+            if nuevo == "pagado" and pedido.tipo == "catalogo":
+                self._descontar_inventario(pedido)
 
-                return self._serializar_pedido(pedido)
+            if nuevo == "enviado":
+                transportadora = (datos.get("transportadora") or "").strip()
+                numero_guia = (datos.get("numero_guia") or "").strip()
 
-            detalles = list(pedido.detalles)
-            productos = {}
-
-            for detalle in detalles:
-                producto = (
-                    db.session.query(Producto)
-                    .filter_by(id=detalle.producto_id)
-                    .with_for_update()
-                    .first()
-                )
-
-                if producto is None or not producto.disponible:
-                    raise ProductoPedidoNoDisponibleError(
-                        f"El producto con ID {detalle.producto_id} "
-                        "ya no está disponible."
+                if not transportadora or not numero_guia:
+                    raise DatosEnvioRequeridosError(
+                        "Para enviar el pedido debe indicar la "
+                        "transportadora y el número de guía."
                     )
 
-                if producto.cantidad_stock < detalle.cantidad:
-                    raise ProductoPedidoNoDisponibleError(
-                        f"Stock insuficiente para el producto "
-                        f"'{producto.nombre}'. "
-                        f"Existencias disponibles: "
-                        f"{producto.cantidad_stock}."
-                    )
+                pedido.transportadora = transportadora
+                pedido.numero_guia = numero_guia
 
-                productos[detalle.producto_id] = producto
-
-            for detalle in detalles:
-                producto = productos[detalle.producto_id]
-                producto.cantidad_stock -= detalle.cantidad
-
-            pedido.estado_pago = "confirmado"
+            pedido.estado = nuevo
+            pedido.historial.append(
+                HistorialEstadoPedido(estado=nuevo, usuario_id=admin_id)
+            )
 
             db.session.commit()
-
             return self._serializar_pedido(pedido)
 
         except Exception:
             db.session.rollback()
             raise
+
+    @staticmethod
+    def _descontar_inventario(pedido):
+        """Verifica y descuenta el stock de cada producto del pedido."""
+        productos = {}
+
+        for detalle in pedido.detalles:
+            producto = (
+                db.session.query(Producto)
+                .filter_by(id=detalle.producto_id)
+                .with_for_update()
+                .first()
+            )
+
+            if producto is None or producto.cantidad_stock < detalle.cantidad:
+                nombre = producto.nombre if producto else detalle.producto_id
+                existencias = producto.cantidad_stock if producto else 0
+                raise ProductoPedidoNoDisponibleError(
+                    f"Stock insuficiente para el producto '{nombre}'. "
+                    f"Existencias disponibles: {existencias}."
+                )
+
+            productos[detalle.id] = producto
+
+        for detalle in pedido.detalles:
+            productos[detalle.id].cantidad_stock -= detalle.cantidad
 
     def listar_todos_los_pedidos(self):
         """Lista todos los pedidos registrados en MUGLY."""
@@ -158,6 +208,17 @@ class PedidoServicio:
             self._serializar_pedido(pedido)
             for pedido in pedidos
         ]
+
+    def obtener_pedido_admin(self, pedido_id):
+        """Obtiene cualquier pedido (vista administrativa)."""
+        pedido = PedidoRepositorio.obtener_por_id(pedido_id)
+
+        if pedido is None:
+            raise PedidoNoEncontradoError(
+                f"Pedido con ID {pedido_id} no encontrado."
+            )
+
+        return self._serializar_pedido(pedido)
 
     def listar_pedidos_usuario(self, usuario_id):
         """Lista únicamente los pedidos del usuario autenticado."""
@@ -181,12 +242,15 @@ class PedidoServicio:
 
     @staticmethod
     def _serializar_pedido(pedido):
-        """Convierte el pedido y sus detalles en un diccionario."""
+        """Convierte el pedido, sus detalles y su historial en un diccionario."""
         return {
             "id": pedido.id,
             "usuario_id": pedido.usuario_id,
             "estado": pedido.estado,
-            "estado_pago": pedido.estado_pago,
+            "tipo": pedido.tipo,
+            "descripcion": pedido.descripcion,
+            "transportadora": pedido.transportadora,
+            "numero_guia": pedido.numero_guia,
             "total": float(pedido.total),
             "fecha_creacion": (
                 pedido.fecha_creacion.isoformat()
@@ -204,5 +268,12 @@ class PedidoServicio:
                     ),
                 }
                 for detalle in pedido.detalles
+            ],
+            "historial": [
+                {
+                    "estado": h.estado,
+                    "fecha": h.fecha.isoformat() if h.fecha else None,
+                }
+                for h in pedido.historial
             ],
         }

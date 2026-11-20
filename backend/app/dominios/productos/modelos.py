@@ -13,6 +13,8 @@ class Producto(db.Model):
     precio = db.Column(db.Numeric(10, 2), nullable=False)
     disponible = db.Column(db.Boolean, nullable=False, default=True)
     cantidad_stock = db.Column(db.Integer, nullable=False, default=0)
+    # Nombre del archivo de la foto guardada en la carpeta de uploads.
+    imagen = db.Column(db.String(255), nullable=True)
 
     def to_dict(self):
         """Convierte el producto en un diccionario."""
@@ -23,4 +25,5 @@ class Producto(db.Model):
             "precio": float(self.precio),
             "disponible": self.disponible,
             "cantidad_stock": self.cantidad_stock,
+            "imagen": f"/uploads/{self.imagen}" if self.imagen else None,
         }

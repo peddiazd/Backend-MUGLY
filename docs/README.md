@@ -145,6 +145,9 @@ En caso de error:
 
 ```
 MUGLY/
+├── frontend/                   # SPA en HTML, CSS y JavaScript Vanilla (Bootstrap)
+├── docs/                       # Documentacion y diagramas (este directorio)
+└── backend/
 ├── app.py                      # Punto de entrada de la app Flask
 ├── app/
 │   ├── __init__.py             # App factory, registro de blueprints y extensiones
@@ -181,12 +184,14 @@ MUGLY/
 │   ├── test_usuarios.py
 │   ├── test_productos.py
 │   └── test_pedidos.py
-├── docs/                       # Documentacion y diagramas (este directorio)
+├── uploads/                    # Archivos subidos (imagenes de productos)
 ├── requirements.txt            # Dependencias de Python
 ├── pytest.ini                  # Configuracion de pytest
-├── .env.example                # Ejemplo de variables de entorno
-└── .gitignore
+└── .env.example                # Ejemplo de variables de entorno
 ```
+
+Todo lo listado bajo `backend/` vive dentro de esa carpeta; los comandos
+del backend se ejecutan desde `backend/`.
 
 ---
 
@@ -204,8 +209,10 @@ MUGLY/
 
 ```bash
 git clone <url-del-repositorio>
-cd MUGLY
+cd MUGLY/backend
 ```
+
+Todos los pasos siguientes se ejecutan dentro de `backend/`.
 
 2. **Crear y activar entorno virtual**
 
@@ -245,7 +252,7 @@ python scripts/create_db.py
 6. **Ejecutar migraciones**
 
 ```bash
-flask db upgrade
+flask --app "app:crear_app()" db upgrade
 ```
 
 7. **Iniciar la aplicacion**
@@ -264,7 +271,7 @@ export FLASK_TESTING=true     # Linux/Mac
 python -m pytest -q
 ```
 
-Se esperan **32 pruebas pasando**.
+Se esperan **41 pruebas pasando**.
 
 ---
 

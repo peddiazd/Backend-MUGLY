@@ -1,3 +1,4 @@
+
 from app.dominios.productos.modelos import Producto
 from app.dominios.productos.repositorios import ProductoRepositorio
 
@@ -16,6 +17,7 @@ class ProductoServicio:
             descripcion=datos["descripcion"],
             precio=datos["precio"],
             disponible=datos.get("disponible", True),
+            cantidad_stock=datos.get("cantidad_stock", 0),
         )
 
         return ProductoRepositorio.guardar(producto)
@@ -45,7 +47,13 @@ class ProductoServicio:
                 f"Producto con ID {producto_id} no encontrado."
             )
 
-        for campo in ("nombre", "descripcion", "precio", "disponible"):
+        for campo in (
+            "nombre",
+            "descripcion",
+            "precio",
+            "disponible",
+            "cantidad_stock",
+        ):
             if datos.get(campo) is not None:
                 setattr(producto, campo, datos[campo])
 

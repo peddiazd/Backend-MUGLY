@@ -35,13 +35,9 @@ def crear_app():
         ],
     )
 
-    # Registrar modulos de usuarios y administracion
-    from app.dominios.usuarios.controladores import (
-        usuarios_bp,
-        admin_bp,
-    )
-    from app.dominios.usuarios.servicios import UsuarioServicio
+    # Registrar modulo de usuarios
     from app.dominios.usuarios import controladores as usuarios_ctrl
+    from app.dominios.usuarios.servicios import UsuarioServicio
 
     usuarios_ctrl.usuario_servicio = UsuarioServicio(
         secret_key=app.config["SECRET_KEY"],
@@ -49,13 +45,8 @@ def crear_app():
     )
 
     app.register_blueprint(
-        usuarios_bp,
+        usuarios_ctrl.usuarios_bp,
         url_prefix=f"/api/{API_VERSION}/usuarios",
-    )
-
-    app.register_blueprint(
-        admin_bp,
-        url_prefix=f"/api/{API_VERSION}/admin",
     )
 
     # Registrar modulo de productos
@@ -73,6 +64,8 @@ def crear_app():
     )
 
     # Registrar modulo de pedidos
+    # Se importa antes de registrar admin_bp porque agrega
+    # una ruta al blueprint administrativo.
     from app.dominios.pedidos import controladores as pedidos_ctrl
     from app.dominios.pedidos.servicios import PedidoServicio
 
@@ -81,6 +74,14 @@ def crear_app():
     app.register_blueprint(
         pedidos_ctrl.pedidos_bp,
         url_prefix=f"/api/{API_VERSION}/pedidos",
+    )
+
+    # Registrar blueprint administrativo DESPUES de importar pedidos
+    from app.dominios.usuarios.controladores import admin_bp
+
+    app.register_blueprint(
+        admin_bp,
+        url_prefix=f"/api/{API_VERSION}/admin",
     )
 
     # Endpoint de salud
@@ -155,6 +156,8 @@ def crear_app():
     from app.dominios.pedidos.servicios import (
         PedidoNoEncontradoError,
         ProductoPedidoNoDisponibleError,
+        PedidoPagoYaProcesadoError,
+        ResultadoPagoInvalidoError,
     )
 
     @app.errorhandler(PedidoNoEncontradoError)
@@ -166,6 +169,20 @@ def crear_app():
 
     @app.errorhandler(ProductoPedidoNoDisponibleError)
     def producto_pedido_no_disponible(error):
+        return {
+            "success": False,
+            "error": {"message": str(error)},
+        }, 400
+
+    @app.errorhandler(PedidoPagoYaProcesadoError)
+    def pedido_pago_ya_procesado(error):
+        return {
+            "success": False,
+            "error": {"message": str(error)},
+        }, 400
+
+    @app.errorhandler(ResultadoPagoInvalidoError)
+    def resultado_pago_invalido(error):
         return {
             "success": False,
             "error": {"message": str(error)},

@@ -1,3 +1,4 @@
+
 from app import db
 
 
@@ -11,6 +12,7 @@ class Producto(db.Model):
     descripcion = db.Column(db.Text, nullable=False)
     precio = db.Column(db.Numeric(10, 2), nullable=False)
     disponible = db.Column(db.Boolean, nullable=False, default=True)
+    cantidad_stock = db.Column(db.Integer, nullable=False, default=0)
 
     def to_dict(self):
         """Convierte el producto en un diccionario."""
@@ -20,4 +22,5 @@ class Producto(db.Model):
             "descripcion": self.descripcion,
             "precio": float(self.precio),
             "disponible": self.disponible,
+            "cantidad_stock": self.cantidad_stock,
         }

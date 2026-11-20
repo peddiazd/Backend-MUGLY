@@ -1,3 +1,4 @@
+
 from decimal import Decimal
 
 from marshmallow import Schema, fields, validate
@@ -23,6 +24,11 @@ class CrearProductoDTO(Schema):
 
     disponible = fields.Boolean(load_default=True)
 
+    cantidad_stock = fields.Integer(
+        load_default=0,
+        validate=validate.Range(min=0),
+    )
+
 
 class ActualizarProductoDTO(Schema):
     """DTO para validar la actualización parcial de un producto."""
@@ -47,5 +53,11 @@ class ActualizarProductoDTO(Schema):
 
     disponible = fields.Boolean(
         load_default=None,
+        allow_none=True,
+    )
+
+    cantidad_stock = fields.Integer(
+        load_default=None,
+        validate=validate.Range(min=0),
         allow_none=True,
     )

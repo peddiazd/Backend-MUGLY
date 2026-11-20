@@ -1,3 +1,4 @@
+
 from datetime import datetime
 
 from app import db
@@ -17,6 +18,12 @@ class Pedido(db.Model):
     )
 
     estado = db.Column(
+        db.String(30),
+        nullable=False,
+        default="pendiente",
+    )
+
+    estado_pago = db.Column(
         db.String(30),
         nullable=False,
         default="pendiente",

@@ -1,0 +1,1019 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>Informe MUGLY</title>
+<meta name="description" content="Informe del proyecto final de Arquitectura de Software: análisis, diseño y desarrollo de MUGLY, tienda virtual de mugs.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --primario:#1F4E5F; --primario-2:#2F6B80; --primario-claro:#DCE8EC;
+  --acento:#A45A33; --acento-claro:#F5E6DC;
+  --texto:#2E3338; --suave:#5F6B73; --tenue:#8A949C;
+  --fondo:#FAF8F5; --papel:#FFFFFF; --calido:#EFE9E1; --calido-2:#F7F3EE;
+  --borde:#E3DED6; --verde:#2D6A4F; --verde-claro:#E1F0E7; --rojo:#A23B3B; --rojo-claro:#F7E3E0;
+  --ambar:#8A6100; --ambar-claro:#FBF0D9;
+  --sombra:0 1px 2px rgba(31,78,95,.06),0 6px 24px rgba(31,78,95,.07);
+  --radio:14px;
+  --fuente:"Inter","Segoe UI",Roboto,Arial,sans-serif;
+  --titulos:"Space Grotesk","Inter","Segoe UI",Arial,sans-serif;
+  --mono:"JetBrains Mono",Consolas,"Courier New",monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:24px}
+body{margin:0;background:var(--fondo);color:var(--texto);font:16px/1.65 var(--fuente);-webkit-font-smoothing:antialiased}
+a{color:var(--primario-2);text-underline-offset:3px}
+a:hover{color:var(--acento)}
+h1,h2,h3,h4{font-family:var(--titulos);color:var(--primario);line-height:1.2;letter-spacing:-.01em}
+h2{font-size:2rem;margin:0 0 .35rem}
+h3{font-size:1.32rem;margin:2.6rem 0 .8rem;padding-top:.4rem}
+h4{font-size:1.04rem;margin:1.6rem 0 .5rem;color:var(--texto)}
+p{margin:.55rem 0 .9rem}
+code{font-family:var(--mono);font-size:.86em;background:var(--calido-2);border:1px solid var(--borde);border-radius:6px;padding:.08em .38em;color:#7A3F1E}
+strong{color:#22282C}
+ul,ol{padding-left:1.25rem;margin:.4rem 0 1rem}
+li{margin:.22rem 0}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* ---------- Portada ---------- */
+.portada{background:linear-gradient(135deg,#173C49 0%,var(--primario) 55%,#2C6476 100%);color:#fff;position:relative;overflow:hidden}
+.portada::after{content:"";position:absolute;right:-120px;top:-120px;width:460px;height:460px;border-radius:50%;border:56px solid rgba(239,233,225,.07)}
+.portada-in{max-width:1180px;margin:0 auto;padding:56px 32px 48px;position:relative;z-index:1}
+.marca{display:flex;align-items:center;gap:12px;font-family:var(--titulos);font-weight:700;font-size:1.05rem;letter-spacing:.18em;color:var(--calido)}
+.marca svg{width:34px;height:34px}
+.portada h1{color:#fff;font-size:clamp(2.2rem,5vw,3.6rem);margin:28px 0 10px;max-width:16ch}
+.portada .bajada{font-size:1.15rem;color:#D7E4E8;max-width:62ch;margin:0}
+.ficha{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;margin-top:36px}
+.ficha div{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:12px;padding:14px 16px}
+.ficha dt{font-size:.74rem;text-transform:uppercase;letter-spacing:.12em;color:#B9D0D7;margin-bottom:4px}
+.ficha dd{margin:0;font-weight:600;color:#fff;font-size:.98rem}
+.ficha a{color:#fff}
+
+/* ---------- Estructura ---------- */
+.marco{max-width:1280px;margin:0 auto;display:grid;grid-template-columns:268px minmax(0,1fr);gap:40px;padding:0 32px}
+nav.indice{position:sticky;top:0;align-self:start;max-height:100vh;overflow:auto;padding:28px 4px 40px 0;font-size:.89rem}
+nav.indice .titulo-indice{font-family:var(--titulos);font-weight:700;color:var(--primario);letter-spacing:.08em;text-transform:uppercase;font-size:.75rem;margin:0 0 10px}
+nav.indice ol{list-style:none;margin:0;padding:0}
+nav.indice > ol > li{margin:2px 0}
+nav.indice a{display:block;padding:6px 10px;border-radius:8px;color:var(--suave);text-decoration:none;border-left:3px solid transparent}
+nav.indice a:hover{background:var(--calido-2);color:var(--primario)}
+nav.indice a.activo{background:var(--primario-claro);color:var(--primario);font-weight:600;border-left-color:var(--primario)}
+nav.indice ol ol{padding-left:12px;margin-bottom:6px}
+nav.indice ol ol a{font-size:.82rem;padding:4px 10px}
+main{min-width:0;padding:36px 0 80px}
+section.fase{background:var(--papel);border:1px solid var(--borde);border-radius:20px;box-shadow:var(--sombra);padding:44px 48px;margin:0 0 36px}
+.cabeza-fase{display:flex;align-items:flex-start;gap:18px;border-bottom:1px solid var(--borde);padding-bottom:22px;margin-bottom:8px}
+.num-fase{flex:none;font-family:var(--titulos);font-weight:700;color:#fff;background:var(--acento);border-radius:12px;padding:8px 12px;font-size:.82rem;letter-spacing:.06em;line-height:1.2;text-align:center}
+.num-fase b{display:block;font-size:1.5rem;letter-spacing:0}
+.cabeza-fase p{color:var(--suave);margin:.2rem 0 0}
+.evidencia{display:inline-flex;flex-wrap:wrap;gap:6px;margin:.2rem 0 .8rem}
+.doc{font-family:var(--mono);font-size:.74rem;background:var(--calido);color:#6E4A2E;border-radius:999px;padding:3px 10px;font-weight:500;white-space:nowrap}
+
+/* ---------- Componentes ---------- */
+.cifras{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin:22px 0 6px}
+.cifra{background:var(--calido-2);border:1px solid var(--borde);border-radius:14px;padding:16px 18px}
+.cifra b{display:block;font-family:var(--titulos);font-size:2rem;color:var(--primario);line-height:1.1}
+.cifra span{font-size:.86rem;color:var(--suave)}
+.rejilla{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin:14px 0 18px}
+.tarjeta{border:1px solid var(--borde);border-radius:var(--radio);padding:18px 20px;background:var(--papel)}
+.tarjeta h4{margin:0 0 .4rem;color:var(--primario)}
+.tarjeta p,.tarjeta ul{margin:.3rem 0 0;font-size:.93rem}
+.tarjeta.acento{border-top:4px solid var(--acento)}
+.tarjeta.primario{border-top:4px solid var(--primario)}
+.nota{border-radius:12px;padding:14px 18px;margin:16px 0;background:var(--primario-claro);border-left:4px solid var(--primario);font-size:.94rem}
+.nota.ambar{background:var(--ambar-claro);border-left-color:var(--ambar)}
+.nota.rojo{background:var(--rojo-claro);border-left-color:var(--rojo)}
+.nota.verde{background:var(--verde-claro);border-left-color:var(--verde)}
+.nota b:first-child{color:var(--primario)}
+.tabla-c{overflow-x:auto;margin:14px 0 20px;border:1px solid var(--borde);border-radius:12px;background:var(--papel)}
+table{border-collapse:collapse;width:100%;font-size:.89rem}
+th{background:var(--calido-2);color:var(--primario);text-align:left;font-weight:600;padding:10px 12px;border-bottom:1px solid var(--borde);white-space:nowrap;font-size:.8rem;letter-spacing:.02em;text-transform:uppercase}
+td{padding:9px 12px;border-bottom:1px solid #EFEBE5;vertical-align:top}
+tr:last-child td{border-bottom:0}
+td code{white-space:nowrap}
+.ids td:first-child{white-space:nowrap;font-weight:600;color:var(--primario)}
+.metodo{font-family:var(--mono);font-size:.74rem;font-weight:600;border-radius:6px;padding:2px 7px;color:#fff;display:inline-block;min-width:54px;text-align:center}
+.GET{background:#2F6B80}.POST{background:#2D6A4F}.PATCH{background:#8A6100}.DELETE{background:#A23B3B}
+.chip{display:inline-block;font-size:.74rem;font-weight:600;border-radius:999px;padding:2px 9px;white-space:nowrap}
+.chip.ok{background:var(--verde-claro);color:var(--verde)}
+.chip.dif{background:var(--ambar-claro);color:var(--ambar)}
+.chip.na{background:#ECEFF1;color:#55616A}
+.chip.pub{background:#ECEFF1;color:#55616A}.chip.cli{background:var(--primario-claro);color:var(--primario)}.chip.adm{background:var(--acento-claro);color:var(--acento)}
+figure.diagrama{margin:22px 0 26px;border:1px solid var(--borde);border-radius:16px;background:#fff;overflow:hidden}
+figure.diagrama .lienzo{overflow-x:auto;padding:16px;cursor:zoom-in}
+figure.diagrama svg{display:block;width:100%;height:auto;min-width:720px}
+figure.diagrama figcaption{border-top:1px solid var(--borde);background:var(--calido-2);padding:12px 18px;font-size:.88rem;color:var(--suave);display:flex;gap:12px;justify-content:space-between;align-items:baseline;flex-wrap:wrap}
+figure.diagrama figcaption b{color:var(--primario)}
+.ampliar{font-size:.78rem;color:var(--primario-2);background:none;border:1px solid var(--borde);border-radius:999px;padding:3px 10px;cursor:pointer;font-family:inherit}
+.ampliar:hover{border-color:var(--primario-2)}
+figure.codigo{margin:16px 0 22px;border-radius:12px;overflow:hidden;background:#17252B;border:1px solid #0E1A1F}
+figure.codigo figcaption{display:flex;justify-content:space-between;gap:12px;padding:8px 14px;background:#0F1C21;color:#9FB6BE;font:500 .76rem/1.4 var(--mono);flex-wrap:wrap}
+figure.codigo pre code{background:none;border:0;padding:0;color:inherit;font-size:inherit;border-radius:0}
+figure.codigo pre{margin:0;padding:14px 16px;overflow-x:auto;color:#E3ECEF;font:.8rem/1.6 var(--mono);tab-size:2}
+.tk-com{color:#7F9AA3;font-style:italic}.tk-str{color:#E8B983}.tk-kw{color:#7CC6DE}.tk-dec{color:#E4A0C0}.tk-num{color:#B9D98A}
+pre.arbol{background:var(--calido-2);border:1px solid var(--borde);border-radius:12px;padding:16px 18px;font:.8rem/1.55 var(--mono);overflow-x:auto;color:#3B444A}
+.linea-tiempo{list-style:none;padding:0;margin:18px 0;position:relative}
+.linea-tiempo::before{content:"";position:absolute;left:94px;top:6px;bottom:6px;width:2px;background:var(--borde)}
+.linea-tiempo li{display:grid;grid-template-columns:82px 1fr;gap:38px;margin:0 0 14px;position:relative}
+.linea-tiempo li::before{content:"";position:absolute;left:88px;top:7px;width:14px;height:14px;border-radius:50%;background:var(--papel);border:3px solid var(--primario-2)}
+.linea-tiempo time{font:600 .8rem/1.6 var(--mono);color:var(--acento);text-align:right}
+.linea-tiempo div{font-size:.93rem}
+.linea-tiempo b{color:var(--primario)}
+.pasos{counter-reset:p;list-style:none;padding:0}
+.pasos > li{counter-increment:p;position:relative;padding:0 0 0 46px;margin:0 0 16px}
+.pasos > li::before{content:counter(p);position:absolute;left:0;top:-2px;width:30px;height:30px;border-radius:50%;background:var(--primario);color:#fff;font:700 .85rem/30px var(--titulos);text-align:center}
+.dos-col{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.pie{max-width:1180px;margin:0 auto;padding:30px 32px 60px;color:var(--tenue);font-size:.85rem;text-align:center}
+.arriba{position:fixed;right:20px;bottom:20px;width:44px;height:44px;border-radius:50%;background:var(--primario);color:#fff;display:grid;place-items:center;text-decoration:none;box-shadow:var(--sombra);opacity:0;pointer-events:none;transition:opacity .2s}
+.arriba.visible{opacity:1;pointer-events:auto}
+.arriba:hover{color:#fff;background:var(--acento)}
+dialog.visor{border:0;padding:0;width:96vw;height:94vh;max-width:none;max-height:none;border-radius:14px;background:#fff}
+dialog.visor::backdrop{background:rgba(17,35,42,.72)}
+dialog.visor .barra{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;border-bottom:1px solid var(--borde);font-weight:600;color:var(--primario)}
+dialog.visor .barra button{font:inherit;border:1px solid var(--borde);background:var(--calido-2);border-radius:999px;padding:4px 14px;cursor:pointer}
+dialog.visor .contenido{height:calc(100% - 50px);overflow:auto;padding:16px}
+dialog.visor svg{width:auto;height:auto;min-width:1400px;max-width:none}
+.movil-indice{display:none}
+
+@media (max-width:1000px){
+  .marco{grid-template-columns:1fr;padding:0 16px;gap:0}
+  nav.indice{display:none}
+  .movil-indice{display:block;margin:20px 0 0}
+  .movil-indice details{background:var(--papel);border:1px solid var(--borde);border-radius:12px;padding:10px 16px}
+  .movil-indice summary{font-weight:600;color:var(--primario);cursor:pointer}
+  .movil-indice ol{font-size:.92rem}
+  section.fase{padding:28px 20px;border-radius:16px}
+  .portada-in{padding:40px 16px 36px}
+  .dos-col{grid-template-columns:1fr}
+  h2{font-size:1.6rem}
+  .pie{padding:24px 16px 48px}
+}
+@media print{
+  body{background:#fff;font-size:11pt}
+  nav.indice,.movil-indice,.arriba,.ampliar{display:none!important}
+  .marco{display:block;padding:0}
+  section.fase{box-shadow:none;border:0;padding:0;margin:0 0 24px;page-break-before:always}
+  figure.diagrama,figure.codigo,.tabla-c,.tarjeta{break-inside:avoid}
+  figure.diagrama svg{min-width:0}
+  .portada{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style>
+</head>
+<body>
+
+<!-- =============================================================== PORTADA -->
+<header class="portada" id="inicio">
+  <div class="portada-in">
+    <div class="marca">
+      <svg viewBox="0 0 40 40" aria-hidden="true"><path d="M8 10h19v16a7 7 0 0 1-7 7h-5a7 7 0 0 1-7-7z" fill="#EFE9E1"/><path d="M27 14h3a5 5 0 0 1 0 10h-3" fill="none" stroke="#EFE9E1" stroke-width="3"/><path d="M12 5c0 2 2 2 2 4M18 5c0 2 2 2 2 4" stroke="#A45A33" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+      MUGLY
+    </div>
+    <h1>Informe del proyecto final</h1>
+    <p class="bajada">Análisis, diseño arquitectónico y desarrollo incremental de MUGLY, la tienda virtual de mugs: desde la atención inicial hasta la versión v1.0.0 en funcionamiento.</p>
+    <dl class="ficha">
+      <div><dt>Proyecto</dt><dd>MUGLY · tienda virtual de mugs</dd></div>
+      <div><dt>Integrantes</dt><dd>Pedro Díaz · Assael Zapata</dd></div>
+      <div><dt>Asignatura</dt><dd>Arquitectura de Software · 2026-2</dd></div>
+      <div><dt>Docente</dt><dd>Rodolfo Ortega Niño</dd></div>
+      <div><dt>Institución</dt><dd>Universidad Cooperativa de Colombia</dd></div>
+      <div><dt>Entrega</dt><dd>Sábado 21 de noviembre de 2026</dd></div>
+      <div><dt>Versión del software</dt><dd>v1.0.0 · migración 9ed994615ffd</dd></div>
+      <div><dt>Repositorio</dt><dd><a href="https://github.com/peddiazd/Backend-MUGLY">github.com/peddiazd/Backend-MUGLY</a></dd></div>
+    </dl>
+  </div>
+</header>
+
+<div class="marco">
+<!-- =============================================================== ÍNDICE -->
+<nav class="indice" aria-label="Contenido del informe">
+  <p class="titulo-indice">Contenido</p>
+  <ol>
+    <li><a href="#resumen">Resumen del proyecto</a></li>
+    <li><a href="#fase01">Fase 01 · Gestión comercial</a>
+      <ol>
+        <li><a href="#f1-solicitud">Solicitud y evaluación</a></li>
+        <li><a href="#f1-reunion">Reunión inicial y responsables</a></li>
+        <li><a href="#f1-expediente">Expediente y cierre</a></li>
+      </ol></li>
+    <li><a href="#fase02">Fase 02 · Requisitos y contratación</a>
+      <ol>
+        <li><a href="#f2-acuerdos">Descubrimiento y acuerdos</a></li>
+        <li><a href="#f2-actores">Actores y sistemas externos</a></li>
+        <li><a href="#f2-rf">Requisitos funcionales</a></li>
+        <li><a href="#f2-rnf">No funcionales y reglas</a></li>
+        <li><a href="#f2-alcance">Alcance (G1)</a></li>
+        <li><a href="#f2-riesgos">Riesgos</a></li>
+        <li><a href="#f2-estimacion">Estimación y autorización</a></li>
+      </ol></li>
+    <li><a href="#fase03">Fase 03 · Scrum, arquitectura y diseño</a>
+      <ol>
+        <li><a href="#f3-scrum">Scrum y backlog</a></li>
+        <li><a href="#f3-drivers">Requisitos de arquitectura</a></li>
+        <li><a href="#f3-estilo">Estilo arquitectónico</a></li>
+        <li><a href="#f3-c4">Diagramas C4</a></li>
+        <li><a href="#f3-logica">Arquitectura lógica</a></li>
+        <li><a href="#f3-uml">Diagramas UML</a></li>
+        <li><a href="#f3-datos">Modelo de datos</a></li>
+        <li><a href="#f3-api">API REST</a></li>
+        <li><a href="#f3-seguridad">Seguridad</a></li>
+        <li><a href="#f3-despliegue">Arquitectura computacional</a></li>
+        <li><a href="#f3-adr">Decisiones (ADR)</a></li>
+        <li><a href="#f3-calidad">Atributos y riesgos</a></li>
+        <li><a href="#f3-prototipos">Prototipos y G2</a></li>
+      </ol></li>
+    <li><a href="#fase04">Fase 04 · Preparación técnica</a>
+      <ol>
+        <li><a href="#f4-repo">Repositorio</a></li>
+        <li><a href="#f4-entorno">Entorno y dependencias</a></li>
+        <li><a href="#f4-bd">Base de datos y migraciones</a></li>
+        <li><a href="#f4-convenciones">Convenciones</a></li>
+        <li><a href="#f4-ejecucion">Instalación y ejecución</a></li>
+      </ol></li>
+    <li><a href="#fase05">Fase 05 · Desarrollo incremental</a>
+      <ol>
+        <li><a href="#f5-incrementos">Incrementos</a></li>
+        <li><a href="#f5-sprint">Historias del Sprint</a></li>
+        <li><a href="#f5-recorrido">Recorrido de una funcionalidad</a></li>
+        <li><a href="#f5-frontend">Piezas del frontend</a></li>
+        <li><a href="#f5-migracion">Migración de datos</a></li>
+        <li><a href="#f5-pruebas">Pruebas de funcionamiento</a></li>
+        <li><a href="#f5-trazabilidad">Diseño ↔ código</a></li>
+      </ol></li>
+    <li><a href="#anexos">Anexos</a></li>
+  </ol>
+</nav>
+
+<main>
+<div class="movil-indice">
+  <details><summary>Contenido del informe</summary>
+    <ol>
+      <li><a href="#resumen">Resumen</a></li><li><a href="#fase01">Fase 01 · Gestión comercial</a></li>
+      <li><a href="#fase02">Fase 02 · Requisitos y contratación</a></li><li><a href="#fase03">Fase 03 · Scrum, arquitectura y diseño</a></li>
+      <li><a href="#fase04">Fase 04 · Preparación técnica</a></li><li><a href="#fase05">Fase 05 · Desarrollo incremental</a></li>
+      <li><a href="#anexos">Anexos</a></li>
+    </ol>
+  </details>
+</div>
+
+<!-- =============================================================== RESUMEN -->
+<section class="fase" id="resumen">
+  <div class="cabeza-fase">
+    <div class="num-fase">MUGLY<b>v1.0</b></div>
+    <div>
+      <h2>Resumen del proyecto</h2>
+      <p>Qué es MUGLY, qué necesidad atiende y cómo está construido.</p>
+    </div>
+  </div>
+  <p><strong>MUGLY</strong> es la plataforma web de un negocio real de venta de mugs, cuyos propietarios son Pedro Díaz y Assael Zapata. Antes de MUGLY la venta se apoyaba en conversaciones informales y procesos manuales, lo que dificultaba organizar pedidos, seguir las ventas y controlar el inventario (MUGS.pdf §1–§2). MUGLY centraliza en un solo sistema el <strong>catálogo, el carrito, los pedidos, el inventario, los clientes y los envíos</strong>, y ofrece al dueño del negocio un <strong>panel de administración</strong>.</p>
+  <p>El proyecto se desarrolló como trabajo de la asignatura Arquitectura de Software (2026-2), siguiendo de forma adaptada el manual metodológico de la asignatura: gestión comercial, descubrimiento de requisitos, Scrum con Jira, diseño arquitectónico con decisiones registradas (ADR), preparación técnica y desarrollo incremental con pruebas.</p>
+
+  <div class="cifras">
+    <div class="cifra"><b>22</b><span>requisitos funcionales (21 cumplidos, 1 diferido)</span></div>
+    <div class="cifra"><b>15</b><span>casos de uso</span></div>
+    <div class="cifra"><b>18</b><span>reglas de negocio</span></div>
+    <div class="cifra"><b>3</b><span>dominios: usuarios, productos y pedidos</span></div>
+    <div class="cifra"><b>23</b><span>endpoints REST (21 bajo <code>/api/v1</code>)</span></div>
+    <div class="cifra"><b>20/20</b><span>historias de Jira en Listo</span></div>
+    <div class="cifra"><b>65</b><span>pruebas automáticas aprobadas</span></div>
+    <div class="cifra"><b>18</b><span>documentos aprobados en el expediente</span></div>
+  </div>
+
+  <div class="rejilla">
+    <div class="tarjeta primario"><h4>Para el cliente</h4><p>Registro e ingreso, catálogo con búsqueda, detalle con foto y disponibilidad, carrito limitado por el stock, confirmación del pedido, pago coordinado por WhatsApp, «Mis pedidos» con progreso, transportadora y guía, y solicitud de mugs personalizados.</p></div>
+    <div class="tarjeta acento"><h4>Para el administrador</h4><p>Productos con foto e inventario, confirmación del pago con descuento automático del stock, envío con transportadora y guía, entrega, cancelación, registro de pedidos personalizados y gestión de clientes (editar, activar o desactivar).</p></div>
+    <div class="tarjeta"><h4>Arquitectura</h4><p>Cliente-servidor con una <strong>SPA en JavaScript Vanilla y Bootstrap</strong> que consume una <strong>API REST en Flask</strong>, organizada como <strong>monolito modular por dominios y capas</strong> (controladores, DTO, servicios, repositorios y modelos) sobre <strong>MySQL</strong> con SQLAlchemy y migraciones.</p></div>
+  </div>
+  <div class="nota"><b>Cómo leer este informe.</b> Cada fase indica los documentos del expediente que la respaldan (códigos <span class="doc">MGL-…</span>, guardados en Google Drive) y las evidencias en Jira y GitHub. Los diagramas se generan desde <code>docs/diagramas/generar_diagramas.py</code> y los fragmentos de código se extraen del repositorio al construir el informe, por lo que corresponden a la misma versión del software. Haga clic en cualquier diagrama para ampliarlo.</div>
+</section>
+
+<!-- =============================================================== FASE 01 -->
+<section class="fase" id="fase01">
+  <div class="cabeza-fase">
+    <div class="num-fase">FASE<b>01</b></div>
+    <div>
+      <h2>Gestión comercial y atención inicial</h2>
+      <p>Recepción de la solicitud, evaluación preliminar, asignación de responsables y apertura del expediente.</p>
+    </div>
+  </div>
+  <div class="evidencia"><span class="doc">MGL-COM-001</span><span class="doc">MGL-DEC-001</span><span class="doc">MGL-REU-001</span><span class="doc">MGL-REU-002</span></div>
+
+  <div class="nota ambar"><b>Adaptación del manual.</b> En MUGLY los propietarios del negocio y el equipo de desarrollo son las mismas dos personas. Por eso los documentos de esta fase se elaboraron como <em>regularización</em> el 19/11/2026: registran hechos ocurridos desde el 01/10/2026 sin simular que se escribieron en su momento.</div>
+
+  <h3 id="f1-solicitud">1.1 Registro de la solicitud y evaluación preliminar</h3>
+  <div class="dos-col">
+    <div class="tabla-c"><table>
+      <tr><th colspan="2">Solicitud (etapa 01.01)</th></tr>
+      <tr><td><strong>Fecha</strong></td><td>01/10/2026, inicio del proyecto</td></tr>
+      <tr><td><strong>Origen</strong></td><td>Conversación entre Pedro Díaz y Assael Zapata, propietarios de MUGLY</td></tr>
+      <tr><td><strong>Canal</strong></td><td>Verbal (no existe mensaje escrito)</td></tr>
+      <tr><td><strong>Producto</strong></td><td>Plataforma web para comercializar y gestionar mugs</td></tr>
+      <tr><td><strong>Pendientes</strong></td><td>Pasarela de pago, transportadora, tecnología y mecanismo de confirmación del pago (MUGS.pdf §9.3)</td></tr>
+    </table></div>
+    <div class="tabla-c"><table>
+      <tr><th>Riesgo evidente (01.02)</th><th>Origen</th></tr>
+      <tr><td>Pasarela de pago no seleccionada</td><td>MUGS.pdf §9.1</td></tr>
+      <tr><td>Empresa de transporte no seleccionada</td><td>MUGS.pdf §9.1</td></tr>
+      <tr><td>Dos personas para todo el ciclo</td><td>Composición del equipo</td></tr>
+      <tr><td>Plazo sujeto al calendario académico</td><td>Asignatura 2026-2</td></tr>
+    </table></div>
+  </div>
+  <p><strong>Decisión (MGL-DEC-001):</strong> continuar hacia el descubrimiento de requisitos. Se descartó declinar el proyecto, y no fue necesario pedir aclaraciones porque los propietarios son el mismo equipo. El alcance (catálogo, compras, pedidos, inventario, clientes, envíos y administración) es abordable por dos personas como monolito modular, como ya planteaba MUGS.pdf §17. La idea fue aprobada por el docente.</p>
+  <p><strong>Etapa 01.03, respuesta formal al cliente:</strong> <span class="chip na">No aplica</span>. No existe un cliente externo al que responder por escrito.</p>
+
+  <h3 id="f1-reunion">1.2 Reunión inicial y asignación de responsables</h3>
+  <div class="tabla-c"><table>
+    <tr><th>Responsable</th><th>Área</th><th>Rol en Scrum</th></tr>
+    <tr><td><strong>Pedro Díaz</strong></td><td>Backend: API Flask, base de datos y pruebas</td><td>Developer backend · PO, SM y arquitectura compartidos</td></tr>
+    <tr><td><strong>Assael Zapata</strong></td><td>Diseño y desarrollo del frontend (SPA)</td><td>Developer frontend · PO, SM y arquitectura compartidos</td></tr>
+  </table></div>
+  <p>En la reunión inicial de octubre de 2026 (MGL-REU-001) se acordó desarrollar MUGLY como tienda virtual y gestionar los mugs personalizados por WhatsApp. La fecha exacta de la reunión no quedó registrada y figura como pendiente no bloqueante.</p>
+
+  <h3 id="f1-expediente">1.3 Apertura del expediente y cierre de la fase</h3>
+  <p>El expediente se abrió en Google Drive (<code>MUGLY/</code>) con una carpeta por fase del manual y un índice maestro en Excel. Cada documento recibe un código <code>MGL-&lt;TIPO&gt;-&lt;NNN&gt;</code>. El prefijo MGL evita confundir los documentos con las claves de Jira (<code>MUG-n</code>).</p>
+<pre class="arbol">MUGLY/
+├── 00_Control_Documental/      Indice_Documental_MUGLY.xlsx
+├── 01_Gestion_Comercial/       MGL-COM-001 · MGL-DEC-001 · MGL-REU-001 · MGL-REU-002
+├── 02_Descubrimiento_Requisitos/  MUGS.pdf (MGL-REQ-001) · MGL-REU-003 · MGL-REQ-002 · MGL-ALC-001
+├── 03_Propuesta_Contratacion/  MGL-EST-001 · MGL-AUT-001
+├── 04_Gestion_Proyecto/        MGL-RIE-001 · MGL-SCR-001 · MGL-BKL-001
+├── 05_Arquitectura_Diseno/     MGL-ARQ-001 (ADR-001 a ADR-007)
+├── 06_Desarrollo_Pruebas/      MGL-TST-001
+├── 07_Despliegue_Entregas/     MGL-REL-001 · MGL-ENT-001
+└── 08_Operacion_Mantenimiento/ MGL-CIE-001</pre>
+  <p>Con MGL-REU-002 los propietarios cerraron la fase 01 y habilitaron la fase 02. Los estados posibles de un documento son Borrador, En revisión, Aprobado, Vigente, Sustituido y Cerrado.</p>
+</section>
+
+<!-- =============================================================== FASE 02 -->
+<section class="fase" id="fase02">
+  <div class="cabeza-fase">
+    <div class="num-fase">FASE<b>02</b></div>
+    <div>
+      <h2>Descubrimiento, requisitos y contratación</h2>
+      <p>Del documento de requisitos MUGS.pdf a una línea base de alcance aprobada, con riesgos, estimación y autorización.</p>
+    </div>
+  </div>
+  <div class="evidencia"><span class="doc">MGL-REQ-001 · MUGS.pdf</span><span class="doc">MGL-REU-003</span><span class="doc">MGL-REQ-002</span><span class="doc">MGL-ALC-001</span><span class="doc">MGL-RIE-001</span><span class="doc">MGL-EST-001</span><span class="doc">MGL-AUT-001</span></div>
+
+  <p>La fuente de los requisitos es <strong>MUGS.pdf</strong> (46 páginas), que define el problema, los actores, los requisitos RF01–RF22, los no funcionales, los requisitos arquitectónicamente relevantes, las reglas de negocio RN01–RN18, los casos de uso CU01–CU15, los mockups y una primera propuesta C4. Una auditoría del repositorio (19/11/2026) encontró vacíos y contradicciones entre el documento y el código. Por ejemplo, el cliente podía confirmar su propio pago. Esos vacíos se resolvieron en una sesión de descubrimiento.</p>
+
+  <h3 id="f2-acuerdos">2.1 Entrevista de descubrimiento y acuerdos de negocio</h3>
+  <div class="tabla-c ids"><table>
+    <tr><th>ID</th><th>Tema</th><th>Acuerdo</th><th>Afecta</th></tr>
+    <tr><td><strong>D1</strong></td><td>Registro del pedido</td><td>El pedido nace <em>pendiente</em> y no descuenta inventario. Cuenta como compra confirmada al confirmarse el pago (RN06).</td><td>RF06, RF08</td></tr>
+    <tr><td><strong>D2</strong></td><td>Estados</td><td>pendiente → pagado → enviado → entregado; si el pago no se concreta o el cliente desiste: cancelado.</td><td>RF10, RF17</td></tr>
+    <tr><td><strong>D3</strong></td><td>Confirmación del pago</td><td>Sin pasarela, el pago se coordina por WhatsApp y <strong>solo el administrador</strong> lo registra.</td><td>RF07, RF16</td></tr>
+    <tr><td><strong>D4a</strong></td><td>Personalizados</td><td>El cliente va a WhatsApp; luego el administrador registra el pedido personalizado en MUGLY.</td><td>RF11, RF12, RF22</td></tr>
+    <tr><td><strong>D4b</strong></td><td>Envío</td><td>El administrador registra transportadora y número de guía.</td><td>RF19, RF20</td></tr>
+    <tr><td><strong>D5</strong></td><td>Clientes</td><td>El administrador consulta, edita y desactiva clientes; desactivar bloquea el ingreso sin borrar la cuenta.</td><td>RF18</td></tr>
+    <tr><td><strong>D6</strong></td><td>Imagen</td><td>El administrador sube la foto del producto, que se guarda en el servidor.</td><td>RF04, RF14</td></tr>
+    <tr><td><strong>D7</strong></td><td>Repositorio</td><td>Un repositorio con carpetas <code>backend/</code> y <code>frontend/</code>; SPA Vanilla JS + Bootstrap.</td><td>RNF01</td></tr>
+    <tr><td><strong>D8</strong></td><td>Pasarela y transporte</td><td>No se seleccionan en esta versión; se gestionan por WhatsApp y registro del administrador.</td><td>RF21</td></tr>
+  </table></div>
+
+  <h3 id="f2-actores">2.2 Actores, interesados y sistemas externos</h3>
+  <div class="rejilla">
+    <div class="tarjeta primario"><h4>Cliente</h4><p>Se registra, consulta el catálogo, compra, paga, consulta sus pedidos y solicita mugs personalizados.</p></div>
+    <div class="tarjeta primario"><h4>Administrador</h4><p>Gestiona productos, inventario, pedidos, clientes, envíos y guías. Es el propietario del negocio.</p></div>
+    <div class="tarjeta"><h4>WhatsApp</h4><p>Canal externo para coordinar el pago y definir los personalizados. La conversación queda fuera de MUGLY (RN16).</p></div>
+    <div class="tarjeta"><h4>Transportadora y pasarela</h4><p>Servicios externos no seleccionados (MUGS.pdf §9.1). En v1.0 no hay integración con ninguno (D8).</p></div>
+  </div>
+
+  <h3 id="f2-rf">2.3 Requisitos funcionales y trazabilidad</h3>
+  <p>La matriz MGL-REQ-002 relaciona cada requisito con su caso de uso, el acuerdo que lo precisa y su criterio de aceptación. La última columna muestra dónde quedó implementado en la versión v1.0.0.</p>
+  <div class="tabla-c ids"><table>
+    <tr><th>RF</th><th>Requisito</th><th>CU</th><th>Acuerdo</th><th>Implementación v1.0</th><th>Estado</th></tr>
+    <tr><td>RF01</td><td>Registrarse como cliente</td><td>CU01</td><td></td><td><code>POST /usuarios/registro</code> · página registro</td><td><span class="chip ok">Cumplido</span></td></tr>
+    <tr><td>RF02</td><td>Iniciar sesión</td><td>CU02</td><td>D5</td><td><code>POST /usuarios/login</code> (403 si está desactivada)</td><td><span class="chip ok">Cumplido</span></td></tr>
+    <tr><td>RF03</td><td>Consultar el catálogo</td><td>CU03</td><td></td><td><code>GET /productos</code> (solo disponibles) · inicio</td><td><span class="chip ok">Cumplido</span></td></tr>
+    <tr><td>RF04</td><td>Información del producto</td><td>CU04</td><td>D6</td><td><code>GET /productos/{id}</code> con imagen · detalle</td><td><span class="chip ok">Cumplido</span></td></tr>
+    <tr><td>RF05</td><td>Seleccionar productos</td><td>CU05</td><td></td><td>Carrito en <code>estado.js</code> limitado por stock</td><td><span class="chip ok">Cumplido</span></td></tr>
+    <tr><td>RF06</td><td>Proceso de compra</td><td>CU05</td><td>D1</td><td><code>POST /pedidos</code> → pendiente</td><td><span class="chip ok">Cumplido</span></td></tr>
+    <tr><td>RF07</td><td>Pagar la compra</td><td>CU06</td><td>D3, D8</td><td>WhatsApp + <code>PATCH /admin/pedidos/{id}/estado</code></td><td><span class="chip ok">Cumplido</span></td></tr>
+    <tr><td>RF08</td><td>Registrar el pedido</td><td>CU05</td><td>D1</td><td>Pedido, detalles, precio unitario, total e historial</td><td><span class="chip ok">Cumplido</span></td></tr>
+    <tr><td>RF09</td><td>Consultar mis pedidos</td><td>CU07</td><td></td><td><code>GET /pedidos</code> (solo propios) · Mis pedidos</td><td><span class="chip ok">Cumplido</span></td></tr>
+    <tr><td>RF10</td><td>Estado del pedido</td><td>CU08</td><td>D2</td><td><code>GET /pedidos/{id}</code> con estado, envío e historial</td><td><span class="chip ok">Cumplido</span></td></tr>
+    <tr><td>RF11</td><td>Solicitud de personalizado</td><td>CU09</td><td>D4a</td><td>Página Personalizados + <code>POST /admin/pedidos/personalizados</code></td><td><span class="chip ok">Cumplido</span></td></tr>
+    <tr><td>RF12</td><td>Dirigir a WhatsApp</td><td>CU09</td><td>D4a</td><td>Enlace <code>wa.me/573133612247</code> con mensaje</td><td><span class="chip ok">Cumplido</span></td></tr>
+    <tr><td>RF13</td><td>Ingreso del administrador</td><td>CU02</td><td></td><td><code>@requiere_admin</code> · rutas <code>admin: true</code></td><td><span class="chip ok">Cumplido</span></td></tr>
+    <tr><td>RF14</td><td>Gestionar productos</td><td>CU10</td><td>D6</td><td>CRUD, foto y retiro lógico · admin/productos</td><td><span class="chip ok">Cumplido</span></td></tr>
+    <tr><td>RF15</td><td>Gestionar inventario</td><td>CU11</td><td></td><td>Ajuste de <code>cantidad_stock</code> (≥ 0)</td><td><span class="chip ok">Cumplido</span></td></tr>
+    <tr><td>RF16</td><td>Actualizar inventario al confirmar</td><td>CU11</td><td>D1, D3</td><td>Descuento con <code>SELECT … FOR UPDATE</code> al pasar a pagado</td><td><span class="chip ok">Cumplido</span></td></tr>
+    <tr><td>RF17</td><td>Gestionar pedidos</td><td>CU12</td><td>D2</td><td>Transiciones validadas · admin/pedidos</td><td><span class="chip ok">Cumplido</span></td></tr>
+    <tr><td>RF18</td><td>Gestionar clientes</td><td>CU13</td><td>D5</td><td><code>GET/PATCH /admin/usuarios/{id}</code> · admin/clientes</td><td><span class="chip ok">Cumplido</span></td></tr>
+    <tr><td>RF19</td><td>Información de envío</td><td>CU14</td><td>D4b</td><td>Transportadora y guía obligatorias al enviar</td><td><span class="chip ok">Cumplido</span></td></tr>
+    <tr><td>RF20</td><td>Registrar la guía</td><td>CU15</td><td>D4b</td><td><code>numero_guia</code> visible para el cliente</td><td><span class="chip ok">Cumplido</span></td></tr>
+    <tr><td>RF21</td><td>Comunicación con pasarela</td><td>CU06</td><td>D8</td><td>Fuera de v1.0 por decisión de los propietarios</td><td><span class="chip dif">Diferido</span></td></tr>
+    <tr><td>RF22</td><td>Dirigir a WhatsApp</td><td>CU09</td><td>D4a</td><td>Igual que RF12</td><td><span class="chip ok">Cumplido</span></td></tr>
+  </table></div>
+
+  <h3 id="f2-rnf">2.4 Requisitos no funcionales y reglas de negocio</h3>
+  <div class="tabla-c ids"><table>
+    <tr><th>ID</th><th>Requisito no funcional (MUGS.pdf §7.2)</th><th>Cómo se cumple</th></tr>
+    <tr><td>RNF01</td><td>Interfaz web para clientes y administradores</td><td>SPA Vanilla JS + Bootstrap (D7)</td></tr>
+    <tr><td>RNF02</td><td>Información organizada y consistente</td><td>Modelo relacional en MySQL con migraciones</td></tr>
+    <tr><td>RNF03</td><td>Acceso administrativo diferenciado</td><td>Roles en el backend (401/403) y rutas protegidas en la SPA</td></tr>
+    <tr><td>RNF04</td><td>Conservar la información de los pedidos</td><td>Retiro lógico de productos con pedidos; historial de estados</td></tr>
+    <tr><td>RNF05</td><td>Compras, pedidos e inventario consistentes</td><td>Transacción con bloqueo de filas al confirmar el pago</td></tr>
+    <tr><td>RNF06</td><td>Interacción con servicios externos</td><td>WhatsApp por enlace; pasarela diferida (D8)</td></tr>
+  </table></div>
+  <p>Las 18 reglas de negocio se agrupan en cinco bloques (MUGS.pdf §8). Algunas se ajustaron con los acuerdos de la sesión de descubrimiento:</p>
+  <div class="rejilla">
+    <div class="tarjeta"><h4>Compra (RN01–RN05)</h4><p>Solo se compran mugs disponibles; toda compra pasa por el pago. Mientras no haya pasarela, el resultado lo registra el administrador (ajuste D3). El inventario se actualiza al confirmar.</p></div>
+    <div class="tarjeta"><h4>Pedidos (RN06–RN09)</h4><p>Cada compra confirmada se asocia a un pedido. Este nace pendiente y cuenta al pasar a pagado (ajuste D1), conserva su seguimiento y lleva transportadora y guía.</p></div>
+    <div class="tarjeta"><h4>Inventario (RN10–RN12)</h4><p>El stock refleja la disponibilidad, la compra confirmada lo descuenta y su gestión corresponde al administrador.</p></div>
+    <div class="tarjeta"><h4>Personalizados (RN13–RN16)</h4><p>Siguen un proceso distinto: inician en MUGLY, se definen por WhatsApp fuera del sistema y el administrador registra el resultado.</p></div>
+    <div class="tarjeta"><h4>Administración (RN17–RN18)</h4><p>El administrador gestiona productos, pedidos, clientes e inventario con funciones diferenciadas de las del cliente.</p></div>
+  </div>
+  <p><strong>Restricciones y supuestos (MUGS.pdf §9):</strong> la pasarela y la transportadora no están seleccionadas; la conversación de WhatsApp ocurre fuera de MUGLY; el procesamiento del pago y la operación física de los envíos son responsabilidad de terceros. La pregunta abierta sobre la tecnología quedó resuelta por los requisitos de la asignatura (ADR-002), y la del mecanismo de confirmación del pago por el acuerdo D3.</p>
+
+  <h3 id="f2-alcance">2.5 Línea base de alcance (puerta G1)</h3>
+  <div class="dos-col">
+    <div class="tarjeta primario"><h4>Incluido en v1.0</h4><ul>
+      <li>Cuentas y acceso: RF01, RF02, RF13 y desactivación (RF18)</li>
+      <li>Catálogo con imagen: RF03, RF04</li>
+      <li>Compra y pedidos: RF05, RF06, RF08–RF10</li>
+      <li>Pago con confirmación del administrador: RF07 (D3)</li>
+      <li>Personalizados: RF11, RF12, RF22</li>
+      <li>Administración: RF14–RF18 · Envíos: RF19, RF20</li></ul></div>
+    <div class="tarjeta acento"><h4>Fuera de v1.0</h4><ul>
+      <li>Integración con pasarela de pago (RF21, D8)</li>
+      <li>Integración con transportadora (solo se registra la guía)</li>
+      <li>Procesamiento financiero, operación física de envíos y gestión de chats de WhatsApp (MUGS.pdf §5.3)</li>
+      <li>Despliegue en la nube: la entrega se ejecuta en local</li></ul></div>
+  </div>
+  <p>Un requisito se acepta cuando su criterio de MGL-REQ-002 se demuestra con pruebas ejecutadas. Tras la puerta G1, cualquier cambio de alcance se trata como solicitud de cambio (manual, etapa 05.12).</p>
+
+  <h3 id="f2-riesgos">2.6 Viabilidad y riesgos</h3>
+  <div class="tabla-c ids"><table>
+    <tr><th>ID</th><th>Riesgo</th><th>Prob.</th><th>Impacto</th><th>Mitigación</th></tr>
+    <tr><td>R1</td><td>Plazo de entrega con el frontend sin empezar</td><td>Alta</td><td>Alto</td><td>Paquetes de trabajo con aprobación agrupada; priorizar flujos de cliente y administrador</td></tr>
+    <tr><td>R2</td><td>El cliente podía confirmar su propio pago</td><td>Alta</td><td>Alto</td><td>Confirmación solo del administrador (ADR-005) con pruebas de seguridad</td></tr>
+    <tr><td>R3</td><td>Dos personas para todo el ciclo</td><td>Alta</td><td>Medio</td><td>Reparto backend/frontend; asistente de IA con revisión humana</td></tr>
+    <tr><td>R4</td><td>Cambios de alcance tardíos</td><td>Media</td><td>Alto</td><td>Línea base G1 y control de cambios</td></tr>
+    <tr><td>R5</td><td>Borrar productos con pedidos fallaba en MySQL</td><td>Media</td><td>Medio</td><td>Retiro lógico (disponible = falso)</td></tr>
+    <tr><td>R6</td><td><code>SECRET_KEY</code> en el repositorio público</td><td>Media</td><td>Alto</td><td><span class="chip dif">Aceptado</span> para la entrega local; rotarla antes de cualquier despliegue</td></tr>
+    <tr><td>R7</td><td>Errores al registrar manualmente pagos y personalizados</td><td>Media</td><td>Medio</td><td>Transiciones validadas e historial con fecha y usuario</td></tr>
+    <tr><td>R8</td><td>Pérdida de datos por MySQL local sin respaldo</td><td>Baja</td><td>Alto</td><td>Respaldo con mysqldump verificado con restauración</td></tr>
+  </table></div>
+
+  <h3 id="f2-estimacion">2.7 Estimación, cronograma y autorización</h3>
+  <p>La estimación se hizo <strong>solo en horas</strong>, sin valor monetario, por decisión de los propietarios. Las horas trabajadas entre el 01/10 y el 19/11 no se registraron. El trabajo restante se estimó en <strong>24 horas</strong>:</p>
+  <div class="tabla-c"><table>
+    <tr><th>Paquete de trabajo</th><th>Responsable</th><th>Horas</th></tr>
+    <tr><td>Fase 02: matriz, alcance, riesgos, estimación y autorización</td><td>Ambos</td><td>2</td></tr>
+    <tr><td>Fase 03: backlog en Jira, definición de terminado, ADR y diagramas</td><td>Ambos</td><td>2</td></tr>
+    <tr><td>Backend: estados del pedido y confirmación del pago</td><td>Pedro Díaz</td><td>1,5</td></tr>
+    <tr><td>Backend: envíos, personalizados y gestión de clientes</td><td>Pedro Díaz</td><td>3</td></tr>
+    <tr><td>Backend: imagen, catálogo disponible y retiro lógico</td><td>Pedro Díaz</td><td>1,5</td></tr>
+    <tr><td>Frontend: base SPA, catálogo, carrito y compra</td><td>Assael Zapata</td><td>5</td></tr>
+    <tr><td>Frontend: registro, ingreso, mis pedidos y personalizados</td><td>Assael Zapata</td><td>2</td></tr>
+    <tr><td>Frontend: panel de administración</td><td>Assael Zapata</td><td>4</td></tr>
+    <tr><td>Integración, pruebas de punta a punta y ajustes</td><td>Ambos</td><td>3</td></tr>
+    <tr><td><strong>Total</strong></td><td></td><td><strong>24</strong></td></tr>
+  </table></div>
+  <ol class="linea-tiempo">
+    <li><time>01/10</time><div><b>Inicio</b> e idea aprobada por el docente.</div></li>
+    <li><time>Oct–Nov</time><div><b>Requisitos</b> (MUGS.pdf) y primer backend: usuarios, productos y pedidos.</div></li>
+    <li><time>19/11</time><div><b>Auditoría</b>, separación backend/frontend y fases 01–03 · puertas <b>G1</b> (alcance) y <b>G2</b> (diseño).</div></li>
+    <li><time>19–20/11</time><div><b>Backend</b> del Sprint con pruebas · puerta <b>G3</b> (línea base técnica).</div></li>
+    <li><time>20/11</time><div><b>Frontend SPA</b> completo e integración.</div></li>
+    <li><time>21/11</time><div><b>Entrega</b> · puerta <b>G4</b>.</div></li>
+  </ol>
+  <p><strong>Autorización (MGL-AUT-001):</strong> el proyecto lo autorizó el docente Rodolfo Ortega Niño al aprobar la idea en octubre de 2026. La <strong>cotización en dinero (02.10)</strong> y la <strong>propuesta comercial y el contrato (02.11)</strong> <span class="chip na">No aplican</span>, porque no existe un cliente externo: los propietarios son el equipo.</p>
+</section>
+
+<!-- =============================================================== FASE 03 -->
+<section class="fase" id="fase03">
+  <div class="cabeza-fase">
+    <div class="num-fase">FASE<b>03</b></div>
+    <div>
+      <h2>Scrum, arquitectura y diseño</h2>
+      <p>Organización del trabajo y diseño de la arquitectura de software y computacional que luego se implementó.</p>
+    </div>
+  </div>
+  <div class="evidencia"><span class="doc">MGL-SCR-001</span><span class="doc">MGL-BKL-001</span><span class="doc">MGL-ARQ-001</span><span class="doc">Jira · proyecto MUG</span><span class="doc">docs/diagramas</span></div>
+
+  <h3 id="f3-scrum">3.1 Scrum: equipo, herramientas y backlog</h3>
+  <div class="rejilla">
+    <div class="tarjeta"><h4>Roles</h4><ul><li>Product Owner, Scrum Master y arquitectura: compartidos</li><li>Developer backend: Pedro Díaz</li><li>Developer frontend: Assael Zapata</li></ul></div>
+    <div class="tarjeta"><h4>Herramientas</h4><ul><li><strong>Jira</strong> (proyecto MUG): backlog y Sprint</li><li><strong>GitHub</strong>: código, ramas y Pull Requests</li><li><strong>Google Drive</strong>: expediente documental</li><li><strong>Claude Code</strong>: asistente de IA, con toda salida revisada por el equipo</li></ul></div>
+    <div class="tarjeta"><h4>Sprint</h4><p>Por el plazo se ejecutó un único Sprint corto, «MUGLY Sprint 1», del 19 al 21/11/2026, en lugar de Sprints de dos semanas. El tablero tenía las columnas Por hacer → En curso → En revisión → Listo, con un máximo de 2 tarjetas en curso.</p></div>
+  </div>
+  <p>El backlog (MGL-BKL-001) se cargó en Jira con <strong>7 épicas</strong> (MUG-2 a MUG-8) y <strong>20 historias</strong> (MUG-9 a MUG-28). Las historias MUG-9 a MUG-12 ya estaban construidas antes del Sprint; las otras 16 se desarrollaron en él.</p>
+  <div class="tabla-c"><table>
+    <tr><th>Épica</th><th>Historias</th><th>Ejemplo de criterio de aceptación</th></tr>
+    <tr><td>Cuentas y clientes · MUG-2</td><td>MUG-9, MUG-17</td><td>Un cliente desactivado no puede iniciar sesión ni usar su token</td></tr>
+    <tr><td>Catálogo y productos · MUG-3</td><td>MUG-10, MUG-18, MUG-19, MUG-20</td><td>Producto con pedidos → se marca no disponible en vez de borrarse</td></tr>
+    <tr><td>Compra y pedidos · MUG-4</td><td>MUG-11, MUG-12, MUG-13, MUG-14</td><td>Solo el administrador pasa el pedido a pagado y el stock se descuenta una vez; el cliente recibe 403</td></tr>
+    <tr><td>Envíos · MUG-5</td><td>MUG-15</td><td>Pasar a enviado exige transportadora y guía</td></tr>
+    <tr><td>Personalizados · MUG-6</td><td>MUG-16, MUG-24</td><td>El botón abre WhatsApp +57 313 361 2247 con un mensaje inicial</td></tr>
+    <tr><td>Frontend SPA · MUG-7</td><td>MUG-21 a MUG-26</td><td>Carrito con cantidades limitadas por el stock; vistas protegidas por rol</td></tr>
+    <tr><td>Calidad y entrega · MUG-8</td><td>MUG-27, MUG-28</td><td>Flujos de punta a punta probados; respaldo restaurable de la base</td></tr>
+  </table></div>
+  <div class="dos-col">
+    <div class="tarjeta primario"><h4>Definición de Listo (DoR)</h4><ul><li>Actor, necesidad y beneficio</li><li>Criterios verificables trazados a MGL-REQ-002</li><li>Dependencias identificadas</li><li>Si cambia la API o la BD, el diseño está en MGL-ARQ-001</li></ul></div>
+    <div class="tarjeta acento"><h4>Definición de Terminado (DoD)</h4><ul><li>Respeta controladores, servicios, repositorios, DTO y modelos</li><li>Tiene pruebas y toda la suite pasa</li><li>Los cambios de esquema tienen migración</li><li>Verificado en el navegador si tiene interfaz</li><li>Commit con clave de Jira, en GitHub, tarjeta en Listo</li></ul></div>
+  </div>
+
+  <h3 id="f3-drivers">3.2 Requisitos arquitectónicamente relevantes, restricciones y atributos de calidad</h3>
+  <div class="tabla-c"><table>
+    <tr><th>RAR (MUGS.pdf §7.3)</th><th>Respuesta en la arquitectura</th></tr>
+    <tr><td>RAR01 · Centralizar productos, clientes, pedidos e inventario</td><td>Una sola API con una base de datos relacional (ADR-001)</td></tr>
+    <tr><td>RAR02–RAR03 · Integrarse con una pasarela y recibir el resultado</td><td>Diferido (D8). La confirmación se aísla en <code>PedidoServicio.cambiar_estado</code>: cuando exista pasarela solo cambia quién la invoca (ADR-005)</td></tr>
+    <tr><td>RAR04 · Inventario actualizado por la compra confirmada</td><td>Descuento transaccional con bloqueo de filas al pasar a pagado</td></tr>
+    <tr><td>RAR05 · Información de envíos de una empresa externa</td><td>Campos <code>transportadora</code> y <code>numero_guia</code> en el pedido</td></tr>
+    <tr><td>RAR06 · Direccionamiento a WhatsApp</td><td>Enlaces <code>wa.me</code> generados en la SPA</td></tr>
+    <tr><td>RAR07 · Responsabilidades diferenciadas cliente/administrador</td><td>Autorización por rol en el backend y rutas protegidas en el frontend</td></tr>
+    <tr><td>RAR08 · Conservar la información de los pedidos</td><td>Historial de estados, precio unitario congelado y retiro lógico de productos</td></tr>
+  </table></div>
+  <div class="dos-col">
+    <div class="tarjeta"><h4>Restricciones técnicas (asignatura)</h4><ul><li>Frontend HTML5, CSS3 y JavaScript Vanilla como SPA, con Bootstrap o Tailwind; sin React, Angular ni Vue</li><li>Backend Python + Flask, API REST, monolito modular por capas y dominios</li><li>MySQL o PostgreSQL con ORM y migraciones</li></ul></div>
+    <div class="tarjeta"><h4>Restricciones del negocio</h4><ul><li>Equipo de dos personas y entrega el 21/11/2026</li><li>Sin pasarela ni transportadora seleccionadas</li><li>Volumen de usuarios desconocido (MUGS.pdf §19.7)</li><li>Ejecución local en esta versión</li></ul></div>
+  </div>
+  <div class="tabla-c"><table>
+    <tr><th>Atributo de calidad</th><th>Escenario verificable</th><th>Evidencia</th></tr>
+    <tr><td><strong>Seguridad</strong></td><td>Sin token → 401; cliente en ruta de administrador → 403; cliente desactivado no inicia sesión</td><td>Pruebas de usuarios y pedidos</td></tr>
+    <tr><td><strong>Consistencia</strong></td><td>Confirmar el pago descuenta el stock una sola vez, dentro de una transacción con bloqueo de filas</td><td><code>test_pago_no_descuenta_inventario_dos_veces</code></td></tr>
+    <tr><td><strong>Mantenibilidad</strong></td><td>Cada dominio separa controladores, servicios, repositorios, DTO y modelos</td><td>Estructura de <code>backend/app/dominios/</code></td></tr>
+    <tr><td><strong>Usabilidad</strong></td><td>La SPA valida formularios y muestra mensajes de error comprensibles</td><td>Casos E08 y E15 de punta a punta</td></tr>
+  </table></div>
+
+  <h3 id="f3-estilo">3.3 Estilo arquitectónico y justificación</h3>
+  <p>MUGS.pdf §14 comparó MVC, monolito tradicional y monolito modular, y propuso de forma provisional un <strong>monolito modular por capas en relación cliente-servidor</strong>. En la fase 03 esa propuesta se confirmó (ADR-001) y se concretó con tecnologías (ADR-002):</p>
+  <div class="rejilla">
+    <div class="tarjeta primario"><h4>Cliente-servidor</h4><p>El navegador ejecuta la SPA, que solo presenta e interactúa. Toda regla de negocio y todo acceso a datos ocurren en el servidor, que es la fuente de verdad.</p></div>
+    <div class="tarjeta primario"><h4>Monolito modular</h4><p>Un único despliegue de la API, dividido en los dominios <strong>usuarios</strong>, <strong>productos</strong> y <strong>pedidos</strong>, cada uno con sus propias capas. Los límites entre dominios son explícitos.</p></div>
+    <div class="tarjeta primario"><h4>Capas</h4><p>Controlador (HTTP) → DTO (validación) → Servicio (reglas) → Repositorio (consultas) → Modelo (ORM). Cada capa solo conoce a la inferior.</p></div>
+  </div>
+  <p><strong>Por qué no microservicios:</strong> el equipo es de dos personas, no hay necesidad de desplegar ni escalar partes por separado y las operaciones críticas (pago e inventario) requieren una transacción única sobre la misma base de datos. Un monolito modular da esa consistencia con un costo operativo mínimo y deja preparada una separación futura por dominios.</p>
+
+  <h3 id="f3-c4">3.4 Diagramas C4</h3>
+  <p>Los tres niveles C4 parten del contexto de MUGS.pdf §15–§16 y lo concretan con las decisiones y tecnologías de la versión implementada.</p>
+  <figure class="diagrama" data-titulo="C4 nivel 1 · Contexto">
+    <div class="lienzo">{{svg:c4_contexto}}</div>
+    <figcaption><span><b>Figura 1. C4 nivel 1, contexto.</b> MUGLY, sus dos actores y los tres sistemas externos. La pasarela aparece con línea discontinua porque su integración se difirió (D8).</span><button class="ampliar" type="button">Ampliar</button></figcaption>
+  </figure>
+  <figure class="diagrama" data-titulo="C4 nivel 2 · Contenedores">
+    <div class="lienzo">{{svg:c4_contenedores}}</div>
+    <figcaption><span><b>Figura 2. C4 nivel 2, contenedores.</b> La SPA consume la API por HTTP/JSON con token Bearer. La API es el único contenedor que accede a MySQL y al almacén de imágenes.</span><button class="ampliar" type="button">Ampliar</button></figcaption>
+  </figure>
+  <figure class="diagrama" data-titulo="C4 nivel 3 · Componentes de la API">
+    <div class="lienzo">{{svg:c4_componentes}}</div>
+    <figcaption><span><b>Figura 3. C4 nivel 3, componentes de la API.</b> Tres dominios con las mismas cinco capas, más componentes transversales. La única dependencia entre dominios es la de pedidos sobre el modelo Producto para descontar stock.</span><button class="ampliar" type="button">Ampliar</button></figcaption>
+  </figure>
+
+  <h3 id="f3-logica">3.5 Arquitectura lógica: dominios, módulos y capas</h3>
+  <figure class="diagrama" data-titulo="Arquitectura lógica por capas">
+    <div class="lienzo">{{svg:arquitectura_logica}}</div>
+    <figcaption><span><b>Figura 4. Arquitectura lógica.</b> Capas del frontend y del backend, la comunicación entre ellas y los componentes transversales.</span><button class="ampliar" type="button">Ampliar</button></figcaption>
+  </figure>
+  <div class="tabla-c"><table>
+    <tr><th>Capa del backend</th><th>Responsabilidad</th><th>No hace</th></tr>
+    <tr><td><strong>Controladores</strong> (<code>controladores.py</code>)</td><td>Definen la ruta y el método HTTP, aplican <code>@requiere_token</code> o <code>@requiere_admin</code>, invocan el DTO y el servicio y arman la respuesta JSON con su código</td><td>Reglas de negocio ni consultas</td></tr>
+    <tr><td><strong>DTO</strong> (<code>dtos.py</code>)</td><td>Esquemas marshmallow que validan tipos, rangos y longitudes de la entrada</td><td>Acceso a datos</td></tr>
+    <tr><td><strong>Servicios</strong> (<code>servicios.py</code>)</td><td>Reglas de negocio: transiciones de estado, stock, retiro lógico, hash de contraseñas y JWT; lanzan excepciones del dominio</td><td>Conocer HTTP</td></tr>
+    <tr><td><strong>Repositorios</strong> (<code>repositorios.py</code>)</td><td>Consultas y persistencia con SQLAlchemy</td><td>Decisiones de negocio</td></tr>
+    <tr><td><strong>Modelos</strong> (<code>modelos.py</code>)</td><td>Entidades ORM, relaciones y serialización <code>to_dict()</code></td><td>Lógica de aplicación</td></tr>
+  </table></div>
+  <p><strong>Frontend:</strong> la SPA no usa frameworks. <code>index.html</code> carga Bootstrap local y <code>js/app.js</code> como módulo ES. Cada página se importa de forma diferida con <code>import()</code> la primera vez que se visita. El enrutador traduce <code>#/ruta</code> a una página, <code>estado.js</code> guarda la sesión y el carrito en <code>localStorage</code> y notifica a los suscriptores, y <code>api.js</code> es el único punto que habla con el backend.</p>
+  <div class="tabla-c"><table>
+    <tr><th>Ruta de la SPA</th><th>Página</th><th>Acceso</th></tr>
+    <tr><td><code>#/</code> · <code>#/catalogo</code> · <code>#/nosotros</code></td><td>inicio.js: catálogo con búsqueda y orden</td><td><span class="chip pub">Público</span></td></tr>
+    <tr><td><code>#/producto/:id</code></td><td>detalle.js</td><td><span class="chip pub">Público</span></td></tr>
+    <tr><td><code>#/carrito</code> · <code>#/personalizados</code></td><td>carrito.js · personalizados.js</td><td><span class="chip pub">Público</span> (confirmar exige sesión)</td></tr>
+    <tr><td><code>#/ingresar</code> · <code>#/registro</code></td><td>ingresar.js · registro.js</td><td><span class="chip pub">Público</span></td></tr>
+    <tr><td><code>#/mis-pedidos</code> · <code>#/mis-pedidos/:id</code></td><td>misPedidos.js</td><td><span class="chip cli">Sesión</span></td></tr>
+    <tr><td><code>#/admin/pedidos</code> · <code>/productos</code> · <code>/clientes</code></td><td>admin/*.js con adminLayout.js</td><td><span class="chip adm">Administrador</span></td></tr>
+  </table></div>
+
+  <h3 id="f3-uml">3.6 Diagramas UML</h3>
+  <figure class="diagrama" data-titulo="UML · Casos de uso">
+    <div class="lienzo">{{svg:uml_casos_uso}}</div>
+    <figcaption><span><b>Figura 5. Casos de uso.</b> CU01–CU15 de MUGS.pdf §10. CU02 es compartido por ambos actores; WhatsApp participa en el pago y en los personalizados.</span><button class="ampliar" type="button">Ampliar</button></figcaption>
+  </figure>
+  <figure class="diagrama" data-titulo="UML · Clases del dominio">
+    <div class="lienzo">{{svg:uml_clases}}</div>
+    <figcaption><span><b>Figura 6. Clases del modelo de dominio.</b> Las seis entidades persistentes con sus tipos reales. Los rombos indican composición: el perfil, los detalles y el historial se eliminan con su dueño.</span><button class="ampliar" type="button">Ampliar</button></figcaption>
+  </figure>
+  <figure class="diagrama" data-titulo="UML · Clases por capas del dominio pedidos">
+    <div class="lienzo">{{svg:uml_clases_pedidos}}</div>
+    <figcaption><span><b>Figura 7. Clases por capas del dominio pedidos.</b> Funciones del controlador, DTO, servicio, repositorio y excepciones, con los mismos nombres del código.</span><button class="ampliar" type="button">Ampliar</button></figcaption>
+  </figure>
+  <figure class="diagrama" data-titulo="UML · Secuencia de confirmación del pago">
+    <div class="lienzo">{{svg:uml_secuencia_pago}}</div>
+    <figcaption><span><b>Figura 8. Secuencia: el administrador confirma el pago.</b> Recorre todas las capas de la arquitectura. Su código se analiza en la sección 5.3.</span><button class="ampliar" type="button">Ampliar</button></figcaption>
+  </figure>
+  <figure class="diagrama" data-titulo="UML · Máquina de estados del pedido">
+    <div class="lienzo">{{svg:uml_estados_pedido}}</div>
+    <figcaption><span><b>Figura 9. Máquina de estados del pedido</b> (acuerdos D1 y D2, ADR-004).</span><button class="ampliar" type="button">Ampliar</button></figcaption>
+  </figure>
+
+  <h3 id="f3-datos">3.7 Modelo de datos lógico y físico</h3>
+  <figure class="diagrama" data-titulo="Modelo lógico">
+    <div class="lienzo">{{svg:bd_logico}}</div>
+    <figcaption><span><b>Figura 10. Modelo lógico (entidad-relación).</b> Un usuario tiene un perfil y realiza pedidos; un pedido contiene detalles y acumula historial; un producto aparece en muchos detalles.</span><button class="ampliar" type="button">Ampliar</button></figcaption>
+  </figure>
+  <figure class="diagrama" data-titulo="Modelo físico en MySQL 8.0">
+    <div class="lienzo">{{svg:bd_fisico}}</div>
+    <figcaption><span><b>Figura 11. Modelo físico en MySQL 8.0.46.</b> Tipos, claves, índices y llaves foráneas tomados de <code>SHOW CREATE TABLE</code> sobre la base <code>mugly_db</code>.</span><button class="ampliar" type="button">Ampliar</button></figcaption>
+  </figure>
+  <p><strong>Decisiones de modelado:</strong> el precio se copia en <code>detalles_pedido.precio_unitario</code> para que un cambio posterior de precio no altere pedidos antiguos (RN07). Los montos usan <code>DECIMAL(10,2)</code> para evitar errores de redondeo. El estado se guarda como texto validado por el servicio, en lugar de un ENUM de MySQL, para que añadir estados solo requiera cambiar código. El correo es único a nivel de base de datos.</p>
+
+  <h3 id="f3-api">3.8 Diseño de la API REST y comunicación entre componentes</h3>
+  <div class="rejilla">
+    <div class="tarjeta"><h4>Convenciones</h4><ul><li>Prefijo y versión: <code>/api/v1</code></li><li>Recursos en plural; acciones de administración bajo <code>/admin</code></li><li>JSON en ambos sentidos; imágenes en <code>multipart/form-data</code></li><li>Autenticación: <code>Authorization: Bearer &lt;JWT&gt;</code></li></ul></div>
+    <div class="tarjeta"><h4>Formato de respuesta</h4><p>Éxito: <code>{"success": true, "message": …, "data": …}</code></p><p>Error: <code>{"success": false, "error": {"message": …, "details": …}}</code></p></div>
+    <div class="tarjeta"><h4>Códigos usados</h4><p><code>200</code> correcto · <code>201</code> creado · <code>204</code> eliminado · <code>400</code> validación o regla · <code>401</code> sin token o inválido · <code>403</code> sin permiso o desactivado · <code>404</code> no existe · <code>413</code> imagen &gt; 5 MB · <code>500</code> error interno</p></div>
+  </div>
+  <div class="tabla-c"><table>
+    <tr><th>Método</th><th>Ruta</th><th>Acceso</th><th>Uso</th><th>Respuestas</th></tr>
+    <tr><td><span class="metodo POST">POST</span></td><td><code>/usuarios/registro</code></td><td><span class="chip pub">Público</span></td><td>Registrar cliente</td><td>201 · 400</td></tr>
+    <tr><td><span class="metodo POST">POST</span></td><td><code>/usuarios/login</code></td><td><span class="chip pub">Público</span></td><td>Iniciar sesión y obtener el token</td><td>200 · 400 · 401 · 403</td></tr>
+    <tr><td><span class="metodo GET">GET</span></td><td><code>/usuarios/perfil</code></td><td><span class="chip cli">Token</span></td><td>Perfil propio</td><td>200 · 401</td></tr>
+    <tr><td><span class="metodo PATCH">PATCH</span></td><td><code>/usuarios/perfil</code></td><td><span class="chip cli">Token</span></td><td>Actualizar nombre, apellido y teléfono</td><td>200 · 400 · 401</td></tr>
+    <tr><td><span class="metodo GET">GET</span></td><td><code>/productos</code></td><td><span class="chip pub">Público</span></td><td>Catálogo: solo disponibles</td><td>200</td></tr>
+    <tr><td><span class="metodo GET">GET</span></td><td><code>/productos/{id}</code></td><td><span class="chip pub">Público</span></td><td>Detalle con imagen</td><td>200 · 404</td></tr>
+    <tr><td><span class="metodo POST">POST</span></td><td><code>/productos</code></td><td><span class="chip adm">Admin</span></td><td>Crear producto</td><td>201 · 400 · 403</td></tr>
+    <tr><td><span class="metodo PATCH">PATCH</span></td><td><code>/productos/{id}</code></td><td><span class="chip adm">Admin</span></td><td>Editar datos, disponibilidad y stock</td><td>200 · 400 · 404</td></tr>
+    <tr><td><span class="metodo DELETE">DELETE</span></td><td><code>/productos/{id}</code></td><td><span class="chip adm">Admin</span></td><td>Eliminar, o retirar si tiene pedidos</td><td>204 · 200 · 404</td></tr>
+    <tr><td><span class="metodo POST">POST</span></td><td><code>/productos/{id}/imagen</code></td><td><span class="chip adm">Admin</span></td><td>Subir foto JPG, PNG o WEBP</td><td>200 · 400 · 413</td></tr>
+    <tr><td><span class="metodo POST">POST</span></td><td><code>/pedidos</code></td><td><span class="chip cli">Token</span></td><td>Confirmar compra (queda pendiente)</td><td>201 · 400 · 401</td></tr>
+    <tr><td><span class="metodo GET">GET</span></td><td><code>/pedidos</code> · <code>/pedidos/{id}</code></td><td><span class="chip cli">Token</span></td><td>Mis pedidos; un pedido ajeno da 404</td><td>200 · 404</td></tr>
+    <tr><td><span class="metodo GET">GET</span></td><td><code>/admin/usuarios</code> · <code>/{id}</code></td><td><span class="chip adm">Admin</span></td><td>Consultar clientes</td><td>200 · 404</td></tr>
+    <tr><td><span class="metodo PATCH">PATCH</span></td><td><code>/admin/usuarios/{id}</code></td><td><span class="chip adm">Admin</span></td><td>Editar y activar o desactivar</td><td>200 · 400 · 404</td></tr>
+    <tr><td><span class="metodo GET">GET</span></td><td><code>/admin/productos</code></td><td><span class="chip adm">Admin</span></td><td>Todos, incluidos no disponibles</td><td>200</td></tr>
+    <tr><td><span class="metodo GET">GET</span></td><td><code>/admin/pedidos</code> · <code>/{id}</code></td><td><span class="chip adm">Admin</span></td><td>Todos los pedidos y su detalle</td><td>200 · 404</td></tr>
+    <tr><td><span class="metodo PATCH">PATCH</span></td><td><code>/admin/pedidos/{id}/estado</code></td><td><span class="chip adm">Admin</span></td><td>Pagar, cancelar, enviar o entregar</td><td>200 · 400 · 404</td></tr>
+    <tr><td><span class="metodo POST">POST</span></td><td><code>/admin/pedidos/personalizados</code></td><td><span class="chip adm">Admin</span></td><td>Registrar un pedido personalizado</td><td>201 · 400 · 404</td></tr>
+    <tr><td><span class="metodo GET">GET</span></td><td><code>/uploads/{archivo}</code> · <code>/health</code></td><td><span class="chip pub">Público</span></td><td>Imágenes y verificación de estado (sin prefijo)</td><td>200 · 404</td></tr>
+  </table></div>
+  <p>En total son <strong>23 operaciones</strong>: 21 bajo <code>/api/v1</code> y 2 sin prefijo. La comunicación es <strong>síncrona</strong> (ADR-003): la SPA espera la respuesta de cada <code>fetch</code> y actualiza el DOM con el resultado. No hay colas ni eventos de servidor porque todas las operaciones son cortas y no existen integraciones asíncronas en esta versión.</p>
+
+  <h3 id="f3-seguridad">3.9 Diseño de seguridad</h3>
+  <figure class="diagrama" data-titulo="Diseño de seguridad">
+    <div class="lienzo">{{svg:seguridad}}</div>
+    <figcaption><span><b>Figura 12. Autenticación y autorización.</b> Registro con hash, emisión del JWT y validación de cada petición protegida.</span><button class="ampliar" type="button">Ampliar</button></figcaption>
+  </figure>
+  <div class="tabla-c"><table>
+    <tr><th>Control</th><th>Implementación</th></tr>
+    <tr><td>Contraseñas</td><td>Hash con Werkzeug (<code>generate_password_hash</code>); nunca se guardan ni se devuelven en claro</td></tr>
+    <tr><td>Sesión</td><td>JWT HS256 firmado con <code>SECRET_KEY</code>, expiración de 15 minutos; la SPA cierra la sesión al recibir 401</td></tr>
+    <tr><td>Autorización</td><td>Decoradores en el backend; el rol se lee de la base en cada petición, de modo que un cambio de rol o una desactivación surte efecto de inmediato</td></tr>
+    <tr><td>Validación</td><td>Doble: formularios en la SPA (<code>is-invalid</code>) y DTO marshmallow en el servidor, que es la que decide</td></tr>
+    <tr><td>Integridad del negocio</td><td>El cliente no puede confirmar pagos (se eliminó la ruta, ADR-005); transiciones de estado validadas en el servidor</td></tr>
+    <tr><td>Archivos</td><td>Extensión y tipo MIME validados, nombre UUID generado (evita rutas maliciosas) y límite de 5 MB (413)</td></tr>
+    <tr><td>Navegador</td><td>CORS restringido a orígenes configurados; textos dinámicos escapados con <code>esc()</code> antes de insertarlos en el DOM</td></tr>
+    <tr><td>Configuración</td><td>Credenciales de la base y clave en <code>.env</code>, fuera del control de versiones</td></tr>
+  </table></div>
+  <div class="nota rojo"><b>Riesgo aceptado R6.</b> El archivo <code>backend/.env.example</code> del repositorio público contiene la misma <code>SECRET_KEY</code> del entorno local. Los propietarios aceptaron este riesgo para la entrega académica en local, y antes de cualquier despliegue real deben generar una clave nueva con <code>scripts/generate_secret.py</code> y cambiar las contraseñas de prueba.</div>
+
+  <h3 id="f3-despliegue">3.10 Arquitectura computacional y diagrama de despliegue</h3>
+  <figure class="diagrama" data-titulo="Diagrama de despliegue">
+    <div class="lienzo">{{svg:despliegue}}</div>
+    <figcaption><span><b>Figura 13. Despliegue de la versión v1.0.</b> Todos los nodos se ejecutan en un equipo local; el navegador habla con dos procesos Python y la API con MySQL.</span><button class="ampliar" type="button">Ampliar</button></figcaption>
+  </figure>
+  <div class="tabla-c"><table>
+    <tr><th>Nodo</th><th>Software</th><th>Puerto</th><th>Recurso que más usa (MUGS.pdf §19)</th></tr>
+    <tr><td>Navegador</td><td>Chrome u otro navegador moderno con módulos ES</td><td>—</td><td>Memoria del cliente para la SPA y el carrito</td></tr>
+    <tr><td>Servidor estático</td><td>Python <code>http.server</code></td><td>5173</td><td>E/S de disco (archivos pequeños)</td></tr>
+    <tr><td>API</td><td>Python 3.14, Flask 3.1 y SQLAlchemy 2.0</td><td>5000</td><td>CPU por petición (validación, JWT) y E/S de disco para imágenes</td></tr>
+    <tr><td>Base de datos</td><td>MySQL Server 8.0.46, InnoDB</td><td>3306</td><td>Almacenamiento y E/S; bloqueos de fila al confirmar pagos</td></tr>
+  </table></div>
+  <p>La separación cliente-servidor es lógica: MUGS.pdf §19.6 aclara que no implica máquinas distintas. Los tres procesos son independientes y se comunican solo por la red (HTTP y TCP), así que podrían moverse a equipos separados <strong>sin cambiar el código</strong>: basta modificar <code>API_URL</code> en <code>frontend/js/config.js</code> y las variables <code>DB_*</code> y <code>CORS_ALLOWED_ORIGINS</code> del <code>.env</code>. Hoy no se dimensionan CPU, memoria ni almacenamiento porque no se conoce el volumen de usuarios (MUGS.pdf §19.7). Esa medición queda para cuando exista operación real.</p>
+
+  <h3 id="f3-adr">3.11 Decisiones de arquitectura (ADR)</h3>
+  <p>Las siete decisiones están registradas en MGL-ARQ-001 y quedaron aceptadas en la puerta G2. Para cada una se indican las alternativas consideradas y el motivo de la elección.</p>
+  <div class="tabla-c ids"><table>
+    <tr><th>ADR</th><th>Decisión</th><th>Alternativas consideradas</th><th>Justificación y consecuencias</th></tr>
+    <tr><td><strong>001</strong></td><td>Monolito modular por dominios (usuarios, productos, pedidos)</td><td>Microservicios; monolito sin módulos; MVC simple (MUGS.pdf §14)</td><td>Equipo de dos, sin necesidad de despliegues independientes y con transacciones que cruzan pedidos e inventario. Límites internos claros para evolucionar.</td></tr>
+    <tr><td><strong>002</strong></td><td>Python + Flask + SQLAlchemy + Flask-Migrate; MySQL; JWT; SPA Vanilla JS con Bootstrap local</td><td>PostgreSQL; Tailwind CSS (ambos permitidos por la asignatura)</td><td>MySQL ya era la base del proyecto y Bootstrap ofrece componentes listos (modales, toasts) sin compilación. Bootstrap se copió en local para funcionar sin CDN.</td></tr>
+    <tr><td><strong>003</strong></td><td>Comunicación REST síncrona con <code>fetch</code> y JSON</td><td>Colas o eventos asíncronos</td><td>Operaciones cortas y sin integraciones asíncronas; menos piezas que operar. Si llega una pasarela con webhooks, se agregaría un endpoint.</td></tr>
+    <tr><td><strong>004</strong></td><td>Un solo campo <code>estado</code> en el pedido, con historial</td><td>Mantener <code>estado</code> + <code>estado_pago</code> (diseño previo)</td><td>Dos campos permitían combinaciones inválidas. La migración trasladó los datos (confirmado → pagado, rechazado → cancelado) y el historial registra fecha y usuario (mitiga R7).</td></tr>
+    <tr><td><strong>005</strong></td><td>El pago lo confirma el administrador</td><td>Ruta del cliente para registrar su pago (existía); integración inmediata con pasarela</td><td>La ruta del cliente era un hueco de seguridad (R2) y no hay pasarela (D8). Cuando exista, solo cambiará quién invoca <code>cambiar_estado</code>.</td></tr>
+    <tr><td><strong>006</strong></td><td>Imágenes en <code>backend/uploads/</code> servidas por la API</td><td>Guardarlas en la base de datos; enlazar URL externas</td><td>Archivos fuera de la base para no inflarla, con nombre UUID, tipos permitidos y un máximo de 5 MB. En la nube se movería a un almacenamiento de objetos.</td></tr>
+    <tr><td><strong>007</strong></td><td>SPA con enrutador por hash, estado central, cliente HTTP único y componentes</td><td>Páginas HTML separadas; enrutado con History API</td><td>El hash no necesita configurar el servidor estático. Un único <code>api.js</code> centraliza el token, los errores y el cierre de sesión. Sin dependencias de compilación.</td></tr>
+  </table></div>
+
+  <h3 id="f3-calidad">3.12 Rendimiento, escalabilidad, disponibilidad, seguridad, costos y riesgos</h3>
+  <div class="rejilla">
+    <div class="tarjeta"><h4>Rendimiento</h4><p>Las páginas de la SPA se cargan de forma diferida y las consultas usan índices sobre las llaves foráneas. El bloqueo <code>FOR UPDATE</code> afecta solo a las filas del pedido y de sus productos, no a toda la tabla. Bootstrap local evita depender de una CDN.</p></div>
+    <div class="tarjeta"><h4>Escalabilidad</h4><p>La API no guarda sesión en memoria: el estado viaja en el JWT. Eso permitiría ejecutar varias instancias detrás de un balanceador. El límite actual es la base única y las imágenes en disco local.</p></div>
+    <div class="tarjeta"><h4>Disponibilidad</h4><p>En v1.0 depende de un solo equipo, sin redundancia. Se mitiga con un respaldo verificado (mysqldump e imágenes, R8). El endpoint <code>/health</code> permite monitoreo futuro.</p></div>
+    <div class="tarjeta"><h4>Seguridad</h4><p>Hash de contraseñas, JWT con expiración, autorización en el servidor, doble validación y archivos controlados (sección 3.9). La deuda conocida es el riesgo R6.</p></div>
+    <div class="tarjeta"><h4>Costos</h4><p>La estimación del proyecto es de 24 horas, sin valor monetario. Todo el software usado es libre o gratuito (Python, Flask, MySQL Community, Bootstrap) y la ejecución local no tiene costo de infraestructura. El costo de un hosting se definirá cuando se decida publicar.</p></div>
+    <div class="tarjeta"><h4>Riesgos</h4><p>Los ocho riesgos de MGL-RIE-001 están en la sección 2.6. Al cierre: R2 y R5 resueltos por diseño (ADR-005 y retiro lógico), R8 mitigado con respaldo y R6 aceptado.</p></div>
+  </div>
+
+  <h3 id="f3-prototipos">3.13 Prototipos y puerta G2</h3>
+  <p>Antes de construir el frontend se prototiparon y aprobaron las pantallas clave del cliente (inicio, detalle, carrito, mis pedidos y personalizados) y del administrador (pedidos, productos y clientes), a partir de los mockups de MUGS.pdf §13. La identidad visual usa un azul petróleo <code>#1F4E5F</code>, un terracota <code>#A45A33</code> y un fondo cálido <code>#EFE9E1</code>, definidos como variables CSS en <code>:root</code> para que puedan cambiarse en un solo lugar. Con MGL-ARQ-001 y el backlog aprobados se cerró la <strong>puerta G2</strong> y se autorizó la construcción.</p>
+</section>
+
+<!-- =============================================================== FASE 04 -->
+<section class="fase" id="fase04">
+  <div class="cabeza-fase">
+    <div class="num-fase">FASE<b>04</b></div>
+    <div>
+      <h2>Preparación técnica</h2>
+      <p>Repositorio, entornos, dependencias, base de datos y convenciones para construir de forma ordenada.</p>
+    </div>
+  </div>
+  <div class="evidencia"><span class="doc">GitHub · peddiazd/Backend-MUGLY</span><span class="doc">commit 7c4be0f</span><span class="doc">README.md</span></div>
+
+  <h3 id="f4-repo">4.1 Repositorio y estructura</h3>
+  <p>El repositorio se reorganizó el 19/11/2026 (commit <code>7c4be0f</code>) en carpetas claramente diferenciadas, según el acuerdo D7:</p>
+<pre class="arbol">Backend-MUGLY/
+├── backend/
+│   ├── app/
+│   │   ├── __init__.py          fábrica crear_app(): blueprints, CORS, errores, /uploads
+│   │   ├── config.py            configuración desde .env
+│   │   ├── seguridad.py         @requiere_token y @requiere_admin (JWT)
+│   │   └── dominios/
+│   │       ├── usuarios/        controladores · dtos · servicios · repositorios · modelos
+│   │       ├── productos/       controladores · dtos · servicios · repositorios · modelos
+│   │       └── pedidos/         controladores · dtos · servicios · repositorios · modelos
+│   ├── migrations/versions/     6 migraciones de Alembic
+│   ├── tests/                   conftest + 65 pruebas (pytest)
+│   ├── scripts/                 create_db.py · generate_secret.py · promover_admin.py
+│   ├── uploads/                 imágenes de productos (ignoradas por git)
+│   ├── app.py · requirements.txt · .env.example · pytest.ini
+├── frontend/
+│   ├── index.html
+│   ├── css/estilos.css          variables de marca y estilos propios
+│   ├── assets/vendor/bootstrap/ Bootstrap 5.3.3 local
+│   └── js/
+│       ├── app.js · router.js · estado.js · api.js · config.js
+│       ├── componentes/         ui.js · encabezado.js · adminLayout.js
+│       └── paginas/             inicio · detalle · carrito · misPedidos · personalizados ·
+│                                ingresar · registro · admin/{pedidos, productos, clientes}
+├── docs/                        diagramas, generador del informe y este informe
+└── README.md</pre>
+
+  <h3 id="f4-entorno">4.2 Entorno y dependencias</h3>
+  <div class="dos-col">
+    <div class="tabla-c"><table>
+      <tr><th>Backend (requirements.txt)</th><th>Versión</th></tr>
+      <tr><td>Python</td><td>3.14.3</td></tr>
+      <tr><td>Flask · Werkzeug</td><td>3.1.3 · 3.1.8</td></tr>
+      <tr><td>Flask-SQLAlchemy · SQLAlchemy</td><td>3.1.1 · 2.0.49</td></tr>
+      <tr><td>Flask-Migrate (Alembic)</td><td>4.1.0</td></tr>
+      <tr><td>Flask-CORS</td><td>6.0.2</td></tr>
+      <tr><td>PyMySQL[rsa]</td><td>1.1.2</td></tr>
+      <tr><td>marshmallow</td><td>3.23.2</td></tr>
+      <tr><td>PyJWT</td><td>2.10.1</td></tr>
+      <tr><td>python-dotenv · pytest</td><td>1.2.2 · 9.0.3</td></tr>
+    </table></div>
+    <div class="tabla-c"><table>
+      <tr><th>Frontend y herramientas</th><th>Detalle</th></tr>
+      <tr><td>Bootstrap</td><td>5.3.3, copiado en <code>assets/vendor</code></td></tr>
+      <tr><td>JavaScript</td><td>Módulos ES nativos, sin compilación ni npm</td></tr>
+      <tr><td>Tipografías</td><td>Inter y Space Grotesk (Google Fonts, con respaldo del sistema)</td></tr>
+      <tr><td>Base de datos</td><td>MySQL Server 8.0 y MySQL Workbench</td></tr>
+      <tr><td>Editor</td><td>Visual Studio Code</td></tr>
+      <tr><td>Navegador</td><td>Chrome y sus DevTools (pestaña Network)</td></tr>
+      <tr><td>Gestión</td><td>Jira, GitHub, Google Drive y draw.io</td></tr>
+    </table></div>
+  </div>
+  <p><strong>Configuración:</strong> el backend lee sus parámetros de <code>backend/.env</code>, que está excluido del repositorio. La plantilla <code>.env.example</code> documenta las variables: <code>SECRET_KEY</code>, <code>CORS_ALLOWED_ORIGINS</code>, <code>DB_USER</code>, <code>DB_PASSWORD</code>, <code>DB_HOST</code>, <code>DB_PORT</code>, <code>DB_NAME</code> y <code>DB_CHARSET</code>. El frontend solo necesita <code>API_URL</code> y el número de WhatsApp en <code>js/config.js</code>. Para las pruebas, <code>FLASK_TESTING=true</code> cambia a SQLite en memoria.</p>
+
+  <h3 id="f4-bd">4.3 Base de datos y migraciones</h3>
+  <p>La base <code>mugly_db</code> se crea con <code>scripts/create_db.py</code> en utf8mb4, y su esquema evoluciona solo mediante migraciones de Flask-Migrate:</p>
+  <div class="tabla-c ids"><table>
+    <tr><th>Revisión</th><th>Fecha</th><th>Cambio</th></tr>
+    <tr><td><code>10eb1f0d53f2</code></td><td>23/10/2026</td><td>Crear tablas usuarios y perfiles</td></tr>
+    <tr><td><code>36359ae89ac0</code></td><td>24/10/2026</td><td>Crear tabla productos</td></tr>
+    <tr><td><code>8c3748238b02</code></td><td>24/10/2026</td><td>Crear tablas pedidos y detalles_pedido</td></tr>
+    <tr><td><code>2098e2ff6c39</code></td><td>30/10/2026</td><td>Agregar cantidad_stock a productos</td></tr>
+    <tr><td><code>e5d10d2eef4a</code></td><td>30/10/2026</td><td>Agregar estado de pago a pedidos (luego reemplazado por ADR-004)</td></tr>
+    <tr><td><code>9ed994615ffd</code></td><td>19/11/2026</td><td>Historial de estados, tipo, envío y personalizados; traslada <code>estado_pago</code> a <code>estado</code>; imagen de producto y usuario activo</td></tr>
+  </table></div>
+
+  <h3 id="f4-convenciones">4.4 Convenciones de trabajo</h3>
+  <ul>
+    <li><strong>Ramas:</strong> <code>feature/MUG-&lt;n&gt;-&lt;resumen&gt;</code> por historia; integración con Pull Request a <code>main</code>.</li>
+    <li><strong>Commits:</strong> estilo convencional (<code>feat</code>, <code>fix</code>, <code>refactor</code>, <code>docs</code>) con la clave de Jira, por ejemplo <code>feat(frontend): carrito, confirmacion del pedido y mis pedidos (MUG-22, MUG-23)</code>.</li>
+    <li><strong>Código:</strong> nombres en español alineados con el dominio (pedido, producto, estado), sin dependencias innecesarias.</li>
+    <li><strong>Versionado:</strong> etiqueta semántica <code>v1.0.0</code> publicada como release en GitHub.</li>
+  </ul>
+
+  <h3 id="f4-ejecucion">4.5 Instalación y ejecución</h3>
+  <ol class="pasos">
+    <li><strong>Backend:</strong> en <code>backend/</code>, crear el entorno con <code>python -m venv venv</code>, activarlo e instalar con <code>pip install -r requirements.txt</code>.</li>
+    <li><strong>Configuración:</strong> copiar <code>.env.example</code> a <code>.env</code> y completar la conexión a MySQL.</li>
+    <li><strong>Base de datos:</strong> ejecutar <code>python scripts/create_db.py</code> y luego <code>flask --app "app:crear_app()" db upgrade</code>.</li>
+    <li><strong>API:</strong> <code>python app.py</code>, que queda escuchando en <code>http://localhost:5000</code>. Para crear un administrador se registra la cuenta y se ejecuta <code>python scripts/promover_admin.py</code>.</li>
+    <li><strong>Frontend:</strong> en <code>frontend/</code>, ejecutar <code>python -m http.server 5173</code> y abrir <code>http://localhost:5173</code>.</li>
+    <li><strong>Pruebas:</strong> en <code>backend/</code>, ejecutar <code>python -m pytest -q</code>.</li>
+  </ol>
+</section>
+
+<!-- =============================================================== FASE 05 -->
+<section class="fase" id="fase05">
+  <div class="cabeza-fase">
+    <div class="num-fase">FASE<b>05</b></div>
+    <div>
+      <h2>Desarrollo incremental</h2>
+      <p>Cómo se construyó MUGLY por incrementos y cómo el código implementa la arquitectura diseñada.</p>
+    </div>
+  </div>
+  <div class="evidencia"><span class="doc">Jira · MUGLY Sprint 1</span><span class="doc">PR #1</span><span class="doc">PR #2</span><span class="doc">release v1.0.0</span><span class="doc">MGL-TST-001</span></div>
+
+  <h3 id="f5-incrementos">5.1 Incrementos</h3>
+  <ol class="linea-tiempo">
+    <li><time>23/10</time><div><b>Base del proyecto</b> y dominio <b>usuarios</b> con autenticación JWT y perfil; roles con <code>@requiere_admin</code>.</div></li>
+    <li><time>24/10</time><div>Dominio <b>productos</b> con CRUD y autorización administrativa; dominio <b>pedidos</b>.</div></li>
+    <li><time>19/11</time><div>Inventario por stock y estado de pago. Auditoría frente a MUGS.pdf y <b>separación en backend/ y frontend/</b> (<code>7c4be0f</code>).</div></li>
+    <li><time>19/11</time><div><b>Backend del Sprint</b> (MUG-13 a MUG-20): ciclo de estados, pago por administrador, envíos, personalizados, imágenes, retiro lógico y gestión de clientes · <b>PR #1</b>.</div></li>
+    <li><time>20/11</time><div><b>Frontend SPA</b> (MUG-21 a MUG-26) en 7 commits: base, catálogo, carrito y pedidos, personalizados, registro e ingreso, y panel de administración · <b>PR #2</b>.</div></li>
+    <li><time>20/11</time><div>Pruebas de punta a punta, diagramas actualizados, respaldo verificado y <b>release v1.0.0</b> (<code>b9d0577</code>).</div></li>
+  </ol>
+
+  <h3 id="f5-sprint">5.2 Historias del Sprint y su resultado</h3>
+  <div class="tabla-c ids"><table>
+    <tr><th>Jira</th><th>Historia</th><th>Resultado en el código</th></tr>
+    <tr><td>MUG-13</td><td>Confirmar el pago de un pedido pendiente</td><td><code>PATCH /admin/pedidos/{id}/estado</code> → pagado; descuento de stock</td></tr>
+    <tr><td>MUG-14</td><td>Cambiar el estado de los pedidos</td><td>Tabla <code>TRANSICIONES</code> e historial</td></tr>
+    <tr><td>MUG-15</td><td>Transportadora y guía al enviar</td><td><code>DatosEnvioRequeridosError</code> si faltan</td></tr>
+    <tr><td>MUG-16</td><td>Pedidos personalizados</td><td><code>POST /admin/pedidos/personalizados</code>, tipo personalizado</td></tr>
+    <tr><td>MUG-17</td><td>Consultar, editar y desactivar clientes</td><td>Campo <code>activo</code>; 403 al ingresar y al usar el token</td></tr>
+    <tr><td>MUG-18</td><td>Foto de cada producto</td><td><code>POST /productos/{id}/imagen</code> y <code>/uploads</code></td></tr>
+    <tr><td>MUG-19</td><td>Catálogo solo con disponibles</td><td><code>listar_disponibles()</code>; el admin ve todos</td></tr>
+    <tr><td>MUG-20</td><td>Retirar productos sin perder pedidos</td><td><code>tiene_pedidos()</code> → retiro lógico</td></tr>
+    <tr><td>MUG-21</td><td>Navegar MUGLY como aplicación web</td><td>router, estado, api, componentes y estilos</td></tr>
+    <tr><td>MUG-22</td><td>Catálogo, detalle y carrito</td><td>inicio.js, detalle.js, carrito.js</td></tr>
+    <tr><td>MUG-23</td><td>Comprar y ver mis pedidos</td><td>Confirmación con enlace de pago por WhatsApp; misPedidos.js</td></tr>
+    <tr><td>MUG-24</td><td>Personalizado por WhatsApp</td><td>personalizados.js</td></tr>
+    <tr><td>MUG-25</td><td>Registro e ingreso</td><td>registro.js e ingresar.js con validación</td></tr>
+    <tr><td>MUG-26</td><td>Panel de administración</td><td>admin/pedidos.js, productos.js, clientes.js</td></tr>
+    <tr><td>MUG-27</td><td>Verificar flujos de punta a punta</td><td>16 casos aprobados (E01–E16)</td></tr>
+    <tr><td>MUG-28</td><td>Respaldo de la base</td><td>mysqldump e imágenes, restauración verificada</td></tr>
+  </table></div>
+
+  <h3 id="f5-recorrido">5.3 Recorrido completo de una funcionalidad: confirmar el pago</h3>
+  <p>Esta funcionalidad atraviesa todas las capas y aplica las reglas más importantes del negocio (D1, D3, RF16 y RNF05). Sigue la secuencia de la <a href="#f3-uml">figura 8</a>.</p>
+  <ol class="pasos">
+    <li><strong>Interfaz (SPA).</strong> En <code>admin/pedidos.js</code> el administrador pulsa «Confirmar pago». Un modal reutilizable (<code>confirmar()</code> de <code>ui.js</code>) pide confirmación y luego se llama a <code>api()</code> con <code>PATCH</code> y <code>{estado: 'pagado'}</code>.
+{{codigo:js:frontend/js/paginas/admin/pedidos.js:case 'pagar':=>break;}}</li>
+    <li><strong>Cliente HTTP.</strong> <code>api.js</code> agrega el token Bearer, serializa el cuerpo, hace el <code>fetch</code> asíncrono y convierte los errores en <code>ApiError</code>. Ante un 401 emite el evento que cierra la sesión.
+{{codigo:js:frontend/js/api.js:export async function api(=>return datos?.data}}</li>
+    <li><strong>Seguridad.</strong> El decorador valida el JWT, busca al usuario en la base y exige el rol de administrador. Si no lo es, la excepción se traduce en 403.
+{{codigo:python:backend/app/seguridad.py:def requiere_admin(=>return f(*args}}</li>
+    <li><strong>Controlador y DTO.</strong> El controlador valida el cuerpo con <code>CambiarEstadoPedidoDTO</code> (400 si es inválido), delega en el servicio y arma la respuesta JSON.
+{{codigo:python:backend/app/dominios/pedidos/controladores.py:@admin_bp.route("/pedidos/<int:pedido_id>/estado"=>200,}}</li>
+    <li><strong>Servicio (reglas de negocio).</strong> Bloquea el pedido con <code>FOR UPDATE</code>, valida la transición contra <code>TRANSICIONES</code>, descuenta el stock si es de catálogo, exige los datos de envío cuando corresponde, registra el historial y confirma o revierte toda la transacción.
+{{codigo:python:backend/app/dominios/pedidos/servicios.py:def cambiar_estado(=>db.session.rollback()}}</li>
+    <li><strong>Persistencia.</strong> SQLAlchemy traduce las operaciones a SQL sobre MySQL (InnoDB), cuyos bloqueos de fila evitan que dos confirmaciones simultáneas descuenten dos veces.</li>
+    <li><strong>Respuesta.</strong> La SPA recibe <code>200</code> con el pedido actualizado, recarga la tabla y muestra un toast. Un error (400, 403 o 404) aparece en el modal sin perder el contexto.</li>
+    <li><strong>Prueba automatizada.</strong> La regla queda protegida por pruebas que verifican el descuento y que el cliente no pueda confirmar su propio pago.
+{{codigo:python:backend/tests/test_pedidos.py:def test_admin_confirma_pago_y_descuenta_inventario(=>assert self.consultar_stock(client, producto_id) == 10}}</li>
+  </ol>
+  <div class="nota verde"><b>Cómo se ve en la pestaña Network.</b> La petición es <code>PATCH http://localhost:5000/api/v1/admin/pedidos/1/estado</code> con la cabecera <code>Authorization: Bearer …</code> y el cuerpo <code>{"estado":"pagado"}</code>. La respuesta <code>200</code> trae <code>data.estado = "pagado"</code> y el historial con dos entradas. En la base, <code>productos.cantidad_stock</code> baja (caso E07: 12 → 10 y 5 → 4).</div>
+
+  <h3 id="f5-frontend">5.4 Piezas clave del frontend</h3>
+  <h4>Enrutamiento con protección por rol</h4>
+  <p><code>router.js</code> compara el hash con los patrones registrados, extrae parámetros como <code>:id</code>, redirige al ingreso si la ruta exige sesión y bloquea las vistas de administración a quien no tiene ese rol. Al final renderiza la página dentro de <code>#app</code>.</p>
+{{codigo:js:frontend/js/router.js:export async function resolver(=>if (paginaNoEncontrada)}}
+  <h4>Gestión de estado: carrito limitado por el stock</h4>
+  <p><code>estado.js</code> es el almacén central. Cada cambio se guarda en <code>localStorage</code> y notifica a los suscriptores; por ejemplo, el encabezado actualiza el contador del carrito.</p>
+{{codigo:js:frontend/js/estado.js:export function agregarAlCarrito(=>return nueva - actual;}}
+  <h4>Validación de formularios y manejo de errores</h4>
+  <p>Los formularios usan <code>novalidate</code> y validación propia con las clases de Bootstrap. Si el servidor rechaza los datos, el mensaje de la API se muestra en el formulario.</p>
+{{codigo:js:frontend/js/paginas/registro.js:form.addEventListener('submit'=>});}}
+
+  <h3 id="f5-migracion">5.5 Migración del modelo de pedidos con traslado de datos</h3>
+  <p>Cambiar de dos campos de estado a uno (ADR-004) no podía perder la información existente. La migración crea el historial, agrega las columnas nuevas, traslada los valores y solo después elimina la columna antigua. Su <code>downgrade()</code> reconstruye <code>estado_pago</code>, y se probó en ambos sentidos sobre MySQL.</p>
+{{codigo:python:backend/migrations/versions/9ed994615ffd_estados_de_pedido_envios_personalizados_.py:def upgrade():=>batch_op.add_column(sa.Column('activo'}}
+
+  <h3 id="f5-pruebas">5.6 Pruebas de funcionamiento</h3>
+  <p>Cada historia cumplió la Definición de Terminado: pruebas automáticas y verificación en el navegador. Las pruebas usan pytest con SQLite en memoria y una carpeta temporal de imágenes, así que no tocan la base real.</p>
+  <div class="tabla-c"><table>
+    <tr><th>Módulo</th><th>Archivo</th><th>Pruebas</th><th>Alcance</th></tr>
+    <tr><td>Usuarios</td><td><code>tests/test_usuarios.py</code></td><td>21</td><td>Registro, ingreso, perfil, 401/403, gestión y desactivación de clientes</td></tr>
+    <tr><td>Productos</td><td><code>tests/test_productos.py</code></td><td>16</td><td>CRUD, catálogo disponible, imagen y retiro lógico</td></tr>
+    <tr><td>Pedidos</td><td><code>tests/test_pedidos.py</code></td><td>28</td><td>Stock, pertenencia, transiciones, pago por administrador, envío y personalizados</td></tr>
+    <tr><td colspan="2"><strong>Total</strong></td><td><strong>65</strong></td><td><span class="chip ok">65 aprobadas</span></td></tr>
+  </table></div>
+  <p>Además se ejecutaron <strong>16 casos de punta a punta</strong> en Chrome contra la API y MySQL. Entre ellos: crear productos y subir fotos (E01–E02), registrarse y comprar 3 unidades por $98.000 (E03–E06), confirmar el pago y verificar el descuento de stock (E07), rechazar un envío sin guía (E08), el ciclo completo hasta entregado (E09), un personalizado de $45.000 (E10), cliente desactivado (E11) y rutas protegidas (E14). Los cuatro hallazgos se cerraron: el menú que se partía en pantallas medianas (<code>2c8f482</code>), el comando de migraciones en la documentación, un diagrama con una caja vacía (<code>cd632bb</code>) y una limitación de la herramienta de pruebas.</p>
+
+  <h3 id="f5-trazabilidad">5.7 Relación entre la arquitectura diseñada y la implementación</h3>
+  <div class="tabla-c"><table>
+    <tr><th>Elemento del diseño</th><th>Dónde está en el código</th></tr>
+    <tr><td>Contenedor «Aplicación web (SPA)»</td><td><code>frontend/</code>: <code>index.html</code>, <code>js/app.js</code></td></tr>
+    <tr><td>Contenedor «API REST»</td><td><code>backend/app/__init__.py</code> → <code>crear_app()</code>; <code>backend/app.py</code></td></tr>
+    <tr><td>Contenedor «Base de datos»</td><td>Modelos SQLAlchemy y <code>backend/migrations/</code></td></tr>
+    <tr><td>Contenedor «Almacén de imágenes»</td><td><code>UPLOAD_FOLDER</code> en <code>config.py</code>; <code>ProductoServicio.guardar_imagen</code></td></tr>
+    <tr><td>Componentes por dominio y capa (figura 3)</td><td><code>backend/app/dominios/{usuarios,productos,pedidos}/{controladores,dtos,servicios,repositorios,modelos}.py</code></td></tr>
+    <tr><td>Componente Seguridad</td><td><code>backend/app/seguridad.py</code></td></tr>
+    <tr><td>Máquina de estados (figura 9)</td><td><code>TRANSICIONES</code> en <code>pedidos/servicios.py</code></td></tr>
+    <tr><td>Modelo físico (figura 11)</td><td>Migración <code>9ed994615ffd</code> y anteriores</td></tr>
+    <tr><td>ADR-007 · enrutador, estado y cliente HTTP</td><td><code>js/router.js</code>, <code>js/estado.js</code>, <code>js/api.js</code></td></tr>
+  </table></div>
+  <div class="nota ambar"><b>Desviación conocida.</b> En <code>PedidoServicio</code>, tres consultas con bloqueo (<code>with_for_update</code>) usan <code>db.session</code> directamente en lugar de pasar por <code>PedidoRepositorio</code>. Se hizo así para mantener el bloqueo y el commit dentro de la misma transacción del servicio. El paso natural es mover esas consultas a métodos del repositorio que reciban la misma sesión, sin cambiar el comportamiento.</div>
+</section>
+
+<!-- =============================================================== ANEXOS -->
+<section class="fase" id="anexos">
+  <div class="cabeza-fase">
+    <div class="num-fase">ANEXOS<b>A–C</b></div>
+    <div>
+      <h2>Anexos</h2>
+      <p>Índice documental, enlaces del proyecto y glosario.</p>
+    </div>
+  </div>
+  <h3>A. Índice del expediente documental</h3>
+  <div class="tabla-c ids"><table>
+    <tr><th>Código</th><th>Documento</th><th>Fase / etapa</th><th>Estado</th></tr>
+    <tr><td>MGL-REQ-001</td><td>Requisitos y propuesta arquitectónica (MUGS.pdf)</td><td>02 · Descubrimiento</td><td><span class="chip ok">Vigente</span></td></tr>
+    <tr><td>MGL-COM-001</td><td>Registro de la solicitud</td><td>01.01</td><td><span class="chip ok">Aprobado</span></td></tr>
+    <tr><td>MGL-DEC-001</td><td>Evaluación preliminar y decisión</td><td>01.02 · 01.03</td><td><span class="chip ok">Aprobado</span></td></tr>
+    <tr><td>MGL-REU-001</td><td>Reunión inicial y responsables</td><td>01.04 · 01.05</td><td><span class="chip ok">Aprobado</span></td></tr>
+    <tr><td>MGL-REU-002</td><td>Cierre de la fase 01</td><td>01.07</td><td><span class="chip ok">Aprobado</span></td></tr>
+    <tr><td>MGL-REU-003</td><td>Acta de definiciones de negocio (D1–D8)</td><td>02.01 · 02.02</td><td><span class="chip ok">Aprobado</span></td></tr>
+    <tr><td>MGL-REQ-002</td><td>Matriz de requisitos y trazabilidad</td><td>02.05 · 02.06</td><td><span class="chip ok">Aprobado</span></td></tr>
+    <tr><td>MGL-ALC-001</td><td>Línea base de alcance (G1)</td><td>02.07 · 02.08</td><td><span class="chip ok">Aprobado</span></td></tr>
+    <tr><td>MGL-RIE-001</td><td>Registro de riesgos</td><td>02.09</td><td><span class="chip ok">Aprobado</span></td></tr>
+    <tr><td>MGL-EST-001</td><td>Estimación en horas y cronograma</td><td>02.10</td><td><span class="chip ok">Aprobado</span></td></tr>
+    <tr><td>MGL-AUT-001</td><td>Registro de autorización</td><td>02.10 · 02.11</td><td><span class="chip ok">Aprobado</span></td></tr>
+    <tr><td>MGL-SCR-001</td><td>Plan Scrum y acuerdos del equipo</td><td>03.01–03.06</td><td><span class="chip ok">Aprobado</span></td></tr>
+    <tr><td>MGL-BKL-001</td><td>Backlog del producto</td><td>03.04 · 03.05</td><td><span class="chip ok">Aprobado</span></td></tr>
+    <tr><td>MGL-ARQ-001</td><td>Arquitectura y decisiones (ADR)</td><td>03.07–03.15</td><td><span class="chip ok">Aprobado</span></td></tr>
+  </table></div>
+  <p>El expediente incluye además los documentos de las fases posteriores (MGL-TST-001, MGL-REL-001, MGL-ENT-001 y MGL-CIE-001), que no forman parte del alcance de este informe.</p>
+
+  <h3>B. Enlaces del proyecto</h3>
+  <div class="tabla-c"><table>
+    <tr><th>Elemento</th><th>Enlace</th></tr>
+    <tr><td>Repositorio (frontend y backend en carpetas separadas)</td><td><a href="https://github.com/peddiazd/Backend-MUGLY">github.com/peddiazd/Backend-MUGLY</a></td></tr>
+    <tr><td>Frontend</td><td><a href="https://github.com/peddiazd/Backend-MUGLY/tree/main/frontend">…/Backend-MUGLY/tree/main/frontend</a></td></tr>
+    <tr><td>Backend</td><td><a href="https://github.com/peddiazd/Backend-MUGLY/tree/main/backend">…/Backend-MUGLY/tree/main/backend</a></td></tr>
+    <tr><td>Versión v1.0.0</td><td><a href="https://github.com/peddiazd/Backend-MUGLY/releases/tag/v1.0.0">…/releases/tag/v1.0.0</a></td></tr>
+  </table></div>
+
+  <h3>C. Glosario</h3>
+  <div class="tabla-c"><table>
+    <tr><td><strong>ADR</strong></td><td>Registro de una decisión de arquitectura con su contexto y consecuencias.</td></tr>
+    <tr><td><strong>C4</strong></td><td>Modelo de diagramas por niveles: contexto, contenedores, componentes y código.</td></tr>
+    <tr><td><strong>DTO</strong></td><td>Objeto de transferencia de datos; aquí, un esquema que valida la entrada de la API.</td></tr>
+    <tr><td><strong>JWT</strong></td><td>Token firmado que identifica al usuario en cada petición.</td></tr>
+    <tr><td><strong>ORM</strong></td><td>Mapeo objeto-relacional (SQLAlchemy): tablas como clases de Python.</td></tr>
+    <tr><td><strong>SPA</strong></td><td>Aplicación de una sola página que cambia de vista sin recargar el navegador.</td></tr>
+    <tr><td><strong>Retiro lógico</strong></td><td>Marcar un registro como no disponible en lugar de borrarlo.</td></tr>
+    <tr><td><strong>Puertas G1–G4</strong></td><td>Puntos de aprobación del manual: alcance, diseño, línea base técnica y entrega.</td></tr>
+  </table></div>
+</section>
+</main>
+</div>
+
+<footer class="pie">MUGLY · Informe del proyecto final · Pedro Díaz y Assael Zapata · Arquitectura de Software 2026-2 · Universidad Cooperativa de Colombia</footer>
+<a class="arriba" href="#inicio" aria-label="Volver al inicio">↑</a>
+
+<dialog class="visor" aria-label="Diagrama ampliado">
+  <div class="barra"><span class="visor-titulo"></span><button type="button">Cerrar ✕</button></div>
+  <div class="contenido"></div>
+</dialog>
+
+<script>
+(function () {
+  // Visor de diagramas ampliados
+  var visor = document.querySelector('dialog.visor');
+  var cont = visor.querySelector('.contenido');
+  function abrir(fig) {
+    cont.innerHTML = fig.querySelector('.lienzo').innerHTML;
+    visor.querySelector('.visor-titulo').textContent = fig.dataset.titulo || '';
+    if (visor.showModal) visor.showModal(); else visor.setAttribute('open', '');
+  }
+  document.querySelectorAll('figure.diagrama').forEach(function (fig) {
+    fig.querySelector('.lienzo').addEventListener('click', function () { abrir(fig); });
+    fig.querySelector('.ampliar').addEventListener('click', function () { abrir(fig); });
+  });
+  visor.querySelector('.barra button').addEventListener('click', function () { visor.close(); });
+  visor.addEventListener('click', function (e) { if (e.target === visor) visor.close(); });
+
+  // Resalta en el índice la sección visible
+  var enlaces = {};
+  document.querySelectorAll('nav.indice a').forEach(function (a) { enlaces[a.getAttribute('href').slice(1)] = a; });
+  var objetivos = Array.prototype.filter.call(document.querySelectorAll('section.fase, h3[id]'), function (el) { return enlaces[el.id]; });
+  var actual = null;
+  function marcar() {
+    var y = window.scrollY + 120, elegido = objetivos[0];
+    objetivos.forEach(function (el) { if (el.getBoundingClientRect().top + window.scrollY <= y) elegido = el; });
+    if (elegido !== actual) {
+      if (actual) enlaces[actual.id].classList.remove('activo');
+      enlaces[elegido.id].classList.add('activo');
+      var nav = document.querySelector('nav.indice'), a = enlaces[elegido.id];
+      if (a.offsetTop < nav.scrollTop || a.offsetTop > nav.scrollTop + nav.clientHeight - 40) {
+        nav.scrollTop = a.offsetTop - nav.clientHeight / 3;
+      }
+      actual = elegido;
+    }
+    document.querySelector('.arriba').classList.toggle('visible', window.scrollY > 600);
+  }
+  window.addEventListener('scroll', marcar, { passive: true });
+  marcar();
+})();
+</script>
+</body>
+</html>

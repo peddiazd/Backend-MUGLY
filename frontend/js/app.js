@@ -17,8 +17,8 @@ const pagina = (modulo) => async (app, ctx) => {
 
 // Cliente
 ruta('/', pagina('./paginas/inicio.js'));
-ruta('/catalogo', pagina('./paginas/inicio.js'));
-ruta('/nosotros', pagina('./paginas/inicio.js'));
+ruta('/catalogo', pagina('./paginas/catalogo.js'));
+ruta('/nosotros', pagina('./paginas/nosotros.js'));
 ruta('/producto/:id', pagina('./paginas/detalle.js'));
 ruta('/carrito', pagina('./paginas/carrito.js'));
 ruta('/personalizados', pagina('./paginas/personalizados.js'));

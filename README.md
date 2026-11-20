@@ -34,6 +34,22 @@ python -m pytest -q
 La documentación completa (arquitectura, endpoints, modelo de datos y flujos)
 está en [`docs/README.md`](docs/README.md).
 
-## Frontend
+## Frontend: puesta en marcha
 
-En construcción. Ver [`frontend/README.md`](frontend/README.md).
+Con la API en ejecución, en otra terminal:
+
+```bash
+cd frontend
+python -m http.server 5173        # http://localhost:5173
+```
+
+La SPA no necesita compilación ni dependencias: Bootstrap 5.3.3 está incluido
+en `frontend/assets/vendor/`. La URL de la API y el número de WhatsApp se
+configuran en `frontend/js/config.js`. Más detalles en
+[`frontend/README.md`](frontend/README.md).
+
+## Informe del proyecto
+
+El informe final está en
+[`docs/Informe_Proyecto_Final_MUGLY.html`](docs/Informe_Proyecto_Final_MUGLY.html):
+un solo archivo que se abre en el navegador, con los diagramas incluidos.

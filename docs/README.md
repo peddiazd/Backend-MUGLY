@@ -322,7 +322,39 @@ Se esperan **65 pruebas pasando**.
 
 ---
 
-## Diagramas (draw.io)
+## Diagramas de arquitectura (SVG)
+
+Los diagramas del informe están en [`diagramas/`](./diagramas/) como archivos
+SVG que se abren en cualquier navegador. Se generan desde el código del
+script, para que todos tengan el mismo estilo y coincidan con la implementación:
+
+```bash
+python docs/diagramas/generar_diagramas.py     # regenera los .svg
+python docs/informe/construir_informe.py       # regenera el informe HTML
+```
+
+| Diagrama | Archivo |
+|----------|---------|
+| C4 nivel 1 · contexto | `c4_contexto.svg` |
+| C4 nivel 2 · contenedores | `c4_contenedores.svg` |
+| C4 nivel 3 · componentes de la API | `c4_componentes.svg` |
+| Arquitectura lógica por capas | `arquitectura_logica.svg` |
+| UML · casos de uso | `uml_casos_uso.svg` |
+| UML · clases del dominio | `uml_clases.svg` |
+| UML · clases por capas (pedidos) | `uml_clases_pedidos.svg` |
+| UML · secuencia de confirmación del pago | `uml_secuencia_pago.svg` |
+| UML · máquina de estados del pedido | `uml_estados_pedido.svg` |
+| Despliegue (arquitectura computacional) | `despliegue.svg` |
+| Modelo lógico de datos | `bd_logico.svg` |
+| Modelo físico en MySQL | `bd_fisico.svg` |
+| Seguridad: autenticación y autorización | `seguridad.svg` |
+
+El informe [`Informe_Proyecto_Final_MUGLY.html`](./Informe_Proyecto_Final_MUGLY.html)
+se construye a partir de [`informe/plantilla.html`](./informe/plantilla.html):
+incrusta estos SVG y extrae los fragmentos de código directamente del
+repositorio.
+
+## Diagramas iniciales (draw.io)
 
 | Diagrama | Archivo | Contenido |
 |----------|---------|-----------|

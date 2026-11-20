@@ -1,0 +1,94 @@
+/*
+ * MUGLY - Estilos propios sobre Bootstrap.
+ * Para cambiar la identidad visual, edite solo las variables de :root.
+ */
+:root {
+  --mg-primario: #1F4E5F;        /* azul petroleo: navegacion y titulos */
+  --mg-primario-oscuro: #163947;
+  --mg-acento: #A45A33;          /* acciones de compra */
+  --mg-acento-oscuro: #8A4A29;
+  --mg-texto: #2E3338;           /* gris grafito */
+  --mg-texto-suave: #5B6670;
+  --mg-fondo: #F7F8F8;
+  --mg-fondo-calido: #EFE9E1;    /* beige */
+  --mg-borde: #E3E7E9;
+  --mg-dorado: #E8D6A0;
+  --mg-radio: 18px;
+
+  --bs-body-font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --bs-body-color: var(--mg-texto);
+  --bs-body-bg: var(--mg-fondo);
+  --bs-link-color: var(--mg-primario);
+  --bs-link-color-rgb: 31, 78, 95;
+  --bs-link-hover-color: var(--mg-primario-oscuro);
+}
+
+body { min-height: 100vh; display: flex; flex-direction: column; }
+main { flex: 1; outline: none; }
+
+h1, h2, .titulo { font-family: "Space Grotesk", "Inter", system-ui, sans-serif; font-weight: 700; }
+
+/* Botones con la identidad de MUGLY */
+.btn-primary {
+  --bs-btn-bg: var(--mg-primario); --bs-btn-border-color: var(--mg-primario);
+  --bs-btn-hover-bg: var(--mg-primario-oscuro); --bs-btn-hover-border-color: var(--mg-primario-oscuro);
+  --bs-btn-active-bg: var(--mg-primario-oscuro); --bs-btn-active-border-color: var(--mg-primario-oscuro);
+  --bs-btn-disabled-bg: var(--mg-primario); --bs-btn-disabled-border-color: var(--mg-primario);
+}
+.btn-outline-primary {
+  --bs-btn-color: var(--mg-primario); --bs-btn-border-color: var(--mg-primario);
+  --bs-btn-hover-bg: var(--mg-primario); --bs-btn-hover-border-color: var(--mg-primario);
+  --bs-btn-active-bg: var(--mg-primario-oscuro);
+}
+.btn-acento {
+  --bs-btn-color: #fff; --bs-btn-bg: var(--mg-acento); --bs-btn-border-color: var(--mg-acento);
+  --bs-btn-hover-color: #fff; --bs-btn-hover-bg: var(--mg-acento-oscuro); --bs-btn-hover-border-color: var(--mg-acento-oscuro);
+  --bs-btn-active-color: #fff; --bs-btn-active-bg: var(--mg-acento-oscuro);
+  --bs-btn-disabled-color: #fff; --bs-btn-disabled-bg: var(--mg-acento); --bs-btn-disabled-border-color: var(--mg-acento);
+}
+.btn { border-radius: 999px; min-height: 44px; padding-left: 1.25rem; padding-right: 1.25rem; font-weight: 600; }
+.btn-sm { min-height: 36px; padding-left: .85rem; padding-right: .85rem; }
+.form-control, .form-select { min-height: 44px; border-radius: 12px; }
+
+/* Encabezado */
+.mg-nav { background: var(--mg-primario); }
+.mg-nav .navbar-brand { font-family: "Space Grotesk", sans-serif; font-weight: 700; letter-spacing: .04em; font-size: 1.6rem; }
+.mg-nav .nav-link { color: #D6E3E8; font-weight: 500; }
+.mg-nav .nav-link:hover, .mg-nav .nav-link:focus { color: #fff; }
+.mg-nav .nav-link.active { color: #fff; box-shadow: inset 0 -2px 0 var(--mg-dorado); }
+.mg-nav .form-control { background: #255A6C; border-color: #3F6B7B; color: #fff; border-radius: 999px; }
+.mg-nav .form-control::placeholder { color: #C5D6DD; }
+.mg-insignia { background: var(--mg-dorado); color: var(--mg-texto); }
+
+/* Secciones */
+.mg-hero { background: var(--mg-fondo-calido); }
+.mg-eyebrow { font-size: .8rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: #8A5A3C; }
+.mg-tarjeta { background: #fff; border: 0; border-radius: var(--mg-radio); box-shadow: 0 1px 2px rgba(31, 78, 95, .08); }
+.mg-tarjeta-producto img { aspect-ratio: 1; object-fit: cover; border-radius: var(--mg-radio) var(--mg-radio) 0 0; }
+.mg-precio { color: var(--mg-primario); font-weight: 600; }
+.mg-img-cuadrada { aspect-ratio: 1; object-fit: cover; border-radius: 24px; width: 100%; }
+.text-suave { color: var(--mg-texto-suave); }
+
+/* Estados de pedido */
+.estado { display: inline-block; font-size: .8rem; font-weight: 600; padding: .3rem .7rem; border-radius: 999px; }
+.estado-pendiente { background: #FBEFD9; color: #7A4E0A; }
+.estado-pagado { background: #E1ECF5; color: #1F4E78; }
+.estado-enviado { background: #DDEFEC; color: #155E54; }
+.estado-entregado { background: #E3F1E4; color: #2D6A33; }
+.estado-cancelado { background: #ECEDEE; color: #4A5056; }
+
+.mg-progreso { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .5rem; list-style: none; padding: 0; margin: 0; }
+.mg-progreso .barra { height: 6px; border-radius: 3px; background: #DDE2E5; }
+.mg-progreso .hecho .barra { background: var(--mg-primario); }
+
+/* Administracion */
+.mg-admin { display: flex; flex-wrap: wrap; min-height: calc(100vh - 72px); background: #F2F4F5; }
+.mg-admin-menu { flex: 1 1 220px; max-width: 100%; background: var(--mg-texto); padding: 1.5rem 1rem; }
+.mg-admin-menu a { display: block; color: #D3D9DD; text-decoration: none; padding: .75rem; border-radius: 10px; margin-bottom: .25rem; }
+.mg-admin-menu a.active { background: var(--mg-primario); color: #fff; font-weight: 600; }
+.mg-admin-menu a:hover { color: #fff; }
+.mg-admin-contenido { flex: 999 1 640px; min-width: 0; padding: 2rem; }
+.mg-admin table td, .mg-admin table th { vertical-align: middle; }
+.mg-mini { width: 48px; height: 48px; object-fit: cover; border-radius: 10px; }
+
+footer#pie { background: #fff; border-top: 1px solid var(--mg-borde); }

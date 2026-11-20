@@ -29,3 +29,9 @@ class ActualizarPerfilDTO(Schema):
         validate=validate.Length(max=20),
         allow_none=True,
     )
+
+
+class AdminActualizarUsuarioDTO(ActualizarPerfilDTO):
+    """DTO para que el administrador edite y active/desactive clientes."""
+
+    activo = fields.Boolean(load_default=None, allow_none=True)

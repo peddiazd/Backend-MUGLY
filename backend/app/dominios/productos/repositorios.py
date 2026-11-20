@@ -23,6 +23,23 @@ class ProductoRepositorio:
         return db.session.query(Producto).all()
 
     @staticmethod
+    def obtener_disponibles():
+        """Devuelve solo los productos disponibles para la venta."""
+        return db.session.query(Producto).filter_by(disponible=True).all()
+
+    @staticmethod
+    def tiene_pedidos(producto_id):
+        """Indica si el producto aparece en algun pedido."""
+        from app.dominios.pedidos.modelos import DetallePedido
+
+        return (
+            db.session.query(DetallePedido.id)
+            .filter_by(producto_id=producto_id)
+            .first()
+            is not None
+        )
+
+    @staticmethod
     def eliminar(producto):
         """Elimina un producto de la base de datos."""
         db.session.delete(producto)

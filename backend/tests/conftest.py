@@ -18,8 +18,10 @@ from app import crear_app, db as _db
 
 
 @pytest.fixture(scope="session")
-def app():
+def app(tmp_path_factory):
     app = crear_app()
+    # Las imagenes de prueba se guardan en una carpeta temporal.
+    app.config["UPLOAD_FOLDER"] = str(tmp_path_factory.mktemp("uploads"))
 
     with app.app_context():
         _db.create_all()

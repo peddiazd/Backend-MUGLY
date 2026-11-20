@@ -17,6 +17,13 @@ class Usuario(db.Model):
         nullable=False,
         server_default="usuario",
     )
+    # Un usuario desactivado no puede iniciar sesion ni usar su token.
+    activo = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=True,
+        server_default=db.true(),
+    )
 
     perfil = db.relationship(
         "PerfilUsuario",
@@ -34,6 +41,7 @@ class Usuario(db.Model):
                 self.fecha_creacion.isoformat() if self.fecha_creacion else None
             ),
             "rol": self.rol,
+            "activo": self.activo,
         }
 
 

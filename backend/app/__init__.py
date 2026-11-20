@@ -1,5 +1,5 @@
 
-from flask import Flask
+from flask import Flask, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from flask_migrate import Migrate
@@ -24,7 +24,11 @@ def crear_app():
     migrate.init_app(app, db)
 
     # Registrar modelos de pedidos
-    from app.dominios.pedidos.modelos import Pedido, DetallePedido
+    from app.dominios.pedidos.modelos import (  # noqa: F401
+        Pedido,
+        DetallePedido,
+        HistorialEstadoPedido,
+    )
 
     CORS(
         app,
@@ -54,6 +58,7 @@ def crear_app():
     from app.dominios.productos.servicios import (
         ProductoServicio,
         ProductoNoEncontradoError,
+        ImagenInvalidaError,
     )
 
     productos_ctrl.producto_servicio = ProductoServicio()
@@ -93,7 +98,19 @@ def crear_app():
             "version": API_VERSION,
         }, 200
 
+    # Imagenes de productos (ADR-006)
+    @app.route("/uploads/<path:nombre>", methods=["GET"])
+    def servir_imagen(nombre):
+        return send_from_directory(app.config["UPLOAD_FOLDER"], nombre)
+
     # Manejadores globales de error
+    @app.errorhandler(413)
+    def archivo_muy_grande(error):
+        return {
+            "success": False,
+            "error": {"message": "El archivo supera el tamaño máximo de 5 MB."},
+        }, 413
+
     @app.errorhandler(404)
     def recurso_no_encontrado(error):
         return {
@@ -114,7 +131,23 @@ def crear_app():
         CredencialesInvalidasError,
         UsuarioNoEncontradoError,
         PermisoDenegadoError,
+        CuentaDesactivadaError,
+        OperacionNoPermitidaError,
     )
+
+    @app.errorhandler(CuentaDesactivadaError)
+    def cuenta_desactivada(error):
+        return {
+            "success": False,
+            "error": {"message": str(error)},
+        }, 403
+
+    @app.errorhandler(OperacionNoPermitidaError)
+    def operacion_no_permitida(error):
+        return {
+            "success": False,
+            "error": {"message": str(error)},
+        }, 400
 
     @app.errorhandler(CorreoYaRegistradoError)
     def correo_duplicado(error):
@@ -144,7 +177,7 @@ def crear_app():
             "error": {"message": str(error)},
         }, 403
 
-    # Error propio del modulo de productos
+    # Errores propios del modulo de productos
     @app.errorhandler(ProductoNoEncontradoError)
     def producto_no_encontrado(error):
         return {
@@ -152,12 +185,19 @@ def crear_app():
             "error": {"message": str(error)},
         }, 404
 
+    @app.errorhandler(ImagenInvalidaError)
+    def imagen_invalida(error):
+        return {
+            "success": False,
+            "error": {"message": str(error)},
+        }, 400
+
     # Errores propios del modulo de pedidos
     from app.dominios.pedidos.servicios import (
         PedidoNoEncontradoError,
         ProductoPedidoNoDisponibleError,
-        PedidoPagoYaProcesadoError,
-        ResultadoPagoInvalidoError,
+        TransicionEstadoInvalidaError,
+        DatosEnvioRequeridosError,
     )
 
     @app.errorhandler(PedidoNoEncontradoError)
@@ -174,15 +214,15 @@ def crear_app():
             "error": {"message": str(error)},
         }, 400
 
-    @app.errorhandler(PedidoPagoYaProcesadoError)
-    def pedido_pago_ya_procesado(error):
+    @app.errorhandler(TransicionEstadoInvalidaError)
+    def transicion_invalida(error):
         return {
             "success": False,
             "error": {"message": str(error)},
         }, 400
 
-    @app.errorhandler(ResultadoPagoInvalidoError)
-    def resultado_pago_invalido(error):
+    @app.errorhandler(DatosEnvioRequeridosError)
+    def datos_envio_requeridos(error):
         return {
             "success": False,
             "error": {"message": str(error)},

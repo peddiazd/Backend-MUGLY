@@ -15,3 +15,7 @@ __pycache__/
 # Archivos subidos por usuarios
 backend/uploads/*
 !backend/uploads/.gitkeep
+# Configuracion local del editor y de extensiones (no es parte del proyecto)
+.vscode/
+.postman/
+postman/

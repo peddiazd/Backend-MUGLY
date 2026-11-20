@@ -172,7 +172,6 @@ MUGLY/
 │   ├── __init__.py             # App factory, registro de blueprints y extensiones
 │   ├── config.py               # Configuracion (variables de entorno, BD, CORS)
 │   ├── seguridad.py            # Decoradores JWT y validacion de tokens
-│   ├── migrate.py              # Reexport de Flask-Migrate
 │   └── dominios/
 │       ├── usuarios/           # Dominio de usuarios
 │       │   ├── controladores.py

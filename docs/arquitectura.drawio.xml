@@ -5,8 +5,8 @@
     <mxCell id="titulo" value="Arquitectura del Sistema - MUGLY API" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontStyle=1" vertex="1" parent="1">
       <mxGeometry x="40" y="20" width="200" height="40" as="geometry" />
     </mxCell>
-    <mxCell id="cliente" value="Cliente / Frontend" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
-      <mxGeometry x="40" y="80" width="140" height="60" as="geometry" />
+    <mxCell id="cliente" value="Frontend SPA&lt;br&gt;(HTML, CSS, JS Vanilla + Bootstrap)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+      <mxGeometry x="40" y="80" width="160" height="60" as="geometry" />
     </mxCell>
     <mxCell id="api" value="Flask API (app.py)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
       <mxGeometry x="260" y="80" width="160" height="60" as="geometry" />

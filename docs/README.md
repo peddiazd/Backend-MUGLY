@@ -10,7 +10,7 @@
 
 El sistema está organizado en capas que separan la presentación, la lógica de negocio y el acceso a datos.
 
-![Arquitectura](./arquitectura.png)
+Diagrama: [`arquitectura.drawio.xml`](./arquitectura.drawio.xml)
 
 ### Capas
 
@@ -33,7 +33,7 @@ El sistema está organizado en capas que separan la presentación, la lógica de
 
 ## Modelo de Datos
 
-![Base de datos](./base_datos.png)
+Diagrama: [`base_datos.drawio.xml`](./base_datos.drawio.xml)
 
 ### Entidades
 
@@ -57,7 +57,7 @@ El sistema está organizado en capas que separan la presentación, la lógica de
 
 ## Endpoints de la API
 
-![Endpoints](./endpoints.png)
+Diagrama: [`endpoints.drawio.xml`](./endpoints.drawio.xml)
 
 Prefijo base: `/api/v1`
 
@@ -143,7 +143,7 @@ En caso de error:
 
 ### Autenticacion y Autorizacion
 
-![Flujo de autenticacion](./flujo_autenticacion.png)
+Diagrama: [`flujo_autenticacion.drawio.xml`](./flujo_autenticacion.drawio.xml)
 
 1. **Registro:** El cliente envia correo y contraseña. El sistema hashea la contraseña con Werkzeug y guarda al usuario en BD.
 2. **Login:** El cliente envia credenciales. Si son validas, se genera un JWT firmado con HS256 y se devuelve un `access_token`.
@@ -151,7 +151,7 @@ En caso de error:
 
 ### Creacion y Pago de Pedidos
 
-![Flujo de pedido](./flujo_pedido.png)
+Diagrama: [`flujo_pedido.drawio.xml`](./flujo_pedido.drawio.xml)
 
 1. **Crear pedido:** El usuario autenticado envia una lista de productos con cantidades. El sistema valida que cada producto exista, este disponible y tenga stock suficiente. Se crea el pedido en estado `pendiente`. **El stock no se descuenta todavia.**
 2. **Pago por WhatsApp:** No hay pasarela en esta version (D8). El cliente coordina el pago por WhatsApp y el **administrador** registra la confirmacion: `pendiente → pagado`. En ese momento se descuenta el stock una sola vez. Si el pago no se concreta, el administrador lo pasa a `cancelado`.
@@ -322,17 +322,15 @@ Se esperan **65 pruebas pasando**.
 
 ---
 
-## Diagramas (PlantUML + planttext.com)
+## Diagramas (draw.io)
 
-Los diagramas fueron generados con **PlantUML** y renderizados a través de [planttext.com](https://www.planttext.com/).
+| Diagrama | Archivo | Contenido |
+|----------|---------|-----------|
+| Arquitectura | `arquitectura.drawio.xml` | Frontend SPA, capas del backend y módulos secundarios |
+| Modelo de datos | `base_datos.drawio.xml` | Entidades y relaciones, incluido el historial de estados |
+| Endpoints | `endpoints.drawio.xml` | Rutas de la API por dominio y de administración |
+| Autenticación | `flujo_autenticacion.drawio.xml` | Login, JWT y autorización por rol |
+| Pedidos | `flujo_pedido.drawio.xml` | Ciclo del pedido, pago confirmado por el administrador y envío |
 
-| Diagrama | Fuente (`.puml`) | Imagen (`.png`) | Contenido |
-|----------|-----------------|-----------------|-----------|
-| Arquitectura | `arquitectura.puml` | `arquitectura.png` | Capas del sistema y modulos secundarios |
-| Modelo de datos | `base_datos.puml` | `base_datos.png` | Entidades y relaciones (ER) |
-| Endpoints | `endpoints.puml` | `endpoints.png` | Rutas de la API por dominio |
-| Autenticacion | `flujo_autenticacion.puml` | `flujo_autenticacion.png` | Login, JWT, autorizacion admin |
-| Pedidos | `flujo_pedido.puml` | `flujo_pedido.png` | Creacion, stock y pago de pedidos |
-
-Para editar los diagramas, abre los archivos `.puml` en cualquier editor PlantUML o pega su contenido en [planttext.com](https://www.planttext.com/).
+Para editarlos, abre el archivo en [diagrams.net](https://app.diagrams.net/) (Archivo → Abrir desde → Dispositivo) o con la extensión de draw.io para VS Code.
 

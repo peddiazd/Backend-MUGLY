@@ -25,7 +25,7 @@ sys.path.insert(0, RAIZ_BACKEND)
 
 from werkzeug.datastructures import FileStorage  # noqa: E402
 
-from app import crear_app  # noqa: E402
+from app import crear_app, db  # noqa: E402
 from app.dominios.productos.modelos import Producto  # noqa: E402
 from app.dominios.productos.servicios import ProductoServicio  # noqa: E402
 from app.dominios.usuarios.repositorios import UsuarioRepositorio  # noqa: E402
@@ -63,7 +63,7 @@ def cargar_productos(carpeta_uploads):
             producto_id = producto.id
             estado = "ya existía"
 
-        producto = Producto.query.get(producto_id)
+        producto = db.session.get(Producto, producto_id)
         foto_ok = bool(producto.imagen) and os.path.exists(os.path.join(carpeta_uploads, producto.imagen))
         if not foto_ok:
             ruta = os.path.join(IMAGENES, datos["imagen"])
@@ -108,4 +108,22 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    from sqlalchemy.exc import OperationalError, ProgrammingError
+
+    try:
+        main()
+    except OperationalError as error:
+        codigo = error.orig.args[0] if getattr(error, "orig", None) and error.orig.args else None
+        print("\nNo se pudo conectar con MySQL.", file=sys.stderr)
+        if codigo == 1045:
+            print("  Usuario o contraseña incorrectos: revise DB_USER y DB_PASSWORD en backend/.env.", file=sys.stderr)
+        elif codigo == 1049:
+            print("  La base no existe: ejecute primero python scripts/create_db.py.", file=sys.stderr)
+        else:
+            print("  Revise que MySQL esté en ejecución y los datos DB_* de backend/.env.", file=sys.stderr)
+        print(f"  Detalle: {error.orig}", file=sys.stderr)
+        sys.exit(1)
+    except ProgrammingError as error:
+        print("\nFaltan las tablas: ejecute primero flask --app \"app:crear_app()\" db upgrade.", file=sys.stderr)
+        print(f"  Detalle: {error.orig}", file=sys.stderr)
+        sys.exit(1)

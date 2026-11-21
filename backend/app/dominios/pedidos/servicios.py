@@ -240,6 +240,33 @@ class PedidoServicio:
 
         return self._serializar_pedido(pedido)
 
+    def buscar_pedidos(self, parametros):
+        """Búsqueda paginada de pedidos con el correo del cliente."""
+        from app.fechas import rango_utc
+        from app.paginacion import paginar
+
+        inicio = fin = None
+        if parametros["desde"] or parametros["hasta"]:
+            desde = parametros["desde"] or parametros["hasta"]
+            hasta = parametros["hasta"] or parametros["desde"]
+            inicio, fin = rango_utc(min(desde, hasta), max(desde, hasta))
+
+        consulta = PedidoRepositorio.buscar(
+            q=parametros["q"],
+            estado=parametros["estado"],
+            tipo=parametros["tipo"],
+            inicio=inicio,
+            fin=fin,
+        )
+        filas, meta = paginar(consulta, parametros["pagina"], parametros["por_pagina"])
+        items = []
+        for pedido, correo in filas:
+            item = self._serializar_pedido(pedido)
+            item["cliente"] = correo
+            items.append(item)
+        conteo = PedidoRepositorio.contar_por_estado()
+        return {"items": items, "por_estado": conteo, **meta}
+
     @staticmethod
     def _serializar_pedido(pedido):
         """Convierte el pedido, sus detalles y su historial en un diccionario."""

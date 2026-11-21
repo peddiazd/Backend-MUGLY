@@ -2,7 +2,7 @@
 // El pedido queda pendiente; el pago se coordina por WhatsApp (D1, D3).
 import { api, urlImagen } from '../api.js';
 import {
-  estado, haySesion, cambiarCantidad, quitarDelCarrito, actualizarItem,
+  estado, esAdmin, haySesion, cambiarCantidad, quitarDelCarrito, actualizarItem,
   vaciarCarrito, totalCarrito, unidadesCarrito,
 } from '../estado.js';
 import { esc, moneda, cargando, alerta, avisar, enlaceWhatsApp } from '../componentes/ui.js';
@@ -65,6 +65,14 @@ function pedidoCreado(app, pedido) {
 }
 
 export async function render(app) {
+  // El administrador gestiona la tienda desde su panel; no realiza compras.
+  if (esAdmin()) {
+    app.innerHTML = `<div class="container py-5" style="max-width:640px">
+      <h1 class="h3">El carrito es para clientes</h1>
+      <p class="text-suave">Con una cuenta de administrador se gestiona la tienda, no se compra. Para probar una compra, ingresa con una cuenta de cliente.</p>
+      <a class="btn btn-primary" href="#/admin">Volver al panel</a></div>`;
+    return;
+  }
   app.innerHTML = `<div class="container py-5">${cargando('Revisando tu carrito…')}</div>`;
   await refrescarItems();
 

@@ -35,3 +35,27 @@ class AdminActualizarUsuarioDTO(ActualizarPerfilDTO):
     """DTO para que el administrador edite y active/desactive clientes."""
 
     activo = fields.Boolean(load_default=None, allow_none=True)
+
+
+class BusquedaClientesDTO(Schema):
+    """Parámetros de la búsqueda paginada de clientes (vista administrativa)."""
+
+    q = fields.String(load_default="", validate=validate.Length(max=100))
+    estado = fields.String(
+        load_default="todos",
+        validate=validate.OneOf(["todos", "activos", "desactivados"]),
+    )
+    pedidos = fields.String(
+        load_default="todos", validate=validate.OneOf(["todos", "con", "sin"])
+    )
+    registro = fields.String(
+        load_default="todos", validate=validate.OneOf(["todos", "30d", "anio"])
+    )
+    orden = fields.String(
+        load_default="recientes",
+        validate=validate.OneOf(["recientes", "pedidos", "compra"]),
+    )
+    pagina = fields.Integer(load_default=1, validate=validate.Range(min=1))
+    por_pagina = fields.Integer(
+        load_default=20, validate=validate.Range(min=1, max=100)
+    )

@@ -2,17 +2,28 @@
 import { esc, enlaceWhatsApp, icono } from '../componentes/ui.js';
 import { CONFIG } from '../config.js';
 import { instalarDefinicionesMug, mugSVG } from '../componentes/mockups.js';
+import { obtenerContenido } from '../componentes/contenidoTienda.js';
 
-export async function render(app) {
+export async function render(app, { query = {} } = {}) {
   instalarDefinicionesMug();
+  let textos = {
+    titulo: 'Hecho para ti, de principio a fin.',
+    texto: 'MUGLY reúne en un solo lugar el catálogo, tus compras y tus pedidos. ¿Tienes una idea especial? La diseñamos contigo por WhatsApp.',
+  };
+  try {
+    const c = await obtenerContenido({ borrador: query.vista === 'borrador' });
+    textos = { ...textos, ...(c.paginas?.nosotros || {}) };
+  } catch {
+    /* se muestran los textos de siempre */
+  }
   const telefono = `+${CONFIG.WHATSAPP.slice(0, 2)} ${CONFIG.WHATSAPP.slice(2, 5)} ${CONFIG.WHATSAPP.slice(5, 8)} ${CONFIG.WHATSAPP.slice(8)}`;
 
   app.innerHTML = `
     <section class="container">
       <div class="row g-5 align-items-center mg-cabecera-pagina">
         <div class="col-lg-6">
-          <h1>Hecho para ti, de principio a fin.</h1>
-          <p>MUGLY reúne en un solo lugar el catálogo, tus compras y tus pedidos. ¿Tienes una idea especial? La diseñamos contigo por WhatsApp.</p>
+          <h1>${esc(textos.titulo)}</h1>
+          <p>${esc(textos.texto)}</p>
           <div class="d-flex flex-wrap gap-3 mt-4">
             <a class="btn btn-acento btn-lg" href="#/catalogo">Ver catálogo</a>
             <a class="btn btn-outline-primary btn-lg" href="#/personalizados">Pedir un personalizado</a>

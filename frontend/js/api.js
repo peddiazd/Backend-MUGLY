@@ -56,6 +56,28 @@ export async function api(ruta, { metodo = 'GET', cuerpo, formData } = {}) {
   return datos?.data ?? null;
 }
 
+// Descarga un archivo protegido (p. ej. un CSV del panel) con el token.
+export async function descargar(ruta, nombre) {
+  const headers = estado.token ? { Authorization: `Bearer ${estado.token}` } : {};
+  let respuesta;
+  try {
+    respuesta = await fetch(`${CONFIG.API_URL}/api/v1${ruta}`, { headers });
+  } catch {
+    throw new ApiError('No se pudo conectar con el servidor.', 0);
+  }
+  if (!respuesta.ok) {
+    let mensaje = `Error ${respuesta.status}`;
+    try { mensaje = (await respuesta.json())?.error?.message || mensaje; } catch { /* sin cuerpo */ }
+    throw new ApiError(mensaje, respuesta.status);
+  }
+  const url = URL.createObjectURL(await respuesta.blob());
+  const enlace = Object.assign(document.createElement('a'), { href: url, download: nombre });
+  document.body.appendChild(enlace);
+  enlace.click();
+  enlace.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
 // URL completa de una imagen servida por la API (/uploads/...).
 export function urlImagen(ruta) {
   return ruta ? `${CONFIG.API_URL}${ruta}` : 'assets/img/sin-imagen.svg';

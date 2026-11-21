@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify
 from marshmallow import ValidationError
 
 from app.dominios.usuarios.dtos import (
+    BusquedaClientesDTO,
     RegistroUsuarioDTO,
     ActualizarPerfilDTO,
     AdminActualizarUsuarioDTO,
@@ -149,7 +150,25 @@ def actualizar_perfil(usuario_id):
 @admin_bp.route("/usuarios", methods=["GET"])
 @requiere_admin
 def listar_usuarios(usuario_id):
-    """Listar todos los usuarios del sistema (solo admin)."""
+    """Listar usuarios (solo admin).
+
+    Sin parámetros devuelve la lista completa (compatibilidad). Con parámetros
+    (q, estado, pedidos, registro, orden, pagina, por_pagina) hace la búsqueda
+    paginada de clientes en el servidor.
+    """
+    if request.args:
+        try:
+            parametros = BusquedaClientesDTO().load(request.args.to_dict())
+        except ValidationError as err:
+            return (
+                jsonify({"success": False, "error": {"message": "Parámetros de búsqueda inválidos.", "details": err.messages}}),
+                400,
+            )
+        return (
+            jsonify({"success": True, "message": "Búsqueda de clientes.", "data": usuario_servicio.buscar_clientes(parametros)}),
+            200,
+        )
+
     lista = usuario_servicio.listar_todos_los_usuarios()
 
     return (

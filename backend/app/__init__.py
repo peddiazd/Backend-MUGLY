@@ -81,6 +81,17 @@ def crear_app():
         url_prefix=f"/api/{API_VERSION}/pedidos",
     )
 
+    # Contenido de la tienda y reportes: agregan rutas al blueprint
+    # administrativo, por eso se importan antes de registrarlo.
+    from app.dominios.contenido.modelos import ContenidoBloque  # noqa: F401
+    from app.dominios.contenido import controladores as contenido_ctrl
+    from app.dominios.reportes import controladores as reportes_ctrl  # noqa: F401
+
+    app.register_blueprint(
+        contenido_ctrl.contenido_bp,
+        url_prefix=f"/api/{API_VERSION}/contenido",
+    )
+
     # Registrar blueprint administrativo DESPUES de importar pedidos
     from app.dominios.usuarios.controladores import admin_bp
 
@@ -227,5 +238,19 @@ def crear_app():
             "success": False,
             "error": {"message": str(error)},
         }, 400
+
+    # Errores propios del modulo de contenido
+    from app.dominios.contenido.servicios import (
+        ContenidoNoEncontradoError,
+        ContenidoInvalidoError,
+    )
+
+    @app.errorhandler(ContenidoNoEncontradoError)
+    def contenido_no_encontrado(error):
+        return {"success": False, "error": {"message": str(error)}}, 404
+
+    @app.errorhandler(ContenidoInvalidoError)
+    def contenido_invalido(error):
+        return {"success": False, "error": {"message": str(error)}}, 400
 
     return app

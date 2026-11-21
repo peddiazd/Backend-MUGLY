@@ -28,15 +28,20 @@ function renderEncabezado() {
          </button>
          <ul class="dropdown-menu dropdown-menu-end">
            <li><span class="dropdown-item-text small text-suave text-truncate d-block" style="max-width:240px">${esc(usuario.correo)}</span></li>
-           <li><a class="dropdown-item" href="#/mis-pedidos">Mis pedidos</a></li>
-           ${esAdmin() ? '<li><a class="dropdown-item" href="#/admin/pedidos">Panel de administración</a></li>' : ''}
+           ${esAdmin() ? '<li><a class="dropdown-item" href="#/admin">Panel de administración</a></li>' : '<li><a class="dropdown-item" href="#/mis-pedidos">Mis pedidos</a></li>'}
            <li><hr class="dropdown-divider"></li>
            <li><button class="dropdown-item" type="button" data-accion="salir">Cerrar sesión</button></li>
          </ul>
        </div>`
     : '<a class="btn btn-primary" href="#/ingresar">Ingresar</a>';
 
-  document.getElementById('encabezado').innerHTML = `
+  // El administrador gestiona la tienda, no compra: ve la tienda tal como la
+  // ven los clientes, con un acceso de vuelta a su panel y sin carrito.
+  const barraAdmin = esAdmin()
+    ? '<div class="mg-tienda-admin" role="status">Estás viendo la tienda como administrador. <a href="#/admin">Volver al panel</a></div>'
+    : '';
+
+  document.getElementById('encabezado').innerHTML = `${barraAdmin}
     <nav class="navbar navbar-expand-xl mg-nav" aria-label="Principal">
       <div class="container">
         <span class="navbar-brand me-4 py-0">${logo()}</span>
@@ -47,18 +52,17 @@ function renderEncabezado() {
         <div class="collapse navbar-collapse" id="menuPrincipal">
           <ul class="navbar-nav me-auto">
             ${ENLACES.map((e) => `<li class="nav-item"><a class="nav-link ${activo(e.ruta) ? 'active' : ''}" ${activo(e.ruta) ? 'aria-current="page"' : ''} href="#${e.ruta}">${e.texto}</a></li>`).join('')}
-            ${usuario ? `<li class="nav-item"><a class="nav-link ${activo('/mis-pedidos') ? 'active' : ''}" href="#/mis-pedidos">Mis pedidos</a></li>` : ''}
-            ${esAdmin() ? `<li class="nav-item"><a class="nav-link ${activo('/admin') ? 'active' : ''}" href="#/admin/pedidos">Administración</a></li>` : ''}
+            ${usuario && !esAdmin() ? `<li class="nav-item"><a class="nav-link ${activo('/mis-pedidos') ? 'active' : ''}" href="#/mis-pedidos">Mis pedidos</a></li>` : ''}
           </ul>
           <form class="d-flex my-2 my-xl-0 me-xl-3" role="search" id="formBuscar">
             <label for="buscar" class="visually-hidden">Buscar mugs</label>
             <input class="form-control" type="search" id="buscar" placeholder="Buscar mugs…">
           </form>
           <div class="d-flex align-items-center gap-2">
-            <a href="#/carrito" class="mg-carrito" aria-label="Carrito, ${unidades} unidades">
+${esAdmin() ? '' : `            <a href="#/carrito" class="mg-carrito" aria-label="Carrito, ${unidades} unidades">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4h2l2.4 11h10.2L20 7H6.2"/><circle cx="9" cy="19.5" r="1.4"/><circle cx="17" cy="19.5" r="1.4"/></svg>
               ${unidades ? `<span class="position-absolute top-0 start-100 translate-middle badge rounded-pill mg-insignia" style="margin-left:-6px;margin-top:6px">${unidades}</span>` : ''}
-            </a>
+            </a>`}
             ${cuenta}
           </div>
         </div>

@@ -1,6 +1,6 @@
 // Administracion de productos, fotos e inventario (RF14, RF15, D6).
 import { api, urlImagen, textoError } from '../../api.js';
-import { adminLayout } from '../../componentes/adminLayout.js';
+import { adminLayout, encabezadoAdmin } from '../../componentes/adminLayout.js';
 import { esc, moneda, cargando, alerta, avisar, modal, confirmar } from '../../componentes/ui.js';
 
 const FORMATOS = ['image/jpeg', 'image/png', 'image/webp'];
@@ -52,28 +52,36 @@ function leerFormulario(el) {
   return { nombre, descripcion, precio, cantidad_stock, disponible };
 }
 
-export async function render(app) {
+export async function render(app, { query = {} } = {}) {
   const cont = adminLayout(app, '/admin/productos');
   let productos = [];
+  let umbral = 3;
+  let soloBajo = Boolean(query.bajo);
 
   async function cargar() {
-    productos = (await api('/admin/productos')).sort((a, b) => b.id - a.id);
+    const [lista, config] = await Promise.all([api('/admin/productos'), api('/admin/configuracion')]);
+    productos = lista.sort((a, b) => b.id - a.id);
+    umbral = Number(config.umbral_inventario_bajo ?? 3);
   }
 
   function pintar() {
+    const bajos = productos.filter((p) => p.disponible && p.cantidad_stock <= umbral);
+    const visibles = soloBajo ? bajos : productos;
     cont.innerHTML = `
-      <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
-        <h1 class="h2 mb-0">Productos e inventario</h1>
-        <button class="btn btn-acento" type="button" data-accion="nuevo">Nuevo producto</button>
+      ${encabezadoAdmin('Productos e inventario', `${productos.length} productos · inventario bajo: ${umbral} unidades o menos (se cambia en Configuración).`,
+        '<button class="btn btn-acento" type="button" data-accion="nuevo">Nuevo producto</button>')}
+      <div class="d-flex flex-wrap gap-2 mb-3" role="group" aria-label="Filtrar productos">
+        <button type="button" class="btn btn-sm ${soloBajo ? 'btn-outline-secondary' : 'btn-primary'}" data-accion="todos" aria-pressed="${!soloBajo}">Todos (${productos.length})</button>
+        <button type="button" class="btn btn-sm ${soloBajo ? 'btn-primary' : 'btn-outline-secondary'}" data-accion="bajo" aria-pressed="${soloBajo}">Inventario bajo (${bajos.length})</button>
       </div>
-      <div class="bg-white rounded-4 table-responsive">
+      <div class="table-responsive rounded-4">
         <table class="table mb-0">
           <thead class="table-light small">
             <tr><th scope="col">Producto</th><th scope="col">Precio</th><th scope="col">Stock</th>
                 <th scope="col">Catálogo</th><th scope="col">Acciones</th></tr>
           </thead>
           <tbody>
-            ${productos.length ? productos.map((p) => `
+            ${visibles.length ? visibles.map((p) => `
               <tr>
                 <td><div class="d-flex align-items-center gap-2">
                   <img class="mg-mini" src="${esc(urlImagen(p.imagen))}" alt="">
@@ -82,9 +90,10 @@ export async function render(app) {
                 <td>
                   <form class="d-flex gap-1 align-items-center" data-stock="${p.id}" novalidate>
                     <label class="visually-hidden" for="stock-${p.id}">Stock de ${esc(p.nombre)}</label>
-                    <input id="stock-${p.id}" class="form-control form-control-sm ${p.cantidad_stock <= 2 ? 'border-danger text-danger fw-semibold' : ''}" type="number" min="0" step="1" value="${p.cantidad_stock}" style="width: 90px; min-height: 36px">
+                    <input id="stock-${p.id}" class="form-control form-control-sm" type="number" min="0" step="1" value="${p.cantidad_stock}" style="width: 90px; min-height: 36px">
                     <button class="btn btn-outline-secondary btn-sm" type="submit">Guardar</button>
                   </form>
+                  ${p.disponible && p.cantidad_stock <= umbral ? `<span class="estado estado-pendiente mt-1">${p.cantidad_stock === 0 ? 'Agotado' : 'Inventario bajo'}</span>` : ''}
                 </td>
                 <td><span class="estado ${p.disponible ? 'estado-entregado' : 'estado-cancelado'}">${p.disponible ? 'Visible' : 'Retirado'}</span></td>
                 <td><div class="d-flex flex-wrap gap-1">
@@ -93,7 +102,7 @@ export async function render(app) {
                   <button class="btn btn-outline-danger btn-sm" data-accion="eliminar" data-id="${p.id}">Eliminar</button>
                 </div></td>
               </tr>`).join('')
-              : '<tr><td colspan="5" class="text-center text-suave py-4">Aún no hay productos. Crea el primero.</td></tr>'}
+              : `<tr><td colspan="5" class="text-center text-suave py-4">${soloBajo ? 'Ningún producto tiene inventario bajo.' : 'Aún no hay productos. Crea el primero.'}</td></tr>`}
           </tbody>
         </table>
       </div>`;
@@ -113,6 +122,8 @@ export async function render(app) {
     return;
   }
   pintar();
+  // Acceso rápido "Nuevo producto": se abre cuando los oyentes ya están listos.
+  if (query.nuevo) setTimeout(() => cont.querySelector('[data-accion="nuevo"]')?.click(), 0);
 
   // Ajuste rapido de inventario (RF15)
   cont.addEventListener('submit', async (ev) => {
@@ -141,6 +152,12 @@ export async function render(app) {
 
     try {
       switch (b.dataset.accion) {
+        case 'todos':
+        case 'bajo':
+          soloBajo = b.dataset.accion === 'bajo';
+          pintar();
+          break;
+
         case 'nuevo': {
           const creado = await modal({
             titulo: 'Nuevo producto',

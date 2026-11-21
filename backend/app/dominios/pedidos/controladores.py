@@ -3,6 +3,7 @@ from flask import Blueprint, jsonify, request
 from marshmallow import ValidationError
 
 from app.dominios.pedidos.dtos import (
+    BusquedaPedidosDTO,
     CrearPedidoDTO,
     CambiarEstadoPedidoDTO,
     CrearPedidoPersonalizadoDTO,
@@ -98,7 +99,24 @@ def obtener_pedido(usuario_id, pedido_id):
 @admin_bp.route("/pedidos", methods=["GET"])
 @requiere_admin
 def listar_todos_los_pedidos(usuario_id):
-    """Consultar todos los pedidos (solo administradores)."""
+    """Consultar pedidos (solo administradores).
+
+    Sin parámetros devuelve todos (compatibilidad). Con parámetros
+    (q, estado, tipo, desde, hasta, pagina, por_pagina) busca y pagina.
+    """
+    if request.args:
+        try:
+            parametros = BusquedaPedidosDTO().load(request.args.to_dict())
+        except ValidationError as err:
+            return (
+                jsonify({"success": False, "error": {"message": "Parámetros de búsqueda inválidos.", "details": err.messages}}),
+                400,
+            )
+        return (
+            jsonify({"success": True, "message": "Búsqueda de pedidos.", "data": pedido_servicio.buscar_pedidos(parametros)}),
+            200,
+        )
+
     lista = pedido_servicio.listar_todos_los_pedidos()
 
     return (

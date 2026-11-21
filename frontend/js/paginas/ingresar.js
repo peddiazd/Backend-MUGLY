@@ -56,7 +56,7 @@ export async function render(app, { query }) {
       });
       iniciarSesion(datos.access_token, datos.usuario);
       avisar('Sesión iniciada.');
-      navegar(volver ?? (datos.usuario.rol === 'admin' ? '/admin/pedidos' : '/'));
+      navegar(volver ?? (datos.usuario.rol === 'admin' ? '/admin' : '/'));
     } catch (error) {
       document.getElementById('errores').innerHTML = alerta(error.message);
       boton.disabled = false;

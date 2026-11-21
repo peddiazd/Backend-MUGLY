@@ -14,9 +14,11 @@ administración del negocio.
 ## Ejecutar MUGLY en un computador nuevo
 
 El repositorio (o el ZIP descargado de GitHub) trae el código, las migraciones y
-las fotos de los productos, pero **no trae datos ni el archivo `.env`**: los datos
-viven en la base MySQL de cada equipo y el `.env` guarda claves locales. Por eso,
-en un equipo nuevo, siga estos pasos en orden.
+una **copia completa de la tienda** en `backend/datos_demo/`: usuarios con sus
+contraseñas cifradas, productos con sus fotos, pedidos con su historial y el
+contenido de la página. Lo que no trae es el archivo `.env`, porque guarda las
+claves de cada equipo. En un equipo nuevo, siga estos pasos en orden y la tienda
+quedará igual a la original, con los mismos inicios de sesión.
 
 ### Requisitos
 
@@ -45,13 +47,21 @@ Con el entorno virtual activo y desde `backend/`:
 ```bash
 python scripts/create_db.py                     # crea la base mugly_db
 flask --app "app:crear_app()" db upgrade        # crea las tablas (7 migraciones)
-python scripts/cargar_datos_demo.py --admin admin@mugly.com
+python scripts/copia_tienda.py importar         # carga usuarios, productos, pedidos, contenido y fotos
 ```
 
-El último comando carga los 6 mugs del catálogo con sus fotos y crea la cuenta de
-administrador `admin@mugly.com`, cuya contraseña pide por teclado. Se puede ejecutar
-de nuevo sin duplicar nada. Las cuentas de cliente se crean desde la página
-(«Regístrate»).
+El último comando deja la tienda igual a la del equipo original: las mismas cuentas
+(por ejemplo `admin@mugly.com` y `cliente@mugly.com`) con **las mismas contraseñas**,
+los mismos productos con sus fotos y los mismos pedidos. Solo se ejecuta sobre una
+base vacía, para no pisar datos.
+
+**Actualizar la copia.** Si en el equipo original se agregan datos y se quieren
+llevar al otro equipo, en el original ejecute `python scripts/copia_tienda.py exportar`
+y suba a GitHub los cambios de `backend/datos_demo/`.
+
+**Tienda limpia (opcional).** Si en lugar de la copia se quiere una tienda nueva,
+solo con los 6 mugs y un administrador propio, use
+`python scripts/cargar_datos_demo.py --admin admin@mugly.com` (pide la contraseña).
 
 Inicie la API y deje esa terminal abierta:
 
@@ -73,7 +83,8 @@ Abra **http://localhost:5173** en el navegador.
 
 | Síntoma | Causa | Solución |
 |---|---|---|
-| El catálogo sale vacío («0 mugs») | La base es nueva y no tiene productos | `python scripts/cargar_datos_demo.py` |
+| El catálogo sale vacío («0 mugs») | La base es nueva y no se importó la copia | `python scripts/copia_tienda.py importar` |
+| «La base ya tiene datos» al importar | La copia solo se carga en una base vacía | Use una base nueva (cambie `DB_NAME` en `.env` y repita los pasos) |
 | «No se pudo conectar con el servidor» | La API no está corriendo, o el `.env` tiene mal la contraseña de MySQL | Revise la terminal de `python app.py` y el `.env` |
 | La página queda en blanco | Se abrió `index.html` con doble clic (`file://`) | Ábrala siempre en `http://localhost:5173` |
 | `flask` no se reconoce | El entorno virtual no está activo | Active `venv` (paso 1) |

@@ -3,8 +3,10 @@
 Mockups de los 6 productos de muestra: foto de mug blanco con el diseño de cada
 producto, fondo transparente (PNG, 750 × 705 px).
 
-La carpeta `backend/uploads/` no se versiona, así que cada equipo debe cargarlas
-desde **Administración → Productos e inventario → editar producto → imagen**.
+La carpeta `backend/uploads/` no se versiona. En un equipo nuevo, el script
+`backend/scripts/cargar_datos_demo.py` crea los 6 productos y les sube estas fotos
+(ver «Ejecutar MUGLY en un computador nuevo» en el README principal). También se
+pueden cambiar desde **Administración → Productos e inventario → Foto**.
 
 | Producto (id) | Archivo |
 |---|---|

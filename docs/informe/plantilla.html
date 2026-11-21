@@ -323,14 +323,14 @@ dialog.visor img{display:block;max-width:100%;height:auto;margin:0 auto}
   <p>El proyecto se desarrolló como trabajo de la asignatura Arquitectura de Software (2026-2), siguiendo de forma adaptada el manual metodológico de la asignatura: gestión comercial, descubrimiento de requisitos, Scrum con Jira, diseño arquitectónico con decisiones registradas (ADR), preparación técnica y desarrollo incremental con pruebas.</p>
 
   <div class="cifras">
-    <div class="cifra"><b>22</b><span>requisitos funcionales (21 cumplidos, 1 diferido)</span></div>
+    <div class="cifra"><b>28</b><span>requisitos funcionales (27 cumplidos, 1 diferido)</span></div>
     <div class="cifra"><b>18</b><span>casos de uso (15 + 3 del panel, CR-01)</span></div>
-    <div class="cifra"><b>18</b><span>reglas de negocio</span></div>
+    <div class="cifra"><b>21</b><span>reglas de negocio</span></div>
     <div class="cifra"><b>5</b><span>dominios: usuarios, productos, pedidos, contenido y reportes</span></div>
     <div class="cifra"><b>39</b><span>endpoints REST (37 bajo <code>/api/v1</code>)</span></div>
     <div class="cifra"><b>20/20</b><span>historias del Sprint 1 en Listo</span></div>
     <div class="cifra"><b>107</b><span>pruebas automáticas aprobadas</span></div>
-    <div class="cifra"><b>18</b><span>documentos aprobados en el expediente</span></div>
+    <div class="cifra"><b>21</b><span>documentos en el expediente (7 de v1.2.0 en revisión)</span></div>
   </div>
 
   <div class="rejilla">
@@ -449,10 +449,10 @@ dialog.visor img{display:block;max-width:100%;height:auto;margin:0 auto}
 ├── 01_Gestion_Comercial/       MGL-COM-001 · MGL-DEC-001 · MGL-REU-001 · MGL-REU-002
 ├── 02_Descubrimiento_Requisitos/  MUGS.pdf (MGL-REQ-001) · MGL-REU-003 · MGL-REQ-002 · MGL-ALC-001
 ├── 03_Propuesta_Contratacion/  MGL-EST-001 · MGL-AUT-001
-├── 04_Gestion_Proyecto/        MGL-RIE-001 · MGL-SCR-001 · MGL-BKL-001
-├── 05_Arquitectura_Diseno/     MGL-ARQ-001 (ADR-001 a ADR-007)
+├── 04_Gestion_Proyecto/        MGL-RIE-001 · MGL-SCR-001 · MGL-BKL-001 · MGL-CR-001
+├── 05_Arquitectura_Diseno/     MGL-ARQ-001 (ADR-001 a ADR-011) · copia de este informe
 ├── 06_Desarrollo_Pruebas/      MGL-TST-001
-├── 07_Despliegue_Entregas/     MGL-REL-001 · MGL-ENT-001
+├── 07_Despliegue_Entregas/     MGL-REL-001 · MGL-REL-002 · MGL-ENT-001 · MGL-ENT-002
 └── 08_Operacion_Mantenimiento/ MGL-CIE-001</pre>
   <p>Con MGL-REU-002 los propietarios cerraron la fase 01 y habilitaron la fase 02. Los estados posibles de un documento son Borrador, En revisión, Aprobado, Vigente, Sustituido y Cerrado.</p>
 </section>
@@ -493,9 +493,9 @@ dialog.visor img{display:block;max-width:100%;height:auto;margin:0 auto}
   </div>
 
   <h3 id="f2-rf">2.3 Requisitos funcionales y trazabilidad</h3>
-  <p>La matriz MGL-REQ-002 relaciona cada requisito con su caso de uso, el acuerdo que lo precisa y su criterio de aceptación. La última columna muestra dónde quedó implementado en la versión v1.0.0.</p>
+  <p>La matriz MGL-REQ-002 relaciona cada requisito con su caso de uso, el acuerdo que lo precisa y su criterio de aceptación. La columna de implementación muestra dónde quedó cada uno en el código. RF23–RF28 se agregaron en la versión 1.1 de la matriz por la solicitud de cambio CR-01 (MGL-CR-001).</p>
   <div class="tabla-c ids"><table>
-    <tr><th>RF</th><th>Requisito</th><th>CU</th><th>Acuerdo</th><th>Implementación v1.0</th><th>Estado</th></tr>
+    <tr><th>RF</th><th>Requisito</th><th>CU</th><th>Acuerdo</th><th>Implementación</th><th>Estado</th></tr>
     <tr><td>RF01</td><td>Registrarse como cliente</td><td>CU01</td><td></td><td><code>POST /usuarios/registro</code> · página registro</td><td><span class="chip ok">Cumplido</span></td></tr>
     <tr><td>RF02</td><td>Iniciar sesión</td><td>CU02</td><td>D5</td><td><code>POST /usuarios/login</code> (403 si está desactivada)</td><td><span class="chip ok">Cumplido</span></td></tr>
     <tr><td>RF03</td><td>Consultar el catálogo</td><td>CU03</td><td></td><td><code>GET /productos</code> (solo disponibles) · inicio</td><td><span class="chip ok">Cumplido</span></td></tr>
@@ -518,6 +518,13 @@ dialog.visor img{display:block;max-width:100%;height:auto;margin:0 auto}
     <tr><td>RF20</td><td>Registrar la guía</td><td>CU15</td><td>D4b</td><td><code>numero_guia</code> visible para el cliente</td><td><span class="chip ok">Cumplido</span></td></tr>
     <tr><td>RF21</td><td>Comunicación con pasarela</td><td>CU06</td><td>D8</td><td>Fuera de v1.0 por decisión de los propietarios</td><td><span class="chip dif">Diferido</span></td></tr>
     <tr><td>RF22</td><td>Dirigir a WhatsApp</td><td>CU09</td><td>D4a</td><td>Igual que RF12</td><td><span class="chip ok">Cumplido</span></td></tr>
+    <tr class="grupo"><td colspan="6">Solicitud de cambio CR-01 · versión v1.2.0</td></tr>
+    <tr><td>RF23</td><td>Panel administrativo propio</td><td>CU10–CU18</td><td>CR-01</td><td><code>adminLayout.js</code> · rutas <code>#/admin/*</code></td><td><span class="chip ok">Cumplido</span></td></tr>
+    <tr><td>RF24</td><td>Indicadores y alertas del negocio</td><td>CU17</td><td>CR-01</td><td><code>GET /admin/resumen</code> · admin/dashboard</td><td><span class="chip ok">Cumplido</span></td></tr>
+    <tr><td>RF25</td><td>Buscar clientes y pedidos</td><td>CU12, CU13</td><td>CR-01</td><td>Parámetros en <code>/admin/usuarios</code> y <code>/admin/pedidos</code></td><td><span class="chip ok">Cumplido</span></td></tr>
+    <tr><td>RF26</td><td>Finanzas y reportes CSV</td><td>CU17</td><td>CR-01</td><td><code>/admin/reportes/*</code> · admin/finanzas</td><td><span class="chip ok">Cumplido</span></td></tr>
+    <tr><td>RF27</td><td>Contenido de la tienda</td><td>CU16</td><td>CR-01</td><td>Dominio contenido · admin/contenido</td><td><span class="chip ok">Cumplido</span></td></tr>
+    <tr><td>RF28</td><td>Configuración e inventario bajo</td><td>CU18, CU11</td><td>CR-01</td><td><code>/admin/configuracion</code> · admin/productos</td><td><span class="chip ok">Cumplido</span></td></tr>
   </table></div>
 
   <h3 id="f2-rnf">2.4 Requisitos no funcionales y reglas de negocio</h3>
@@ -529,14 +536,16 @@ dialog.visor img{display:block;max-width:100%;height:auto;margin:0 auto}
     <tr><td>RNF04</td><td>Conservar la información de los pedidos</td><td>Retiro lógico de productos con pedidos; historial de estados</td></tr>
     <tr><td>RNF05</td><td>Compras, pedidos e inventario consistentes</td><td>Transacción con bloqueo de filas al confirmar el pago</td></tr>
     <tr><td>RNF06</td><td>Interacción con servicios externos</td><td>WhatsApp por enlace; pasarela diferida (D8)</td></tr>
+    <tr><td>RNF07</td><td>Búsquedas administrativas filtradas y paginadas en el servidor (CR-01)</td><td>DTO de búsqueda y <code>paginar()</code> (ADR-011)</td></tr>
   </table></div>
-  <p>Las 18 reglas de negocio se agrupan en cinco bloques (MUGS.pdf §8). Algunas se ajustaron con los acuerdos de la sesión de descubrimiento:</p>
+  <p>Las 18 reglas de negocio de MUGS.pdf §8 se agrupan en cinco bloques, y la solicitud de cambio CR-01 agregó tres más. Algunas se ajustaron con los acuerdos de la sesión de descubrimiento:</p>
   <div class="rejilla">
     <div class="tarjeta"><h4>Compra (RN01–RN05)</h4><p>Solo se compran mugs disponibles; toda compra pasa por el pago. Mientras no haya pasarela, el resultado lo registra el administrador (ajuste D3). El inventario se actualiza al confirmar.</p></div>
     <div class="tarjeta"><h4>Pedidos (RN06–RN09)</h4><p>Cada compra confirmada se asocia a un pedido. Este nace pendiente y cuenta al pasar a pagado (ajuste D1), conserva su seguimiento y lleva transportadora y guía.</p></div>
     <div class="tarjeta"><h4>Inventario (RN10–RN12)</h4><p>El stock refleja la disponibilidad, la compra confirmada lo descuenta y su gestión corresponde al administrador.</p></div>
     <div class="tarjeta"><h4>Personalizados (RN13–RN16)</h4><p>Siguen un proceso distinto: inician en MUGLY, se definen por WhatsApp fuera del sistema y el administrador registra el resultado.</p></div>
     <div class="tarjeta"><h4>Administración (RN17–RN18)</h4><p>El administrador gestiona productos, pedidos, clientes e inventario con funciones diferenciadas de las del cliente.</p></div>
+    <div class="tarjeta"><h4>Panel (RN19–RN21, CR-01)</h4><p>Las ventas confirmadas son los pedidos pagados, enviados o entregados, y los cancelados nunca suman. No se calcula utilidad sin costos registrados. Los clientes solo ven el contenido publicado.</p></div>
   </div>
   <p><strong>Restricciones y supuestos (MUGS.pdf §9):</strong> la pasarela y la transportadora no están seleccionadas; la conversación de WhatsApp ocurre fuera de MUGLY; el procesamiento del pago y la operación física de los envíos son responsabilidad de terceros. La pregunta abierta sobre la tecnología quedó resuelta por los requisitos de la asignatura (ADR-002), y la del mecanismo de confirmación del pago por el acuerdo D3.</p>
 
@@ -555,7 +564,7 @@ dialog.visor img{display:block;max-width:100%;height:auto;margin:0 auto}
       <li>Procesamiento financiero, operación física de envíos y gestión de chats de WhatsApp (MUGS.pdf §5.3)</li>
       <li>Despliegue en la nube: la entrega se ejecuta en local</li></ul></div>
   </div>
-  <p>Un requisito se acepta cuando su criterio de MGL-REQ-002 se demuestra con pruebas ejecutadas. Tras la puerta G1, cualquier cambio de alcance se trata como solicitud de cambio (manual, etapa 05.12).</p>
+  <p>Un requisito se acepta cuando su criterio de MGL-REQ-002 se demuestra con pruebas ejecutadas. Tras la puerta G1, cualquier cambio de alcance se trata como solicitud de cambio (manual, etapa 05.12). Así se hizo con el panel administrativo: la solicitud CR-01 (MGL-CR-001) agregó RF23–RF28 con su análisis de impacto y la aprobación de los propietarios (sección 5.9).</p>
 
   <h3 id="f2-riesgos">2.6 Viabilidad y riesgos</h3>
   <div class="tabla-c ids"><table>
@@ -975,7 +984,7 @@ dialog.visor img{display:block;max-width:100%;height:auto;margin:0 auto}
       <p>Cómo se construyó MUGLY por incrementos y cómo el código implementa la arquitectura diseñada.</p>
     </div>
   </div>
-  <div class="evidencia"><span class="doc">Jira · MUGLY Sprint 1</span><span class="doc">PR #1</span><span class="doc">PR #2</span><span class="doc">PR #5</span><span class="doc">PR #6</span><span class="doc">v1.0.0</span><span class="doc">v1.1.0</span><span class="doc">v1.2.0</span><span class="doc">MGL-TST-001</span></div>
+  <div class="evidencia"><span class="doc">Jira · MUGLY Sprint 1</span><span class="doc">PR #1</span><span class="doc">PR #2</span><span class="doc">PR #5</span><span class="doc">PR #6</span><span class="doc">v1.0.0</span><span class="doc">v1.1.0</span><span class="doc">v1.2.0</span><span class="doc">MGL-TST-001</span><span class="doc">MGL-CR-001</span><span class="doc">MGL-REL-002</span></div>
 
   <h3 id="f5-incrementos">5.1 Incrementos</h3>
   <ol class="linea-tiempo">
@@ -1101,7 +1110,7 @@ dialog.visor img{display:block;max-width:100%;height:auto;margin:0 auto}
   </div>
 
   <h3 id="f5-panel">5.9 Incremento v1.2.0: panel administrativo</h3>
-  <p>Después de la versión v1.1.0 los propietarios pidieron que el administrador tuviera una experiencia propia, separada de la tienda, con información para manejar el negocio. Se registró como la <strong>solicitud de cambio CR-01</strong> y siguió el mismo método del proyecto: <strong>auditoría</strong> del panel existente, <strong>diagnóstico</strong>, <strong>prototipo</strong> aprobado y luego <strong>implementación</strong> con pruebas.</p>
+  <p>Después de la versión v1.1.0 los propietarios pidieron que el administrador tuviera una experiencia propia, separada de la tienda, con información para manejar el negocio. Se registró como la <strong>solicitud de cambio CR-01</strong> (documento MGL-CR-001, con su análisis de impacto y riesgos) y siguió el mismo método del proyecto: <strong>auditoría</strong> del panel existente, <strong>diagnóstico</strong>, <strong>prototipo</strong> aprobado y luego <strong>implementación</strong> con pruebas.</p>
   <div class="dos-col">
     <div class="tarjeta"><h4>Hallazgos de la auditoría</h4><ul><li>El administrador navegaba la tienda como un cliente y llegó a crear un pedido (#4)</li><li>La página de clientes pedía cada cliente por separado (problema N+1)</li><li>Todos los textos de la tienda estaban fijos en el código</li><li>No existían indicadores ni reportes del negocio</li><li>La utilidad no se puede calcular: no hay costos registrados</li></ul></div>
     <div class="tarjeta primario"><h4>Qué se construyó</h4><ul><li>Panel con menú lateral, encabezado y búsqueda global propios</li><li>Inicio con indicadores, ventas de 7 días y «Requiere atención»</li><li>Búsqueda paginada de clientes (con ficha) y de pedidos</li><li>Finanzas internas con definiciones y exportación CSV</li><li>Contenido de la tienda con borrador, vista previa y publicación</li><li>Inventario bajo configurable y configuración de la tienda</li></ul></div>
@@ -1159,16 +1168,17 @@ dialog.visor img{display:block;max-width:100%;height:auto;margin:0 auto}
     <tr><td>MGL-REU-001</td><td>Reunión inicial y responsables</td><td>01.04 · 01.05</td><td><span class="chip ok">Aprobado</span></td></tr>
     <tr><td>MGL-REU-002</td><td>Cierre de la fase 01</td><td>01.07</td><td><span class="chip ok">Aprobado</span></td></tr>
     <tr><td>MGL-REU-003</td><td>Acta de definiciones de negocio (D1–D8)</td><td>02.01 · 02.02</td><td><span class="chip ok">Aprobado</span></td></tr>
-    <tr><td>MGL-REQ-002</td><td>Matriz de requisitos y trazabilidad</td><td>02.05 · 02.06</td><td><span class="chip ok">Aprobado</span></td></tr>
+    <tr><td>MGL-REQ-002</td><td>Matriz de requisitos y trazabilidad (v1.0 aprobada; v1.1 agrega RF23–RF28)</td><td>02.05 · 02.06</td><td><span class="chip dif">En revisión</span></td></tr>
     <tr><td>MGL-ALC-001</td><td>Línea base de alcance (G1)</td><td>02.07 · 02.08</td><td><span class="chip ok">Aprobado</span></td></tr>
     <tr><td>MGL-RIE-001</td><td>Registro de riesgos</td><td>02.09</td><td><span class="chip ok">Aprobado</span></td></tr>
     <tr><td>MGL-EST-001</td><td>Estimación en horas y cronograma</td><td>02.10</td><td><span class="chip ok">Aprobado</span></td></tr>
     <tr><td>MGL-AUT-001</td><td>Registro de autorización</td><td>02.10 · 02.11</td><td><span class="chip ok">Aprobado</span></td></tr>
     <tr><td>MGL-SCR-001</td><td>Plan Scrum y acuerdos del equipo</td><td>03.01–03.06</td><td><span class="chip ok">Aprobado</span></td></tr>
-    <tr><td>MGL-BKL-001</td><td>Backlog del producto</td><td>03.04 · 03.05</td><td><span class="chip ok">Aprobado</span></td></tr>
-    <tr><td>MGL-ARQ-001</td><td>Arquitectura y decisiones (ADR)</td><td>03.07–03.15</td><td><span class="chip ok">Aprobado</span></td></tr>
+    <tr><td>MGL-BKL-001</td><td>Backlog del producto (v1.0 aprobada; v1.1 agrega H21–H27)</td><td>03.04 · 03.05</td><td><span class="chip dif">En revisión</span></td></tr>
+    <tr><td>MGL-ARQ-001</td><td>Arquitectura y decisiones (v1.0 aprobada en G2; v1.1 agrega ADR-008 a ADR-011)</td><td>03.07–03.15</td><td><span class="chip dif">En revisión</span></td></tr>
+    <tr><td>MGL-CR-001</td><td>Solicitud de cambio CR-01: panel administrativo</td><td>05.12 · control de cambios</td><td><span class="chip dif">En revisión</span></td></tr>
   </table></div>
-  <p>El expediente incluye además los documentos de las fases posteriores (MGL-TST-001, MGL-REL-001, MGL-ENT-001 y MGL-CIE-001), que no forman parte del alcance de este informe.</p>
+  <p>El expediente incluye además los documentos de las fases posteriores (MGL-TST-001 en su versión 1.1, MGL-REL-001, MGL-REL-002, MGL-ENT-001, MGL-ENT-002 y MGL-CIE-001), que no forman parte del alcance de este informe. Los documentos marcados «En revisión» se actualizaron el 21/11/2026 para la versión v1.2.0 y esperan la aprobación de los propietarios.</p>
 
   <h3 id="a-enlaces">B. Enlaces del proyecto</h3>
   <div class="tabla-c"><table>

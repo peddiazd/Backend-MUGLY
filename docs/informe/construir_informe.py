@@ -6,11 +6,15 @@ Marcadores que reemplaza:
   {{codigo:lenguaje:ruta:inicio=>fin}}   → fragmento real del código fuente,
                                            desde la línea que contiene 'inicio'
                                            hasta la que contiene 'fin' (incluida)
+  {{img:archivo}}                        → docs/informe/capturas/archivo como
+                                           data URI (el informe sigue siendo un
+                                           solo archivo)
 
 Uso (desde la raíz del repositorio):
     python docs/diagramas/generar_diagramas.py
     python docs/informe/construir_informe.py
 """
+import base64
 import html
 import os
 import re
@@ -66,10 +70,18 @@ def svg(nombre):
         return f.read().strip()
 
 
+def imagen(archivo):
+    ruta = os.path.join(os.path.dirname(__file__), "capturas", archivo)
+    tipo = "image/png" if archivo.endswith(".png") else "image/jpeg"
+    with open(ruta, "rb") as f:
+        return f"data:{tipo};base64,{base64.b64encode(f.read()).decode('ascii')}"
+
+
 def construir():
     with open(PLANTILLA, encoding="utf-8") as f:
         texto = f.read()
     texto = re.sub(r"\{\{svg:([\w]+)\}\}", lambda m: svg(m.group(1)), texto)
+    texto = re.sub(r"\{\{img:([\w.-]+)\}\}", lambda m: imagen(m.group(1)), texto)
     texto = re.sub(r"\{\{codigo:(\w+):([^:]+):(.+?)=>(.+?)\}\}",
                    lambda m: fragmento(*m.groups()), texto)
     faltan = re.findall(r"\{\{[^}]+\}\}", texto)

@@ -350,8 +350,16 @@ python docs/informe/construir_informe.py       # regenera el informe HTML
 
 El informe [`Informe_Proyecto_Final_MUGLY.html`](./Informe_Proyecto_Final_MUGLY.html)
 se construye a partir de [`informe/plantilla.html`](./informe/plantilla.html):
-incrusta estos SVG y extrae los fragmentos de código directamente del
-repositorio.
+incrusta estos SVG, las capturas de [`informe/capturas/`](./informe/capturas/) y
+extrae los fragmentos de código directamente del repositorio. Para regenerarlo:
+
+```bash
+python docs/diagramas/generar_diagramas.py
+python docs/informe/construir_informe.py
+```
+
+Las imágenes de los productos de muestra están en
+[`recursos/imagenes-productos/`](./recursos/imagenes-productos/).
 
 ## Diagramas iniciales (draw.io)
 

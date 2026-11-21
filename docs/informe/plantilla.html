@@ -894,8 +894,7 @@ dialog.visor img{display:block;max-width:100%;height:auto;margin:0 auto}
 │   ├── migrations/versions/     7 migraciones de Alembic
 │   ├── tests/                   conftest + 107 pruebas (pytest)
 │   ├── scripts/                 create_db.py · generate_secret.py · promover_admin.py ·
-│   │                            cargar_datos_demo.py · copia_tienda.py (exportar e importar la tienda)
-│   ├── datos_demo/              copia completa de la tienda (tienda.json y fotos) para otros equipos
+│   │                            cargar_datos_demo.py (6 mugs con foto y administrador)
 │   ├── uploads/                 imágenes de productos (ignoradas por git)
 │   ├── app.py · requirements.txt · .env.example · pytest.ini
 ├── frontend/
@@ -969,7 +968,7 @@ dialog.visor img{display:block;max-width:100%;height:auto;margin:0 auto}
     <li><strong>Backend:</strong> en <code>backend/</code>, crear el entorno con <code>python -m venv venv</code>, activarlo e instalar con <code>pip install -r requirements.txt</code>.</li>
     <li><strong>Configuración:</strong> copiar <code>.env.example</code> a <code>.env</code> y completar la conexión a MySQL.</li>
     <li><strong>Base de datos:</strong> ejecutar <code>python scripts/create_db.py</code> y luego <code>flask --app "app:crear_app()" db upgrade</code>.</li>
-    <li><strong>Datos:</strong> <code>python scripts/copia_tienda.py importar</code> carga la copia completa de <code>backend/datos_demo/</code> (usuarios con sus contraseñas cifradas, productos con fotos, pedidos con historial y contenido) y deja el equipo nuevo igual al original, con los mismos inicios de sesión. Solo se ejecuta sobre una base vacía. La copia se genera en el equipo original con <code>copia_tienda.py exportar</code>, usando los modelos de la aplicación. Como alternativa, <code>cargar_datos_demo.py --admin …</code> crea una tienda limpia con los 6 mugs y un administrador nuevo. Sin uno de estos pasos el catálogo queda vacío, porque los datos viven en la base de cada equipo.</li>
+    <li><strong>Datos de demostración:</strong> <code>python scripts/cargar_datos_demo.py --admin admin@mugly.com</code> crea los 6 mugs con sus fotos (de <code>docs/recursos/imagenes-productos</code>) y la cuenta de administrador, cuya contraseña pide por teclado. Usa los servicios de la aplicación y no duplica datos si se ejecuta de nuevo. Sin este paso, en un equipo nuevo el catálogo queda vacío, porque los datos viven en la base de cada equipo y no en el repositorio.</li>
     <li><strong>API:</strong> <code>python app.py</code>, que queda escuchando en <code>http://localhost:5000</code>. Si se prefiere, un administrador también puede crearse registrando la cuenta y ejecutando <code>python scripts/promover_admin.py</code>.</li>
     <li><strong>Frontend:</strong> en <code>frontend/</code>, ejecutar <code>python -m http.server 5173</code> y abrir <code>http://localhost:5173</code> (no abrir <code>index.html</code> con doble clic: los módulos ES no cargan desde <code>file://</code>).</li>
     <li><strong>Pruebas:</strong> en <code>backend/</code>, ejecutar <code>python -m pytest -q</code>.</li>

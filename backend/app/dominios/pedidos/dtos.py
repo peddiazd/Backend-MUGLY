@@ -68,6 +68,13 @@ class CrearPedidoPersonalizadoDTO(Schema):
         validate=validate.Range(min=Decimal("0.01")),
     )
 
+    # Datos acordados por WhatsApp (RF31, CR-02)
+    cantidad = fields.Integer(load_default=1, validate=validate.Range(min=1, max=1000))
+    mug_base = fields.String(load_default=None, allow_none=True, validate=validate.Length(max=40))
+    transportadora_acordada = fields.String(load_default=None, allow_none=True, validate=validate.Length(max=100))
+    entrega_acordada = fields.Date(load_default=None, allow_none=True)
+    pagado = fields.Boolean(load_default=False)
+
 
 class BusquedaPedidosDTO(Schema):
     """Parámetros de la búsqueda paginada de pedidos (vista administrativa)."""
@@ -75,8 +82,13 @@ class BusquedaPedidosDTO(Schema):
     q = fields.String(load_default="", validate=validate.Length(max=100))
     estado = fields.String(
         load_default="todos",
-        validate=validate.OneOf(["todos", "pendiente", "pagado", "enviado", "entregado", "cancelado"]),
+        validate=validate.OneOf(["todos", "pendiente", "pagado", "enviado", "entregado", "cancelado", "reembolsado"]),
     )
+    # CR-02: varios estados separados por coma, vista activos/archivo, ciudad y tipo de mug
+    estados = fields.String(load_default="", validate=validate.Regexp(r"^[a-z,]*$"))
+    vista = fields.String(load_default="todos", validate=validate.OneOf(["todos", "activos", "archivo"]))
+    ciudad = fields.String(load_default="", validate=validate.Length(max=60))
+    tipo_mug = fields.Integer(load_default=None, allow_none=True)
     tipo = fields.String(
         load_default="todos", validate=validate.OneOf(["todos", "catalogo", "personalizado"])
     )
@@ -84,3 +96,17 @@ class BusquedaPedidosDTO(Schema):
     hasta = fields.Date(load_default=None)
     pagina = fields.Integer(load_default=1, validate=validate.Range(min=1))
     por_pagina = fields.Integer(load_default=20, validate=validate.Range(min=1, max=100))
+
+
+class ArchivoPedidoDTO(Schema):
+    archivado = fields.Boolean(required=True)
+
+
+class ReembolsoDTO(Schema):
+    """Reembolso o devolución (RF32, RN22)."""
+
+    tipo = fields.String(required=True, validate=validate.OneOf(["reembolso", "devolucion"]))
+    monto = fields.Decimal(load_default=None, allow_none=True, places=2, validate=validate.Range(min=Decimal("0.01")))
+    motivo = fields.String(required=True, validate=validate.Length(min=1, max=120))
+    detalle = fields.String(load_default=None, allow_none=True, validate=validate.Length(max=1000))
+    reingresar = fields.Boolean(load_default=False)

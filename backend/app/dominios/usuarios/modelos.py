@@ -54,6 +54,13 @@ class PerfilUsuario(db.Model):
     nombre = db.Column(db.String(50))
     apellido = db.Column(db.String(50))
     telefono = db.Column(db.String(20))
+    # Datos para enviar los pedidos (RF29, CR-02)
+    tipo_documento = db.Column(db.String(4))
+    numero_documento = db.Column(db.String(20))
+    departamento = db.Column(db.String(60))
+    ciudad = db.Column(db.String(60))
+    direccion = db.Column(db.String(120))
+    complemento = db.Column(db.String(80))
     usuario_id = db.Column(
         db.Integer,
         db.ForeignKey("usuarios.id"),
@@ -68,5 +75,11 @@ class PerfilUsuario(db.Model):
             "nombre": self.nombre,
             "apellido": self.apellido,
             "telefono": self.telefono,
+            "tipo_documento": self.tipo_documento,
+            "numero_documento": self.numero_documento,
+            "departamento": self.departamento,
+            "ciudad": self.ciudad,
+            "direccion": self.direccion,
+            "complemento": self.complemento,
             "usuario_id": self.usuario_id,
         }

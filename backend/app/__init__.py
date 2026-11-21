@@ -59,6 +59,8 @@ def crear_app():
         ProductoServicio,
         ProductoNoEncontradoError,
         ImagenInvalidaError,
+        DatoDuplicadoError,
+        TipoEnUsoError,
     )
 
     productos_ctrl.producto_servicio = ProductoServicio()
@@ -144,7 +146,17 @@ def crear_app():
         PermisoDenegadoError,
         CuentaDesactivadaError,
         OperacionNoPermitidaError,
+        EnlaceInvalidoError,
+        ContrasenaActualIncorrectaError,
     )
+
+    @app.errorhandler(EnlaceInvalidoError)
+    def enlace_invalido(error):
+        return {"success": False, "error": {"message": str(error)}}, 400
+
+    @app.errorhandler(ContrasenaActualIncorrectaError)
+    def contrasena_incorrecta(error):
+        return {"success": False, "error": {"message": str(error)}}, 400
 
     @app.errorhandler(CuentaDesactivadaError)
     def cuenta_desactivada(error):
@@ -189,6 +201,14 @@ def crear_app():
         }, 403
 
     # Errores propios del modulo de productos
+    @app.errorhandler(DatoDuplicadoError)
+    def dato_duplicado(error):
+        return {"success": False, "error": {"message": str(error)}}, 409
+
+    @app.errorhandler(TipoEnUsoError)
+    def tipo_en_uso(error):
+        return {"success": False, "error": {"message": str(error)}}, 409
+
     @app.errorhandler(ProductoNoEncontradoError)
     def producto_no_encontrado(error):
         return {
@@ -209,7 +229,12 @@ def crear_app():
         ProductoPedidoNoDisponibleError,
         TransicionEstadoInvalidaError,
         DatosEnvioRequeridosError,
+        OperacionPedidoInvalidaError,
     )
+
+    @app.errorhandler(OperacionPedidoInvalidaError)
+    def operacion_pedido_invalida(error):
+        return {"success": False, "error": {"message": str(error)}}, 400
 
     @app.errorhandler(PedidoNoEncontradoError)
     def pedido_no_encontrado(error):

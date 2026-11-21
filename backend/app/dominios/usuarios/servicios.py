@@ -1,3 +1,5 @@
+import hashlib
+import secrets
 from datetime import datetime, timedelta, timezone
 
 import jwt
@@ -29,6 +31,25 @@ class CuentaDesactivadaError(Exception):
 
 class OperacionNoPermitidaError(Exception):
     """La operacion solicitada no esta permitida."""
+
+
+class EnlaceInvalidoError(Exception):
+    """El enlace de acceso venció, ya se usó o no es válido."""
+
+
+class ContrasenaActualIncorrectaError(Exception):
+    """La contraseña actual no coincide."""
+
+
+CAMPOS_PERFIL = ("nombre", "apellido", "telefono", "tipo_documento", "numero_documento",
+                 "departamento", "ciudad", "direccion", "complemento")
+# Vigencia de los enlaces de acceso (CR-02): restablecer 30 min, activar 7 días
+VIGENCIA_ENLACE = {"restablecer": timedelta(minutes=30), "activar": timedelta(days=7)}
+
+
+def _huella(usuario):
+    """Cambia cuando cambia la contraseña: hace que el enlace sirva una sola vez."""
+    return hashlib.sha256(usuario.contrasena.encode()).hexdigest()[:16]
 
 
 def _generar_access_token(usuario, secret_key, exp_minutes):
@@ -114,8 +135,9 @@ class UsuarioServicio:
         if datos.get("apellido") is not None:
             perfil.apellido = datos["apellido"]
 
-        if datos.get("telefono") is not None:
-            perfil.telefono = datos["telefono"]
+        for campo in CAMPOS_PERFIL[2:]:
+            if datos.get(campo) is not None:
+                setattr(perfil, campo, datos[campo])
 
         UsuarioRepositorio.guardar_perfil(perfil)
         return perfil.to_dict()
@@ -173,6 +195,7 @@ class UsuarioServicio:
             pedidos=parametros["pedidos"],
             registro=parametros["registro"],
             orden=parametros["orden"],
+            ciudad=parametros.get("ciudad", ""),
         )
         filas, meta = paginar(consulta, parametros["pagina"], parametros["por_pagina"])
         items = []
@@ -182,6 +205,9 @@ class UsuarioServicio:
                 nombre=perfil.nombre if perfil else None,
                 apellido=perfil.apellido if perfil else None,
                 telefono=perfil.telefono if perfil else None,
+                tipo_documento=perfil.tipo_documento if perfil else None,
+                numero_documento=perfil.numero_documento if perfil else None,
+                ciudad=perfil.ciudad if perfil else None,
                 pedidos=int(num_pedidos or 0),
                 compra_confirmada=float(compra or 0),
             )
@@ -206,14 +232,92 @@ class UsuarioServicio:
         if datos.get("activo") is not None:
             usuario.activo = datos["activo"]
 
+        correo = (datos.get("correo") or "").strip().lower()
+        if correo and correo != usuario.correo:
+            existente = UsuarioRepositorio.obtener_por_correo(correo)
+            if existente and existente.id != usuario.id:
+                raise CorreoYaRegistradoError(f"El correo {correo} ya está registrado.")
+            usuario.correo = correo
+
         perfil = usuario.perfil or PerfilUsuario(usuario_id=usuario.id)
 
-        for campo in ("nombre", "apellido", "telefono"):
+        for campo in CAMPOS_PERFIL:
             if datos.get(campo) is not None:
                 setattr(perfil, campo, datos[campo])
 
         UsuarioRepositorio.guardar_perfil(perfil)
         return self.obtener_usuario_admin(usuario_id)
+
+    # ---------------------------------------------------------- CR-02
+    def crear_cliente_admin(self, datos):
+        """El administrador registra un cliente que compra por WhatsApp (RF29).
+
+        La cuenta nace sin contraseña conocida; se entrega un enlace de
+        activación para que el cliente cree la suya.
+        """
+        correo = datos["correo"].strip().lower()
+        if UsuarioRepositorio.obtener_por_correo(correo):
+            raise CorreoYaRegistradoError(f"El correo {correo} ya está registrado.")
+        usuario = Usuario(correo=correo, contrasena=generate_password_hash(secrets.token_urlsafe(32)))
+        UsuarioRepositorio.guardar_usuario(usuario)
+        perfil = PerfilUsuario(usuario_id=usuario.id, **{c: datos.get(c) for c in CAMPOS_PERFIL})
+        UsuarioRepositorio.guardar_perfil(perfil)
+        resultado = self.obtener_usuario_admin(usuario.id)
+        resultado["enlace"] = self.generar_enlace_acceso(usuario.id, "activar")
+        return resultado
+
+    def eliminar_cliente_admin(self, admin_id, usuario_id):
+        """Elimina un cliente sin pedidos. Con pedidos solo se desactiva (RN24, RNF04)."""
+        usuario = UsuarioRepositorio.obtener_por_id(usuario_id)
+        if not usuario:
+            raise UsuarioNoEncontradoError(f"Usuario con ID {usuario_id} no encontrado.")
+        if usuario.rol == "admin" or usuario.id == admin_id:
+            raise OperacionNoPermitidaError("No se puede eliminar una cuenta de administrador.")
+        n = UsuarioRepositorio.contar_pedidos(usuario_id)
+        if n:
+            raise OperacionNoPermitidaError(
+                f"El cliente tiene {n} pedido(s): sus datos se conservan por el historial. Desactive la cuenta."
+            )
+        UsuarioRepositorio.eliminar_usuario(usuario)
+
+    def generar_enlace_acceso(self, usuario_id, tipo="restablecer"):
+        """Token firmado de un solo uso para crear o restablecer la contraseña."""
+        usuario = UsuarioRepositorio.obtener_por_id(usuario_id)
+        if not usuario:
+            raise UsuarioNoEncontradoError(f"Usuario con ID {usuario_id} no encontrado.")
+        vence = datetime.now(timezone.utc) + VIGENCIA_ENLACE[tipo]
+        token = jwt.encode(
+            {"sub": str(usuario.id), "uso": "acceso", "tipo": tipo, "fp": _huella(usuario), "exp": vence},
+            self.secret_key, algorithm="HS256",
+        )
+        return {"token": token, "tipo": tipo, "vence": vence.isoformat()}
+
+    def restablecer_contrasena(self, token, contrasena):
+        """El cliente crea o cambia su contraseña con el enlace (pantalla pública)."""
+        try:
+            datos = jwt.decode(token, self.secret_key, algorithms=["HS256"])
+        except jwt.PyJWTError:
+            raise EnlaceInvalidoError("El enlace venció o no es válido. Pide uno nuevo a la tienda.")
+        if datos.get("uso") != "acceso":
+            raise EnlaceInvalidoError("El enlace no es válido.")
+        usuario = UsuarioRepositorio.obtener_por_id(int(datos["sub"]))
+        if not usuario or datos.get("fp") != _huella(usuario):
+            raise EnlaceInvalidoError("El enlace ya se usó. Pide uno nuevo a la tienda.")
+        usuario.contrasena = generate_password_hash(contrasena)
+        UsuarioRepositorio.actualizar_usuario()
+        return {"correo": usuario.correo}
+
+    def cambiar_contrasena(self, usuario_id, actual, nueva):
+        """Cambio de contraseña del usuario autenticado (Mi cuenta)."""
+        usuario = UsuarioRepositorio.obtener_por_id(usuario_id)
+        if not usuario:
+            raise UsuarioNoEncontradoError("Usuario no encontrado.")
+        if not check_password_hash(usuario.contrasena, actual):
+            raise ContrasenaActualIncorrectaError("La contraseña actual no es correcta.")
+        if actual == nueva:
+            raise OperacionNoPermitidaError("La nueva contraseña debe ser distinta de la actual.")
+        usuario.contrasena = generate_password_hash(nueva)
+        UsuarioRepositorio.actualizar_usuario()
 
     def promover_a_admin(self, correo):
         """Promueve un usuario existente al rol de administrador."""

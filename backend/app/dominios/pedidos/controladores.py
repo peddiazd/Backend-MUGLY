@@ -7,6 +7,8 @@ from app.dominios.pedidos.dtos import (
     CrearPedidoDTO,
     CambiarEstadoPedidoDTO,
     CrearPedidoPersonalizadoDTO,
+    ArchivoPedidoDTO,
+    ReembolsoDTO,
 )
 from app.dominios.usuarios.controladores import admin_bp
 from app.seguridad import requiere_token, requiere_admin
@@ -200,3 +202,39 @@ def crear_pedido_personalizado(usuario_id):
         }),
         201,
     )
+
+
+# ============================================================
+# CR-02: archivo y reembolsos
+# ============================================================
+
+
+@admin_bp.route("/pedidos/<int:pedido_id>/archivo", methods=["PATCH"])
+@requiere_admin
+def archivar_pedido(usuario_id, pedido_id):
+    """Archivar o restaurar un pedido cerrado (RN25)."""
+    try:
+        datos = ArchivoPedidoDTO().load(request.get_json(silent=True) or {})
+    except ValidationError as err:
+        return _error_validacion(err)
+    pedido = pedido_servicio.archivar(pedido_id, datos["archivado"])
+    return jsonify({"success": True, "message": "Pedido archivado." if datos["archivado"] else "Pedido restaurado.", "data": pedido}), 200
+
+
+@admin_bp.route("/pedidos/archivar-cerrados", methods=["POST"])
+@requiere_admin
+def archivar_cerrados(usuario_id):
+    """Archivar de una vez todos los pedidos cerrados."""
+    return jsonify({"success": True, "message": "Pedidos archivados.", "data": pedido_servicio.archivar_cerrados()}), 200
+
+
+@admin_bp.route("/pedidos/<int:pedido_id>/reembolsos", methods=["POST"])
+@requiere_admin
+def reembolsar_pedido(usuario_id, pedido_id):
+    """Registrar un reembolso o devolución (RF32, RN22)."""
+    try:
+        datos = ReembolsoDTO().load(request.get_json(silent=True) or {})
+    except ValidationError as err:
+        return _error_validacion(err)
+    pedido = pedido_servicio.reembolsar(pedido_id, usuario_id, datos)
+    return jsonify({"success": True, "message": "Reembolso registrado.", "data": pedido}), 201

@@ -136,7 +136,57 @@ class UsuarioServicio:
 
         datos = usuario.to_dict()
         datos["perfil"] = usuario.perfil.to_dict() if usuario.perfil else None
+
+        # Ficha comercial: pedidos del cliente y su resumen de compra.
+        from app.dominios.pedidos.modelos import ESTADOS_CONFIRMADOS
+        from app.dominios.pedidos.repositorios import PedidoRepositorio
+
+        pedidos = sorted(
+            PedidoRepositorio.obtener_por_usuario(usuario_id),
+            key=lambda p: p.id,
+            reverse=True,
+        )
+        datos["pedidos"] = [
+            {
+                "id": p.id,
+                "estado": p.estado,
+                "tipo": p.tipo,
+                "total": float(p.total),
+                "fecha_creacion": p.fecha_creacion.isoformat() if p.fecha_creacion else None,
+            }
+            for p in pedidos
+        ]
+        datos["resumen"] = {
+            "pedidos": len(pedidos),
+            "compra_confirmada": float(sum(p.total for p in pedidos if p.estado in ESTADOS_CONFIRMADOS)),
+            "pendiente_de_pago": float(sum(p.total for p in pedidos if p.estado == "pendiente")),
+        }
         return datos
+
+    def buscar_clientes(self, parametros):
+        """Búsqueda paginada de clientes; nunca devuelve contraseñas."""
+        from app.paginacion import paginar
+
+        consulta = UsuarioRepositorio.buscar_clientes(
+            q=parametros["q"],
+            estado=parametros["estado"],
+            pedidos=parametros["pedidos"],
+            registro=parametros["registro"],
+            orden=parametros["orden"],
+        )
+        filas, meta = paginar(consulta, parametros["pagina"], parametros["por_pagina"])
+        items = []
+        for usuario, perfil, num_pedidos, compra in filas:
+            item = usuario.to_dict()
+            item.update(
+                nombre=perfil.nombre if perfil else None,
+                apellido=perfil.apellido if perfil else None,
+                telefono=perfil.telefono if perfil else None,
+                pedidos=int(num_pedidos or 0),
+                compra_confirmada=float(compra or 0),
+            )
+            items.append(item)
+        return {"items": items, **meta}
 
     def actualizar_usuario_admin(self, admin_id, usuario_id, datos):
         """Permite al administrador editar el perfil y activar o desactivar."""

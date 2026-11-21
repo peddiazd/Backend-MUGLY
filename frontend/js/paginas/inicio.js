@@ -1,8 +1,9 @@
 // Inicio · THE MUG EXPERIENCE
 // Presentación de producto controlada por scroll (motor scrollcraft, skill
 // scroll-craft). El catálogo, personalizados y nosotros son páginas propias.
-import { api } from '../api.js';
-import { cargando, alerta, icono } from '../componentes/ui.js';
+import { api, urlImagen } from '../api.js';
+import { esc, cargando, alerta, icono } from '../componentes/ui.js';
+import { obtenerContenido } from '../componentes/contenidoTienda.js';
 import { instalarDefinicionesMug, mugSVG, ESTILOS } from '../componentes/mockups.js';
 import { tarjetaProducto, enlazarAgregar } from '../componentes/producto.js';
 import { montarEscena, desmontarEscena, seguirProgreso, suave, tramo } from '../componentes/escena.js';
@@ -104,40 +105,45 @@ function escenaProtagonista(acto, id) {
   seguirProgreso(acto, id, pintar);
 }
 
-export async function render(app) {
-  desmontarEscena();
-  instalarDefinicionesMug();
+// Texto con la palabra resaltada envuelta en <em> (el subrayado amarillo).
+function tituloResaltado(titulo, resaltado) {
+  const seguro = esc(titulo);
+  const palabra = esc(resaltado || '');
+  if (!palabra || !seguro.includes(palabra)) return seguro;
+  return seguro.replace(palabra, `<em>${palabra}</em>`);
+}
 
-  app.innerHTML = `
-    <span data-sc-progress aria-hidden="true"></span>
+const HOJAS = `<svg viewBox="0 0 220 260" width="100%"><g fill="none" stroke="#344B36" stroke-width="3" stroke-linecap="round"><path d="M40 258C70 190 110 120 190 40"/><path d="M110 258c10-60 40-110 90-150"/></g>
+  <g fill="#7E9B6E"><ellipse cx="78" cy="180" rx="26" ry="11" transform="rotate(-50 78 180)"/><ellipse cx="112" cy="128" rx="26" ry="11" transform="rotate(-40 112 128)"/><ellipse cx="150" cy="84" rx="24" ry="10" transform="rotate(-35 150 84)"/></g>
+  <g fill="#B7C5A4"><ellipse cx="62" cy="214" rx="24" ry="10" transform="rotate(30 62 214)"/><ellipse cx="98" cy="156" rx="24" ry="10" transform="rotate(35 98 156)"/><ellipse cx="136" cy="104" rx="22" ry="9" transform="rotate(40 136 104)"/><ellipse cx="146" cy="172" rx="22" ry="9" transform="rotate(-30 146 172)"/></g>
+  <g fill="#344B36"><ellipse cx="128" cy="214" rx="20" ry="8" transform="rotate(30 128 214)"/><ellipse cx="164" cy="104" rx="18" ry="7" transform="rotate(-50 164 104)"/></g></svg>`;
 
-    <!-- ESCENA 1 · Portada: capas con profundidad -->
+// Cada sección de Inicio se arma con su contenido administrable.
+const SECCIONES = {
+  portada: (d) => `
     <section class="xp-portada" data-sc-act="flow">
       <div class="container">
         <div class="xp-copy">
-          <h1>Un mug para cada <em>estilo</em>, y para cada mañana.</h1>
-          <p class="lead">Anime, kawaii, gamer, naturaleza, frases o tu propia foto. Elige el tuyo en el catálogo o pídelo personalizado por WhatsApp.</p>
+          <h1>${tituloResaltado(d.titulo, d.resaltado)}</h1>
+          <p class="lead">${esc(d.subtitulo)}</p>
           <div class="xp-acciones">
-            <a class="btn btn-acento btn-lg" href="#/catalogo">Ver catálogo ${icono('flecha', 18)}</a>
-            <a class="xp-enlace" href="#/personalizados">Quiero uno personalizado ${icono('flecha', 18)}</a>
+            <a class="btn btn-acento btn-lg" href="#/catalogo">${esc(d.boton)} ${icono('flecha', 18)}</a>
+            <a class="xp-enlace" href="#/personalizados">${esc(d.enlace_secundario)} ${icono('flecha', 18)}</a>
           </div>
         </div>
-        <div class="xp-escena" aria-label="Mug estilo anime sobre la repisa">
+        <div class="xp-escena" aria-label="Producto destacado sobre la repisa">
           <div class="xp-plano xp-arco" data-sc-parallax="0.10"></div>
-          <div class="xp-plano xp-mug-portada" data-sc-parallax="-0.06">${mugSVG('anime', 'frente', { etiqueta: 'Mug blanco con diseño anime Ohayō' })}</div>
+          <div class="xp-plano xp-mug-portada" data-sc-parallax="-0.06">${d.imagen
+            ? `<img src="${esc(urlImagen(d.imagen))}" alt="${esc(d.etiqueta || 'Producto destacado')}" style="width:100%;height:auto;display:block">`
+            : mugSVG('anime', 'frente', { etiqueta: 'Mug blanco con diseño anime Ohayō' })}</div>
           <div class="xp-plano xp-repisa"></div>
-          <div class="xp-plano xp-hojas" data-sc-parallax="-0.22" aria-hidden="true">
-            <svg viewBox="0 0 220 260" width="100%"><g fill="none" stroke="#344B36" stroke-width="3" stroke-linecap="round"><path d="M40 258C70 190 110 120 190 40"/><path d="M110 258c10-60 40-110 90-150"/></g>
-              <g fill="#7E9B6E"><ellipse cx="78" cy="180" rx="26" ry="11" transform="rotate(-50 78 180)"/><ellipse cx="112" cy="128" rx="26" ry="11" transform="rotate(-40 112 128)"/><ellipse cx="150" cy="84" rx="24" ry="10" transform="rotate(-35 150 84)"/></g>
-              <g fill="#B7C5A4"><ellipse cx="62" cy="214" rx="24" ry="10" transform="rotate(30 62 214)"/><ellipse cx="98" cy="156" rx="24" ry="10" transform="rotate(35 98 156)"/><ellipse cx="136" cy="104" rx="22" ry="9" transform="rotate(40 136 104)"/><ellipse cx="146" cy="172" rx="22" ry="9" transform="rotate(-30 146 172)"/></g>
-              <g fill="#344B36"><ellipse cx="128" cy="214" rx="20" ry="8" transform="rotate(30 128 214)"/><ellipse cx="164" cy="104" rx="18" ry="7" transform="rotate(-50 164 104)"/></g></svg>
-          </div>
-          <div class="mg-etiqueta"><small>Estilo</small><strong>Anime · Ohayō</strong></div>
+          <div class="xp-plano xp-hojas" data-sc-parallax="-0.22" aria-hidden="true">${HOJAS}</div>
+          ${d.etiqueta ? `<div class="mg-etiqueta"><small>Estilo</small><strong>${esc(d.etiqueta)}</strong></div>` : ''}
         </div>
       </div>
-    </section>
+    </section>`,
 
-    <!-- ESCENA 2 · El mug protagonista: cámara, impresión, fragmentos, detalles y perspectiva -->
+  escena: () => `
     <section class="xp-show" id="protagonista" data-sc-act="pin" data-sc-span="5.2">
       <div data-sc-stage>
         <div class="xp-lienzo">
@@ -164,67 +170,111 @@ export async function render(app) {
         </div>
         <div class="xp-avance" aria-hidden="true"></div>
       </div>
-    </section>
+    </section>`,
 
-    <!-- ESCENA 3 · Colección: recorrido lateral por estilos -->
+  coleccion: (d) => `
     <section class="xp-coleccion" data-sc-act="pan" data-sc-span="3.4">
       <div data-sc-stage>
         <div class="xp-riel" data-sc-pan="0.08">
           <div class="xp-cabeza">
-            <h2>Una colección para cada estilo.</h2>
-            <p>Seis estilos sobre el mismo mug blanco. Desliza y elige el tuyo.</p>
+            <h2>${esc(d.titulo)}</h2>
+            <p>${esc(d.texto)}</p>
           </div>
           ${ESTILOS.map((e) => `
             <article class="xp-estilo">
               <div class="xp-vitrina" style="--fondo:${e.fondo};--piso:${e.piso}" data-sc-tilt="6">${mugSVG(e.id, e.vista, { etiqueta: `Mug blanco con diseño ${e.nombre} ${e.diseno}` })}</div>
               <div><h3>${e.nombre}</h3><p>${e.texto}</p></div>
-              <a class="btn btn-acento btn-sm justify-self-start" style="justify-self:start" href="#/personalizados?estilo=${e.id}">${icono('chat', 16)} ${e.id === 'personalizado' ? 'Cuéntanos tu idea' : 'Lo quiero'}</a>
+              <a class="btn btn-acento btn-sm" style="justify-self:start" href="#/personalizados?estilo=${e.id}">${icono('chat', 16)} ${e.id === 'personalizado' ? 'Cuéntanos tu idea' : 'Lo quiero'}</a>
             </article>`).join('')}
         </div>
       </div>
-    </section>
+    </section>`,
 
-    <!-- ESCENA 4 · Personalización -->
+  banner: (d) => (d.titulo || d.imagen ? `
+    <section class="container py-5" data-sc-act="flow">
+      <div class="xp-bloque" style="grid-template-columns:${d.imagen ? '1.2fr .8fr' : '1fr'}">
+        <div data-sc-in>
+          ${d.titulo ? `<h2>${esc(d.titulo)}</h2>` : ''}
+          ${d.texto ? `<p class="lead">${esc(d.texto)}</p>` : ''}
+          ${d.boton && d.enlace ? `<a class="btn btn-acento btn-lg mt-3" href="${esc(d.enlace)}" ${d.enlace.startsWith('https://') ? 'target="_blank" rel="noopener"' : ''}>${esc(d.boton)}</a>` : ''}
+        </div>
+        ${d.imagen ? `<figure class="m-0" data-sc-in><img src="${esc(urlImagen(d.imagen))}" alt="${esc(d.titulo || 'Promoción')}" style="width:100%;height:auto;border-radius:20px;background:#fff"></figure>` : ''}
+      </div>
+    </section>` : ''),
+
+  personaliza: (d) => `
     <section class="xp-personaliza container" data-sc-act="flow">
       <div class="xp-bloque">
         <div data-sc-in>
-          <h2>Tu idea, en tu mug.</h2>
-          <p class="lead">Una foto, una frase, el logo de tu marca. Lo diseñamos contigo y queda registrado para que lo sigas aquí.</p>
+          <h2>${esc(d.titulo)}</h2>
+          <p class="lead">${esc(d.texto)}</p>
           <ol class="xp-pasos" data-sc-in data-sc-stagger="70">
             <li><span class="ic">${icono('chat')}</span><div><b>Escríbenos por WhatsApp</b><span>Cuéntanos tu idea y envía tu imagen.</span></div></li>
             <li><span class="ic">${icono('lapiz')}</span><div><b>Definimos diseño y valor</b><span>Te mostramos cómo queda y acordamos el pago.</span></div></li>
             <li><span class="ic">${icono('ruta')}</span><div><b>Sigue tu pedido</b><span>Lo verás en Mis pedidos con su guía de envío.</span></div></li>
           </ol>
-          <a class="btn btn-acento btn-lg" href="#/personalizados">${icono('chat', 18)} Pedir un personalizado</a>
+          <a class="btn btn-acento btn-lg" href="#/personalizados">${icono('chat', 18)} ${esc(d.boton)}</a>
         </div>
         <figure data-sc-reveal="up" data-sc-reveal-at="0.12 0.5">
           ${mugSVG('personalizado', 'tres', { etiqueta: 'Ejemplo de mug personalizado con foto' })}
           <figcaption>Ejemplo ilustrativo de un mug personalizado</figcaption>
         </figure>
       </div>
-    </section>
+    </section>`,
 
-    <!-- ESCENA 5 · Del catálogo: conexión con la tienda real -->
+  catalogo: (d) => `
     <section class="xp-catalogo container" data-sc-act="flow">
       <div class="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-4">
-        <h2 class="mb-0">Del catálogo</h2>
+        <h2 class="mb-0">${esc(d.titulo)}</h2>
         <a class="xp-enlace" href="#/catalogo">Ver todo el catálogo ${icono('flecha', 18)}</a>
       </div>
-      <div id="destacados">${cargando('Cargando mugs…')}</div>
-    </section>`;
+      <div id="destacados" data-cantidad="${Number(d.cantidad) || 4}">${cargando('Cargando mugs…')}</div>
+    </section>`,
+};
+
+// Contenido inicial si la API de contenido no responde (mismos textos de siempre).
+const RESPALDO = {
+  secciones: [
+    { clave: 'portada', datos: { titulo: 'Un mug para cada estilo, y para cada mañana.', resaltado: 'estilo', subtitulo: 'Anime, kawaii, gamer, naturaleza, frases o tu propia foto. Elige el tuyo en el catálogo o pídelo personalizado por WhatsApp.', boton: 'Ver catálogo', enlace_secundario: 'Quiero uno personalizado', etiqueta: 'Anime · Ohayō' } },
+    { clave: 'escena', datos: {} },
+    { clave: 'coleccion', datos: { titulo: 'Una colección para cada estilo.', texto: 'Seis estilos sobre el mismo mug blanco. Desliza y elige el tuyo.' } },
+    { clave: 'personaliza', datos: { titulo: 'Tu idea, en tu mug.', texto: 'Una foto, una frase, el logo de tu marca. Lo diseñamos contigo y queda registrado para que lo sigas aquí.', boton: 'Pedir un personalizado' } },
+    { clave: 'catalogo', datos: { titulo: 'Del catálogo', cantidad: 4 } },
+  ],
+};
+
+export async function render(app, { query = {} } = {}) {
+  desmontarEscena();
+  instalarDefinicionesMug();
+
+  // Contenido publicado; con ?vista=borrador el administrador ve su borrador.
+  let contenido;
+  try {
+    contenido = await obtenerContenido({ borrador: query.vista === 'borrador' });
+  } catch {
+    contenido = RESPALDO;
+  }
+
+  const aviso = query.vista === 'borrador'
+    ? '<div class="mg-tienda-admin" role="status">Vista previa del borrador: así se verá Inicio al publicar.</div>' : '';
+  app.innerHTML = `<span data-sc-progress aria-hidden="true"></span>${aviso}
+    ${contenido.secciones.map((s) => (SECCIONES[s.clave] ? SECCIONES[s.clave](s.datos || {}) : '')).join('')}`;
 
   try {
     const id = await montarEscena(app, '/');
-    escenaProtagonista(document.getElementById('protagonista'), id);
+    const protagonista = document.getElementById('protagonista');
+    if (protagonista) escenaProtagonista(protagonista, id);
   } catch (error) {
     console.error(error);
   }
 
   // Productos reales de la API.
   const cont = document.getElementById('destacados');
+  if (!cont) return;
   try {
     const productos = await api('/productos');
-    const lista = [...productos].sort((a, b) => b.id - a.id).slice(0, 4);
+    const cantidad = Number(cont.dataset.cantidad) || 4;
+    const lista = [...productos].sort((a, b) => b.id - a.id).slice(0, cantidad);
     cont.innerHTML = lista.length
       ? `<div class="row row-cols-2 row-cols-lg-4 g-3 g-lg-4 gy-5" data-sc-in data-sc-stagger="70">${lista.map((p) => `<div class="col">${tarjetaProducto(p)}</div>`).join('')}</div>`
       : '<p class="text-suave">Aún no hay mugs en el catálogo.</p>';

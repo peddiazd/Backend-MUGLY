@@ -11,18 +11,18 @@ MONO = "'JetBrains Mono', Consolas, 'Courier New', monospace"
 
 # Paleta de la marca (frontend/css/estilos.css)
 C = {
-    "primario": "#1F4E5F",
-    "primario2": "#2F6B80",
-    "acento": "#A45A33",
-    "texto": "#2E3338",
-    "calido": "#EFE9E1",
-    "calido2": "#F7F3EE",
-    "gris": "#7C858D",
-    "gris_claro": "#ECEFF1",
-    "linea": "#4F5B66",
+    "primario": "#344B36",
+    "primario2": "#4A6550",
+    "acento": "#7A5C08",
+    "texto": "#292929",
+    "calido": "#E6ECDD",
+    "calido2": "#F3F6EF",
+    "gris": "#6E736A",
+    "gris_claro": "#EEF1EA",
+    "linea": "#4F5B52",
     "blanco": "#FFFFFF",
-    "suave": "#E4EEF1",
-    "verde": "#2D6A4F",
+    "suave": "#E6ECDD",
+    "verde": "#2F6B3C",
     "rojo": "#A23B3B",
 }
 
@@ -106,7 +106,7 @@ class Diagrama:
             cy += usado + 6
 
     def persona(self, cx, y, w, h, titulo, desc=None, relleno=None):
-        relleno = relleno or "#183B47"
+        relleno = relleno or "#2A3D2C"
         self._add("cajas", f'<circle cx="{cx}" cy="{y + 24}" r="22" fill="{relleno}"/>')
         self.caja(cx - w / 2, y + 40, w, h, titulo, "[Persona]", desc, relleno,
                   radio=18)
@@ -232,7 +232,7 @@ class Diagrama:
     def nota(self, x, y, w, texto, tam=11, relleno=None):
         lineas = envolver(texto, w - 22, tam)
         h = len(lineas) * tam * 1.35 + 16
-        relleno = relleno or "#FFF6E5"
+        relleno = relleno or "#FDF6DE"
         self._add("cajas", f'<path d="M{x},{y} h{w - 14} l14,14 v{h - 14} h{-w} z" '
                            f'fill="{relleno}" stroke="{C["acento"]}" stroke-width="1.2"/>'
                            f'<path d="M{x + w - 14},{y} v14 h14" fill="none" stroke="{C["acento"]}" stroke-width="1.2"/>')

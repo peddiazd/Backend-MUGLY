@@ -1,20 +1,13 @@
 
 import os
-import uuid
 
+from app.archivos import EXTENSIONES_IMAGEN, ImagenInvalidaError, guardar_imagen  # noqa: F401
 from app.dominios.productos.modelos import Producto
 from app.dominios.productos.repositorios import ProductoRepositorio
 
 
 class ProductoNoEncontradoError(Exception):
     """Error cuando un producto no existe."""
-
-
-class ImagenInvalidaError(Exception):
-    """Error cuando el archivo de imagen no es valido."""
-
-
-EXTENSIONES_IMAGEN = {"jpg", "jpeg", "png", "webp"}
 
 
 class ProductoServicio:
@@ -97,22 +90,7 @@ class ProductoServicio:
         """Guarda la foto del producto y reemplaza la anterior (RF14, D6)."""
         producto = self._obtener(producto_id)
 
-        if archivo is None or not archivo.filename:
-            raise ImagenInvalidaError("Debe adjuntar un archivo de imagen.")
-
-        extension = archivo.filename.rsplit(".", 1)[-1].lower()
-
-        if "." not in archivo.filename or extension not in EXTENSIONES_IMAGEN:
-            raise ImagenInvalidaError(
-                "Formato no permitido. Use JPG, PNG o WEBP."
-            )
-
-        if not (archivo.mimetype or "").startswith("image/"):
-            raise ImagenInvalidaError("El archivo no es una imagen.")
-
-        os.makedirs(carpeta, exist_ok=True)
-        nombre = f"{uuid.uuid4().hex}.{extension}"
-        archivo.save(os.path.join(carpeta, nombre))
+        nombre = guardar_imagen(archivo, carpeta)
 
         anterior = producto.imagen
         producto.imagen = nombre

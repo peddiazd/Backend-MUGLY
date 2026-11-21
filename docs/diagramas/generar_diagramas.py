@@ -77,7 +77,7 @@ def c4_contenedores():
                "[Contenedor: MySQL 8.0 · InnoDB · utf8mb4]",
                "usuarios, perfiles, productos, pedidos, detalles e historial de estados")
     d.cilindro(712, 440, 168, 140, "Almacén de imágenes", "[Carpeta backend/uploads]",
-               "Fotos de productos con nombre UUID", relleno="#4F7F8F")
+               "Fotos de productos con nombre UUID", relleno="#4A6550")
     d.caja(940, 250, 180, 100, "WhatsApp", "[Sistema externo]", relleno=C["gris"])
     d.flecha([(250, 140), (250, 240)], "Usa [navegador]", 250, 196)
     d.flecha([(620, 140), (620, 240)], "Usa [navegador]", 620, 196)
@@ -99,7 +99,7 @@ def c4_componentes():
     d.caja(440, 8, 300, 66, "Aplicación web (SPA)", "[Contenedor]", relleno=C["primario2"],
            tam_titulo=14)
     d.frontera(20, 104, 1140, 730, "API REST de MUGLY [contenedor Flask]")
-    comp = "#DCE8EC"
+    comp = "#E6ECDD"
     claro = dict(relleno=comp, borde=C["primario"], color=C["texto"], tam_titulo=13.5,
                  tam_desc=11.2, tam_tipo=10.5)
     d.caja(45, 130, 340, 84, "Fábrica crear_app()", "[app/__init__.py]",
@@ -162,16 +162,17 @@ def arquitectura_logica():
     d = Diagrama("arquitectura_logica", 1180, 660, "Arquitectura lógica de MUGLY por capas")
     d.texto(285, 32, "FRONTEND · SPA (frontend/)", 13, C["acento"], 700)
     d.texto(830, 32, "BACKEND · API REST (backend/app/)", 13, C["acento"], 700)
-    banda = dict(relleno="#DCE8EC", borde=C["primario"], color=C["texto"],
+    banda = dict(relleno="#E6ECDD", borde=C["primario"], color=C["texto"],
                  tam_titulo=14, tam_desc=11.5, tam_tipo=10.5)
     fe = [
         ("Vista", "index.html · css/estilos.css · Bootstrap 5.3.3 local",
          "Contenedores #encabezado, #app, #pie y #toasts; variables de marca en :root"),
         ("Páginas", "js/paginas/",
-         "inicio · detalle · carrito · misPedidos · personalizados · ingresar · registro · "
-         "admin/pedidos · admin/productos · admin/clientes"),
+         "inicio · catalogo · detalle · carrito · personalizados · nosotros · misPedidos · ingresar · "
+         "registro · admin/pedidos · admin/productos · admin/clientes"),
         ("Componentes reutilizables", "js/componentes/",
-         "ui.js (modal, confirmar, avisar, insigniaEstado, moneda) · encabezado.js · adminLayout.js"),
+         "ui.js · encabezado.js · adminLayout.js · producto.js (tarjeta) · mockups.js · "
+         "escena.js (monta y desmonta el motor de scroll)"),
         ("Núcleo de la SPA", "js/",
          "router.js (rutas hash y protección por rol) · estado.js (sesión y carrito) · "
          "api.js (cliente HTTP único) · config.js"),
@@ -207,7 +208,7 @@ def arquitectura_logica():
            relleno=C["calido"], borde=C["acento"], color=C["texto"], tam_desc=11)
     d.flecha([(415, 496), (415, 532)])
     d.caja(985, 532, 175, 90, "uploads/", "[Archivos]", "Imágenes de productos",
-           relleno="#4F7F8F", tam_desc=11)
+           relleno="#4A6550", tam_desc=11)
     d.flecha([(1010, 496), (1010, 532)], discontinuo=True)
     return d
 
@@ -236,14 +237,14 @@ def uml_casos_uso():
     ]
     for cu, t, y in cliente:
         d.caso_uso(395, y, 125, 28, f"{cu} · {t}")
-        d.flecha([(136, 335), (270, y)], punta=None, color="#8C969E", grosor=1.1)
+        d.flecha([(136, 335), (270, y)], punta=None, color="#8A9184", grosor=1.1)
     for cu, t, y in admin:
         d.caso_uso(705, y, 125, 28, f"{cu} · {t}")
-        d.flecha([(964, 295), (830, y)], punta=None, color="#8C969E", grosor=1.1)
+        d.flecha([(964, 295), (830, y)], punta=None, color="#8A9184", grosor=1.1)
     d.caso_uso(550, 690, 130, 30, "CU02 · Iniciar sesión", relleno="#F3E3D6", borde=C["acento"])
-    d.flecha([(130, 395), (420, 690)], punta=None, color="#8C969E", grosor=1.1)
-    d.flecha([(975, 355), (680, 690)], punta=None, color="#8C969E", grosor=1.1)
-    d.flecha([(964, 610), (520, 580)], punta=None, color="#8C969E", grosor=1.1, discontinuo=True)
+    d.flecha([(130, 395), (420, 690)], punta=None, color="#8A9184", grosor=1.1)
+    d.flecha([(975, 355), (680, 690)], punta=None, color="#8A9184", grosor=1.1)
+    d.flecha([(964, 610), (520, 580)], punta=None, color="#8A9184", grosor=1.1, discontinuo=True)
     d.nota(20, 560, 210,
            "Sin pasarela en v1.0 (D3, D8): el cliente paga por WhatsApp y el "
            "administrador confirma el pago en CU12, que descuenta el inventario (CU11).")
@@ -456,7 +457,7 @@ def uml_estados_pedido():
     d._add("cajas", f'<circle cx="50" cy="300" r="11" fill="{C["texto"]}"/>')
     estado(170, 99, "pendiente", "#9A6B00")
     estado(470, 99, "pagado", C["primario"])
-    estado(760, 99, "enviado", "#155E54")
+    estado(760, 99, "enviado", "#2F6B3C")
     estado(760, 300, "entregado", C["verde"])
     estado(170, 300, "cancelado", C["gris"])
     for cx, cy in [(1020, 331), (450, 331)]:
@@ -495,7 +496,7 @@ def despliegue():
     d.nodo(240, 360, 270, 190, "Python http.server :5173", "servidor web estático",
            relleno=C["blanco"])
     d.artefacto(258, 430, 234, 100, "frontend/",
-                "Archivos estáticos: HTML, CSS, JS y Bootstrap 5.3.3")
+                "Archivos estáticos: HTML, CSS, JS, Bootstrap 5.3.3 y motor scrollcraft")
     d.nodo(570, 110, 300, 440, "Python 3.14 · venv", "entorno de ejecución",
            relleno=C["blanco"])
     d.artefacto(588, 180, 264, 112, "API Flask · app.py :5000",
@@ -650,7 +651,7 @@ def bd_fisico():
 @registrar
 def seguridad():
     d = Diagrama("seguridad", 1180, 560, "Diseño de seguridad: autenticación y autorización")
-    paso = dict(relleno="#DCE8EC", borde=C["primario"], color=C["texto"], tam_titulo=12.5,
+    paso = dict(relleno="#E6ECDD", borde=C["primario"], color=C["texto"], tam_titulo=12.5,
                 tam_desc=10.8, tam_tipo=10)
     malo = dict(relleno="#F6E1DE", borde=C["rojo"], color=C["texto"], tam_titulo=12.5,
                 tam_desc=10.8)

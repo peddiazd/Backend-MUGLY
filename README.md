@@ -52,4 +52,6 @@ configuran en `frontend/js/config.js`. Más detalles en
 
 El informe final está en
 [`docs/Informe_Proyecto_Final_MUGLY.html`](docs/Informe_Proyecto_Final_MUGLY.html):
-un solo archivo que se abre en el navegador, con los diagramas incluidos.
+un solo archivo que se abre en el navegador, con los diagramas y las capturas
+de la aplicación incluidos. Corresponde a la versión v1.1.0 e incluye una matriz
+de cumplimiento con cada punto solicitado para la entrega.

@@ -7,6 +7,9 @@ from app import db
 # Ciclo de vida del pedido (MGL-REU-003, D1/D2; ADR-004)
 ESTADOS_PEDIDO = ("pendiente", "pagado", "enviado", "entregado", "cancelado")
 TIPOS_PEDIDO = ("catalogo", "personalizado")
+# Pedidos con pago confirmado por el administrador (un pagado no puede
+# cancelarse: TRANSICIONES en servicios.py). Base de las ventas confirmadas.
+ESTADOS_CONFIRMADOS = ("pagado", "enviado", "entregado")
 
 
 class Pedido(db.Model):

@@ -8,183 +8,224 @@
 <meta name="description" content="Informe del proyecto final de Arquitectura de Software: análisis, diseño y desarrollo de MUGLY, tienda virtual de mugs.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600..800&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
+/* Identidad MUGLY: blanco, verde salvia #B7C5A4, verde profundo #344B36,
+   amarillo #F2C94C y gris oscuro #292929. El amarillo solo resalta. */
 :root{
-  --primario:#1F4E5F; --primario-2:#2F6B80; --primario-claro:#DCE8EC;
-  --acento:#A45A33; --acento-claro:#F5E6DC;
-  --texto:#2E3338; --suave:#5F6B73; --tenue:#8A949C;
-  --fondo:#FAF8F5; --papel:#FFFFFF; --calido:#EFE9E1; --calido-2:#F7F3EE;
-  --borde:#E3DED6; --verde:#2D6A4F; --verde-claro:#E1F0E7; --rojo:#A23B3B; --rojo-claro:#F7E3E0;
-  --ambar:#8A6100; --ambar-claro:#FBF0D9;
-  --sombra:0 1px 2px rgba(31,78,95,.06),0 6px 24px rgba(31,78,95,.07);
-  --radio:14px;
-  --fuente:"Inter","Segoe UI",Roboto,Arial,sans-serif;
-  --titulos:"Space Grotesk","Inter","Segoe UI",Arial,sans-serif;
+  --primario:#344B36; --primario-2:#4A6550; --primario-claro:#E6ECDD;
+  --salvia:#B7C5A4; --salvia-50:#F3F6EF;
+  --acento:#7A5C08; --amarillo:#F2C94C; --acento-claro:#FDF6DE;
+  --texto:#292929; --suave:#575C54; --tenue:#6E736A;
+  --fondo:#F6F8F2; --papel:#FFFFFF; --calido:#E6ECDD; --calido-2:#F3F6EF;
+  --borde:#E1E7D8; --verde:#2F6B3C; --verde-claro:#E3EFE3; --rojo:#A23B3B; --rojo-claro:#F7E3E0;
+  --ambar:#7A5C08; --ambar-claro:#FDF6DE;
+  --sombra:0 1px 2px rgba(52,75,54,.05),0 8px 28px rgba(52,75,54,.07);
+  --radio:16px;
+  --ease:cubic-bezier(.23,1,.32,1);
+  --fuente:"Figtree","Segoe UI",Roboto,Arial,sans-serif;
+  --titulos:"Bricolage Grotesque","Figtree","Segoe UI",Arial,sans-serif;
   --mono:"JetBrains Mono",Consolas,"Courier New",monospace;
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth;scroll-padding-top:24px}
-body{margin:0;background:var(--fondo);color:var(--texto);font:16px/1.65 var(--fuente);-webkit-font-smoothing:antialiased}
-a{color:var(--primario-2);text-underline-offset:3px}
-a:hover{color:var(--acento)}
-h1,h2,h3,h4{font-family:var(--titulos);color:var(--primario);line-height:1.2;letter-spacing:-.01em}
-h2{font-size:2rem;margin:0 0 .35rem}
-h3{font-size:1.32rem;margin:2.6rem 0 .8rem;padding-top:.4rem}
-h4{font-size:1.04rem;margin:1.6rem 0 .5rem;color:var(--texto)}
-p{margin:.55rem 0 .9rem}
-code{font-family:var(--mono);font-size:.86em;background:var(--calido-2);border:1px solid var(--borde);border-radius:6px;padding:.08em .38em;color:#7A3F1E}
-strong{color:#22282C}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important;animation:none!important}}
+body{margin:0;background:var(--fondo);color:var(--texto);font:16.5px/1.68 var(--fuente);-webkit-font-smoothing:antialiased}
+::selection{background:var(--amarillo);color:var(--texto)}
+:focus-visible{outline:3px solid var(--primario);outline-offset:3px;border-radius:6px}
+a{color:var(--primario-2);text-underline-offset:3px;text-decoration-thickness:1px}
+a:hover{color:var(--primario)}
+.portada a:hover,.saltar:hover,.saltar:focus{color:#fff}
+h1,h2,h3,h4{font-family:var(--titulos);color:var(--primario);line-height:1.15;letter-spacing:-0.01em;text-wrap:balance;font-variation-settings:"opsz" 48}
+h2{font-size:clamp(1.7rem,1.3rem + 1.2vw,2.2rem);margin:0 0 .35rem;font-weight:800}
+h3{font-size:1.36rem;margin:3rem 0 .8rem;padding-top:.4rem;font-weight:700;letter-spacing:0}
+h4{font-size:1.06rem;margin:1.7rem 0 .5rem;color:var(--texto);font-weight:700;letter-spacing:0}
+p{margin:.55rem 0 .95rem;text-wrap:pretty}
+code{font-family:var(--mono);font-size:.85em;background:var(--salvia-50);border:1px solid var(--borde);border-radius:6px;padding:.08em .38em;color:#3B5A3E}
+strong{color:#1F2620}
 ul,ol{padding-left:1.25rem;margin:.4rem 0 1rem}
 li{margin:.22rem 0}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.saltar{position:absolute;left:16px;top:-60px;z-index:50;background:var(--primario);color:#fff;padding:.6rem 1rem;border-radius:10px;text-decoration:none;font-weight:700;transition:top .2s var(--ease)}
+.saltar:focus{top:12px;color:#fff}
+.progreso{position:fixed;left:0;top:0;height:3px;width:100%;background:var(--amarillo);transform-origin:0 50%;transform:scaleX(0);z-index:40}
+table,.cifra b,.num{font-variant-numeric:tabular-nums}
 
 /* ---------- Portada ---------- */
-.portada{background:linear-gradient(135deg,#173C49 0%,var(--primario) 55%,#2C6476 100%);color:#fff;position:relative;overflow:hidden}
-.portada::after{content:"";position:absolute;right:-120px;top:-120px;width:460px;height:460px;border-radius:50%;border:56px solid rgba(239,233,225,.07)}
-.portada-in{max-width:1180px;margin:0 auto;padding:56px 32px 48px;position:relative;z-index:1}
-.marca{display:flex;align-items:center;gap:12px;font-family:var(--titulos);font-weight:700;font-size:1.05rem;letter-spacing:.18em;color:var(--calido)}
-.marca svg{width:34px;height:34px}
-.portada h1{color:#fff;font-size:clamp(2.2rem,5vw,3.6rem);margin:28px 0 10px;max-width:16ch}
-.portada .bajada{font-size:1.15rem;color:#D7E4E8;max-width:62ch;margin:0}
-.ficha{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;margin-top:36px}
-.ficha div{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:12px;padding:14px 16px}
-.ficha dt{font-size:.74rem;text-transform:uppercase;letter-spacing:.12em;color:#B9D0D7;margin-bottom:4px}
-.ficha dd{margin:0;font-weight:600;color:#fff;font-size:.98rem}
+.portada{background:var(--primario);color:#fff;position:relative;overflow:hidden}
+.portada-in{max-width:1280px;margin:0 auto;padding:52px 32px 40px;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:44px;align-items:center}
+.marca{display:flex;align-items:center;gap:10px;font-family:var(--titulos);font-weight:800;font-size:1.6rem;letter-spacing:-.03em;color:#fff}
+.marca svg{width:40px;height:40px}
+.portada h1{color:#fff;font-size:clamp(2.3rem,1.6rem + 2.6vw,3.5rem);margin:26px 0 12px;max-width:15ch;font-weight:800;letter-spacing:-.03em}
+.portada .bajada{font-size:1.14rem;color:#DDE6D5;max-width:56ch;margin:0}
+.portada .pantalla{margin:0;border-radius:18px;overflow:hidden;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.18),0 30px 70px rgba(0,0,0,.28)}
+.portada .pantalla .barra-nav{display:flex;gap:6px;padding:10px 12px;background:#EEF1EA}
+.portada .pantalla .barra-nav i{width:10px;height:10px;border-radius:50%;background:#C9D1C1}
+.portada .pantalla img{display:block;width:100%;height:auto}
+.ficha{max-width:1280px;margin:0 auto;padding:0 32px 44px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.ficha div{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.16);border-radius:12px;padding:13px 16px}
+.ficha dt{font-size:.8rem;color:#C9D6BE;margin-bottom:2px;font-weight:600}
+.ficha dd{margin:0;font-weight:700;color:#fff;font-size:.98rem}
 .ficha a{color:#fff}
 
 /* ---------- Estructura ---------- */
-.marco{max-width:1280px;margin:0 auto;display:grid;grid-template-columns:268px minmax(0,1fr);gap:40px;padding:0 32px}
-nav.indice{position:sticky;top:0;align-self:start;max-height:100vh;overflow:auto;padding:28px 4px 40px 0;font-size:.89rem}
-nav.indice .titulo-indice{font-family:var(--titulos);font-weight:700;color:var(--primario);letter-spacing:.08em;text-transform:uppercase;font-size:.75rem;margin:0 0 10px}
+.marco{max-width:1320px;margin:0 auto;display:grid;grid-template-columns:270px minmax(0,1fr);gap:40px;padding:0 32px}
+nav.indice{position:sticky;top:0;align-self:start;max-height:100vh;overflow:auto;padding:30px 4px 40px 0;font-size:.9rem;scrollbar-width:thin}
+nav.indice .titulo-indice{font-family:var(--titulos);font-weight:800;color:var(--primario);font-size:1.05rem;margin:0 0 10px;padding-left:10px}
 nav.indice ol{list-style:none;margin:0;padding:0}
 nav.indice > ol > li{margin:2px 0}
-nav.indice a{display:block;padding:6px 10px;border-radius:8px;color:var(--suave);text-decoration:none;border-left:3px solid transparent}
-nav.indice a:hover{background:var(--calido-2);color:var(--primario)}
-nav.indice a.activo{background:var(--primario-claro);color:var(--primario);font-weight:600;border-left-color:var(--primario)}
-nav.indice ol ol{padding-left:12px;margin-bottom:6px}
-nav.indice ol ol a{font-size:.82rem;padding:4px 10px}
+nav.indice a{display:block;padding:6px 10px;border-radius:9px;color:var(--suave);text-decoration:none;transition:background-color .15s ease,color .15s ease}
+nav.indice a:hover{background:var(--salvia-50);color:var(--primario)}
+nav.indice a.activo{background:var(--primario-claro);color:var(--primario);font-weight:700}
+nav.indice ol ol{padding-left:10px;margin-bottom:6px}
+nav.indice ol ol a{font-size:.84rem;padding:4px 10px}
 main{min-width:0;padding:36px 0 80px}
-section.fase{background:var(--papel);border:1px solid var(--borde);border-radius:20px;box-shadow:var(--sombra);padding:44px 48px;margin:0 0 36px}
-.cabeza-fase{display:flex;align-items:flex-start;gap:18px;border-bottom:1px solid var(--borde);padding-bottom:22px;margin-bottom:8px}
-.num-fase{flex:none;font-family:var(--titulos);font-weight:700;color:#fff;background:var(--acento);border-radius:12px;padding:8px 12px;font-size:.82rem;letter-spacing:.06em;line-height:1.2;text-align:center}
-.num-fase b{display:block;font-size:1.5rem;letter-spacing:0}
-.cabeza-fase p{color:var(--suave);margin:.2rem 0 0}
-.evidencia{display:inline-flex;flex-wrap:wrap;gap:6px;margin:.2rem 0 .8rem}
-.doc{font-family:var(--mono);font-size:.74rem;background:var(--calido);color:#6E4A2E;border-radius:999px;padding:3px 10px;font-weight:500;white-space:nowrap}
+section.fase{background:var(--papel);border:1px solid var(--borde);border-radius:22px;box-shadow:var(--sombra);padding:44px 48px;margin:0 0 32px}
+.cabeza-fase{display:flex;align-items:center;gap:18px;border-bottom:1px solid var(--borde);padding-bottom:22px;margin-bottom:8px}
+.num-fase{flex:none;font-family:var(--titulos);font-weight:800;color:var(--primario);background:var(--salvia-50);border:1px solid var(--borde);border-radius:14px;width:80px;padding:10px 6px;font-size:.78rem;line-height:1.2;text-align:center}
+.num-fase b{display:block;font-size:1.6rem;letter-spacing:-.02em}
+.cabeza-fase p{color:var(--suave);margin:.15rem 0 0}
+.evidencia{display:inline-flex;flex-wrap:wrap;gap:6px;margin:.4rem 0 .8rem}
+.doc{font-family:var(--mono);font-size:.76rem;background:var(--salvia-50);border:1px solid var(--borde);color:#3B5A3E;border-radius:999px;padding:3px 10px;font-weight:500;white-space:nowrap}
 
 /* ---------- Componentes ---------- */
-.cifras{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin:22px 0 6px}
-.cifra{background:var(--calido-2);border:1px solid var(--borde);border-radius:14px;padding:16px 18px}
-.cifra b{display:block;font-family:var(--titulos);font-size:2rem;color:var(--primario);line-height:1.1}
-.cifra span{font-size:.86rem;color:var(--suave)}
-.rejilla{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin:14px 0 18px}
+.cifras{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:22px 0 6px}
+.cifra{background:var(--salvia-50);border:1px solid var(--borde);border-radius:14px;padding:16px 18px}
+.cifra b{display:block;font-family:var(--titulos);font-size:2.1rem;color:var(--primario);line-height:1.05;font-weight:800}
+.cifra span{font-size:.88rem;color:var(--suave)}
+.rejilla{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin:14px 0 18px}
 .tarjeta{border:1px solid var(--borde);border-radius:var(--radio);padding:18px 20px;background:var(--papel)}
-.tarjeta h4{margin:0 0 .4rem;color:var(--primario)}
-.tarjeta p,.tarjeta ul{margin:.3rem 0 0;font-size:.93rem}
-.tarjeta.acento{border-top:4px solid var(--acento)}
-.tarjeta.primario{border-top:4px solid var(--primario)}
-.nota{border-radius:12px;padding:14px 18px;margin:16px 0;background:var(--primario-claro);border-left:4px solid var(--primario);font-size:.94rem}
-.nota.ambar{background:var(--ambar-claro);border-left-color:var(--ambar)}
-.nota.rojo{background:var(--rojo-claro);border-left-color:var(--rojo)}
-.nota.verde{background:var(--verde-claro);border-left-color:var(--verde)}
-.nota b:first-child{color:var(--primario)}
-.tabla-c{overflow-x:auto;margin:14px 0 20px;border:1px solid var(--borde);border-radius:12px;background:var(--papel)}
-table{border-collapse:collapse;width:100%;font-size:.89rem}
-th{background:var(--calido-2);color:var(--primario);text-align:left;font-weight:600;padding:10px 12px;border-bottom:1px solid var(--borde);white-space:nowrap;font-size:.8rem;letter-spacing:.02em;text-transform:uppercase}
-td{padding:9px 12px;border-bottom:1px solid #EFEBE5;vertical-align:top}
+.tarjeta h4,.tarjeta h3{margin:0 0 .4rem;color:var(--primario);font-size:1.06rem;letter-spacing:0;padding:0}
+.tarjeta p,.tarjeta ul{margin:.3rem 0 0;font-size:.95rem}
+.tarjeta.primario{background:var(--salvia-50)}
+.tarjeta.acento{background:var(--acento-claro);border-color:#F1E3B3}
+.nota{border-radius:14px;padding:14px 18px;margin:18px 0;background:var(--salvia-50);border:1px solid var(--borde);font-size:.95rem}
+.nota.ambar{background:var(--ambar-claro);border-color:#F1E3B3}
+.nota.rojo{background:var(--rojo-claro);border-color:#EFCFCB}
+.nota.verde{background:var(--verde-claro);border-color:#CDE2CF}
+.nota b:first-child{color:var(--primario);display:block;margin-bottom:2px}
+.nota.ambar b:first-child{color:var(--ambar)}
+.tabla-c{overflow-x:auto;margin:14px 0 20px;border:1px solid var(--borde);border-radius:14px;background:var(--papel);padding:4px 6px}
+table{border-collapse:collapse;width:100%;font-size:.9rem}
+th{background:var(--salvia-50);color:var(--primario);text-align:left;font-weight:700;padding:10px 12px;border-bottom:1px solid var(--borde);white-space:nowrap;font-size:.84rem}
+td{padding:9px 12px;border-bottom:1px solid #EDF1E8;vertical-align:top}
 tr:last-child td{border-bottom:0}
+td{transition:background-color .12s ease}
+@media (hover:hover) and (pointer:fine){table tr:hover td{background:#FAFCF8}}
 td code{white-space:nowrap}
-.ids td:first-child{white-space:nowrap;font-weight:600;color:var(--primario)}
+.ids td:first-child{white-space:nowrap;font-weight:700;color:var(--primario)}
 .metodo{font-family:var(--mono);font-size:.74rem;font-weight:600;border-radius:6px;padding:2px 7px;color:#fff;display:inline-block;min-width:54px;text-align:center}
-.GET{background:#2F6B80}.POST{background:#2D6A4F}.PATCH{background:#8A6100}.DELETE{background:#A23B3B}
-.chip{display:inline-block;font-size:.74rem;font-weight:600;border-radius:999px;padding:2px 9px;white-space:nowrap}
+.GET{background:#2F5D8C}.POST{background:#2F6B3C}.PATCH{background:#7A5C08}.DELETE{background:#A23B3B}
+.chip{display:inline-block;font-size:.76rem;font-weight:700;border-radius:999px;padding:2px 9px;white-space:nowrap}
 .chip.ok{background:var(--verde-claro);color:var(--verde)}
 .chip.dif{background:var(--ambar-claro);color:var(--ambar)}
-.chip.na{background:#ECEFF1;color:#55616A}
-.chip.pub{background:#ECEFF1;color:#55616A}.chip.cli{background:var(--primario-claro);color:var(--primario)}.chip.adm{background:var(--acento-claro);color:var(--acento)}
-figure.diagrama{margin:22px 0 26px;border:1px solid var(--borde);border-radius:16px;background:#fff;overflow:hidden}
+.chip.na,.chip.pub{background:#EEF1EA;color:#4F5B52}
+.chip.cli{background:var(--primario-claro);color:var(--primario)}.chip.adm{background:var(--acento-claro);color:var(--acento)}
+figure.diagrama,figure.captura{margin:22px 0 26px;border:1px solid var(--borde);border-radius:18px;background:#fff;overflow:hidden}
 figure.diagrama .lienzo{overflow-x:auto;padding:16px;cursor:zoom-in}
 figure.diagrama svg{display:block;width:100%;height:auto;min-width:720px}
-figure.diagrama figcaption{border-top:1px solid var(--borde);background:var(--calido-2);padding:12px 18px;font-size:.88rem;color:var(--suave);display:flex;gap:12px;justify-content:space-between;align-items:baseline;flex-wrap:wrap}
-figure.diagrama figcaption b{color:var(--primario)}
-.ampliar{font-size:.78rem;color:var(--primario-2);background:none;border:1px solid var(--borde);border-radius:999px;padding:3px 10px;cursor:pointer;font-family:inherit}
-.ampliar:hover{border-color:var(--primario-2)}
-figure.codigo{margin:16px 0 22px;border-radius:12px;overflow:hidden;background:#17252B;border:1px solid #0E1A1F}
-figure.codigo figcaption{display:flex;justify-content:space-between;gap:12px;padding:8px 14px;background:#0F1C21;color:#9FB6BE;font:500 .76rem/1.4 var(--mono);flex-wrap:wrap}
+figure.diagrama figcaption,figure.captura figcaption{border-top:1px solid var(--borde);background:var(--salvia-50);padding:12px 18px;font-size:.9rem;color:var(--suave);display:flex;gap:12px;justify-content:space-between;align-items:center;flex-wrap:wrap}
+figure.diagrama figcaption b,figure.captura figcaption b{color:var(--primario)}
+.galeria{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin:18px 0 22px}
+.galeria figure.captura{margin:0}
+.galeria figure.captura figcaption{font-size:.88rem;padding:10px 14px}
+figure.captura img{display:block;width:100%;height:auto;cursor:zoom-in}
+.ampliar{font:600 .82rem var(--fuente);color:var(--primario);background:#fff;border:1px solid var(--borde);border-radius:999px;min-height:36px;padding:0 14px;cursor:pointer;transition:border-color .15s ease,transform .16s var(--ease)}
+.ampliar:hover{border-color:var(--primario)}
+.ampliar:active{transform:scale(.97)}
+figure.codigo{margin:16px 0 22px;border-radius:14px;overflow:hidden;background:#1C261E;border:1px solid #121A14}
+figure.codigo figcaption{display:flex;justify-content:space-between;gap:12px;padding:8px 14px;background:#141C16;color:#A9BCA6;font:500 .78rem/1.4 var(--mono);flex-wrap:wrap}
 figure.codigo pre code{background:none;border:0;padding:0;color:inherit;font-size:inherit;border-radius:0}
-figure.codigo pre{margin:0;padding:14px 16px;overflow-x:auto;color:#E3ECEF;font:.8rem/1.6 var(--mono);tab-size:2}
-.tk-com{color:#7F9AA3;font-style:italic}.tk-str{color:#E8B983}.tk-kw{color:#7CC6DE}.tk-dec{color:#E4A0C0}.tk-num{color:#B9D98A}
-pre.arbol{background:var(--calido-2);border:1px solid var(--borde);border-radius:12px;padding:16px 18px;font:.8rem/1.55 var(--mono);overflow-x:auto;color:#3B444A}
+figure.codigo pre{margin:0;padding:14px 16px;overflow-x:auto;color:#E7EEE3;font:.81rem/1.62 var(--mono);tab-size:2}
+.tk-com{color:#8FA58C;font-style:italic}.tk-str{color:#F2C94C}.tk-kw{color:#9DD0A6}.tk-dec{color:#E6A8C3}.tk-num{color:#C9DE96}
+pre.arbol{background:var(--salvia-50);border:1px solid var(--borde);border-radius:14px;padding:16px 18px;font:.81rem/1.55 var(--mono);overflow-x:auto;color:#33402F}
 .linea-tiempo{list-style:none;padding:0;margin:18px 0;position:relative}
 .linea-tiempo::before{content:"";position:absolute;left:94px;top:6px;bottom:6px;width:2px;background:var(--borde)}
 .linea-tiempo li{display:grid;grid-template-columns:82px 1fr;gap:38px;margin:0 0 14px;position:relative}
 .linea-tiempo li::before{content:"";position:absolute;left:88px;top:7px;width:14px;height:14px;border-radius:50%;background:var(--papel);border:3px solid var(--primario-2)}
-.linea-tiempo time{font:600 .8rem/1.6 var(--mono);color:var(--acento);text-align:right}
-.linea-tiempo div{font-size:.93rem}
+.linea-tiempo li.nuevo::before{background:var(--amarillo);border-color:var(--primario)}
+.linea-tiempo time{font:600 .82rem/1.6 var(--mono);color:var(--primario-2);text-align:right}
+.linea-tiempo div{font-size:.95rem}
 .linea-tiempo b{color:var(--primario)}
 .pasos{counter-reset:p;list-style:none;padding:0}
 .pasos > li{counter-increment:p;position:relative;padding:0 0 0 46px;margin:0 0 16px}
 .pasos > li::before{content:counter(p);position:absolute;left:0;top:-2px;width:30px;height:30px;border-radius:50%;background:var(--primario);color:#fff;font:700 .85rem/30px var(--titulos);text-align:center}
 .dos-col{display:grid;grid-template-columns:1fr 1fr;gap:18px}
-.pie{max-width:1180px;margin:0 auto;padding:30px 32px 60px;color:var(--tenue);font-size:.85rem;text-align:center}
-.arriba{position:fixed;right:20px;bottom:20px;width:44px;height:44px;border-radius:50%;background:var(--primario);color:#fff;display:grid;place-items:center;text-decoration:none;box-shadow:var(--sombra);opacity:0;pointer-events:none;transition:opacity .2s}
-.arriba.visible{opacity:1;pointer-events:auto}
-.arriba:hover{color:#fff;background:var(--acento)}
-dialog.visor{border:0;padding:0;width:96vw;height:94vh;max-width:none;max-height:none;border-radius:14px;background:#fff}
-dialog.visor::backdrop{background:rgba(17,35,42,.72)}
-dialog.visor .barra{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;border-bottom:1px solid var(--borde);font-weight:600;color:var(--primario)}
-dialog.visor .barra button{font:inherit;border:1px solid var(--borde);background:var(--calido-2);border-radius:999px;padding:4px 14px;cursor:pointer}
-dialog.visor .contenido{height:calc(100% - 50px);overflow:auto;padding:16px}
+.cumple td:nth-child(2) a{font-weight:700;white-space:nowrap}
+.cumple tr.grupo td{background:var(--salvia-50);font-family:var(--titulos);font-weight:800;color:var(--primario);font-size:.98rem}
+.pie{max-width:1180px;margin:0 auto;padding:30px 32px 60px;color:var(--tenue);font-size:.88rem;text-align:center}
+.arriba{position:fixed;right:20px;bottom:20px;width:48px;height:48px;border-radius:50%;background:var(--primario);color:#fff;display:grid;place-items:center;text-decoration:none;box-shadow:var(--sombra);opacity:0;pointer-events:none;transform:translateY(8px);transition:opacity .2s ease,transform .25s var(--ease),background-color .15s ease}
+.arriba.visible{opacity:1;pointer-events:auto;transform:none}
+.arriba:hover{color:#fff;background:var(--primario-2)}
+dialog.visor{border:0;padding:0;width:96vw;height:94vh;max-width:none;max-height:none;border-radius:16px;background:#fff}
+dialog.visor[open]{animation:visor-entra .28s var(--ease)}
+@keyframes visor-entra{from{opacity:0;transform:scale(.97)}}
+dialog.visor::backdrop{background:rgba(20,30,22,.72)}
+dialog.visor .barra{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;border-bottom:1px solid var(--borde);font-weight:700;color:var(--primario)}
+dialog.visor .barra button{font:600 .9rem var(--fuente);border:1px solid var(--borde);background:var(--salvia-50);border-radius:999px;min-height:40px;padding:0 16px;cursor:pointer;transition:transform .16s var(--ease)}
+dialog.visor .barra button:active{transform:scale(.97)}
+dialog.visor .contenido{height:calc(100% - 62px);overflow:auto;padding:16px}
 dialog.visor svg{width:auto;height:auto;min-width:1400px;max-width:none}
+dialog.visor img{display:block;max-width:100%;height:auto;margin:0 auto}
 .movil-indice{display:none}
 
+@media (max-width:1100px){
+  .portada-in{grid-template-columns:1fr}
+  .ficha{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .cifras{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
 @media (max-width:1000px){
   .marco{grid-template-columns:1fr;padding:0 16px;gap:0}
   nav.indice{display:none}
   .movil-indice{display:block;margin:20px 0 0}
   .movil-indice details{background:var(--papel);border:1px solid var(--borde);border-radius:12px;padding:10px 16px}
-  .movil-indice summary{font-weight:600;color:var(--primario);cursor:pointer}
-  .movil-indice ol{font-size:.92rem}
-  section.fase{padding:28px 20px;border-radius:16px}
-  .portada-in{padding:40px 16px 36px}
-  .dos-col{grid-template-columns:1fr}
-  h2{font-size:1.6rem}
+  .movil-indice summary{font-weight:700;color:var(--primario);cursor:pointer;min-height:32px}
+  .movil-indice ol{font-size:.94rem}
+  section.fase{padding:28px 20px;border-radius:18px}
+  .portada-in{padding:40px 16px 28px}
+  .ficha{padding:0 16px 32px}
+  .dos-col,.galeria{grid-template-columns:1fr}
   .pie{padding:24px 16px 48px}
 }
+@media (max-width:560px){.ficha,.cifras{grid-template-columns:1fr}}
 @media print{
   body{background:#fff;font-size:11pt}
-  nav.indice,.movil-indice,.arriba,.ampliar{display:none!important}
+  nav.indice,.movil-indice,.arriba,.ampliar,.progreso,.saltar{display:none!important}
   .marco{display:block;padding:0}
   section.fase{box-shadow:none;border:0;padding:0;margin:0 0 24px;page-break-before:always}
-  figure.diagrama,figure.codigo,.tabla-c,.tarjeta{break-inside:avoid}
+  figure.diagrama,figure.codigo,figure.captura,.tabla-c,.tarjeta{break-inside:avoid}
   figure.diagrama svg{min-width:0}
   .portada{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
 </style>
 </head>
 <body>
+<a class="saltar" href="#contenido">Saltar al contenido</a>
+<div class="progreso" aria-hidden="true"></div>
 
 <!-- =============================================================== PORTADA -->
 <header class="portada" id="inicio">
   <div class="portada-in">
-    <div class="marca">
-      <svg viewBox="0 0 40 40" aria-hidden="true"><path d="M8 10h19v16a7 7 0 0 1-7 7h-5a7 7 0 0 1-7-7z" fill="#EFE9E1"/><path d="M27 14h3a5 5 0 0 1 0 10h-3" fill="none" stroke="#EFE9E1" stroke-width="3"/><path d="M12 5c0 2 2 2 2 4M18 5c0 2 2 2 2 4" stroke="#A45A33" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
-      MUGLY
+    <div>
+      <div class="marca"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M8 15h20v10a9 9 0 0 1-9 9h-2a9 9 0 0 1-9-9z" fill="#fff"/><path d="M28 18h1.5a4.5 4.5 0 0 1 0 9H28" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/><path d="M18 29.5s-5.5-3.2-5.5-6.6a3 3 0 0 1 5.5-1.7 3 3 0 0 1 5.5 1.7c0 3.4-5.5 6.6-5.5 6.6z" fill="#F2C94C"/><path d="M14 5.5c-1.4 1.6 1.4 2.9 0 4.6M19 4c-1.4 1.6 1.4 2.9 0 4.6M24 5.5c-1.4 1.6 1.4 2.9 0 4.6" fill="none" stroke="#B7C5A4" stroke-width="2.2" stroke-linecap="round"/></svg>mugly</div>
+      <h1>Informe del proyecto final</h1>
+      <p class="bajada">Análisis, diseño arquitectónico y desarrollo incremental de MUGLY, la tienda virtual de mugs: desde la atención inicial hasta la versión v1.1.0 en funcionamiento.</p>
     </div>
-    <h1>Informe del proyecto final</h1>
-    <p class="bajada">Análisis, diseño arquitectónico y desarrollo incremental de MUGLY, la tienda virtual de mugs: desde la atención inicial hasta la versión v1.0.0 en funcionamiento.</p>
-    <dl class="ficha">
-      <div><dt>Proyecto</dt><dd>MUGLY · tienda virtual de mugs</dd></div>
-      <div><dt>Integrantes</dt><dd>Pedro Díaz · Assael Zapata</dd></div>
-      <div><dt>Asignatura</dt><dd>Arquitectura de Software · 2026-2</dd></div>
-      <div><dt>Docente</dt><dd>Rodolfo Ortega Niño</dd></div>
-      <div><dt>Institución</dt><dd>Universidad Cooperativa de Colombia</dd></div>
-      <div><dt>Entrega</dt><dd>Sábado 21 de noviembre de 2026</dd></div>
-      <div><dt>Versión del software</dt><dd>v1.0.0 · migración 9ed994615ffd</dd></div>
-      <div><dt>Repositorio</dt><dd><a href="https://github.com/peddiazd/Backend-MUGLY">github.com/peddiazd/Backend-MUGLY</a></dd></div>
-    </dl>
+    <figure class="pantalla">
+      <div class="barra-nav" aria-hidden="true"><i></i><i></i><i></i></div>
+      <img src="{{img:01-inicio-portada.jpg}}" alt="Página de inicio de MUGLY v1.1.0 con un mug de diseño anime sobre su repisa" width="1152" height="548">
+    </figure>
   </div>
+  <dl class="ficha">
+    <div><dt>Proyecto</dt><dd>MUGLY · tienda virtual de mugs</dd></div>
+    <div><dt>Integrantes</dt><dd>Pedro Díaz · Assael Zapata</dd></div>
+    <div><dt>Asignatura</dt><dd>Arquitectura de Software · 2026-2</dd></div>
+    <div><dt>Docente</dt><dd>Rodolfo Ortega Niño</dd></div>
+    <div><dt>Institución</dt><dd>Universidad Cooperativa de Colombia</dd></div>
+    <div><dt>Entrega</dt><dd>Sábado 21 de noviembre de 2026</dd></div>
+    <div><dt>Versión del software</dt><dd>v1.1.0 · migración 9ed994615ffd</dd></div>
+    <div><dt>Repositorio</dt><dd><a href="https://github.com/peddiazd/Backend-MUGLY">github.com/peddiazd/Backend-MUGLY</a></dd></div>
+  </dl>
 </header>
 
 <div class="marco">
@@ -193,6 +234,7 @@ dialog.visor svg{width:auto;height:auto;min-width:1400px;max-width:none}
   <p class="titulo-indice">Contenido</p>
   <ol>
     <li><a href="#resumen">Resumen del proyecto</a></li>
+    <li><a href="#cumplimiento">Matriz de cumplimiento</a></li>
     <li><a href="#fase01">Fase 01 · Gestión comercial</a>
       <ol>
         <li><a href="#f1-solicitud">Solicitud y evaluación</a></li>
@@ -223,7 +265,7 @@ dialog.visor svg{width:auto;height:auto;min-width:1400px;max-width:none}
         <li><a href="#f3-despliegue">Arquitectura computacional</a></li>
         <li><a href="#f3-adr">Decisiones (ADR)</a></li>
         <li><a href="#f3-calidad">Atributos y riesgos</a></li>
-        <li><a href="#f3-prototipos">Prototipos y G2</a></li>
+        <li><a href="#f3-prototipos">Identidad visual y G2</a></li>
       </ol></li>
     <li><a href="#fase04">Fase 04 · Preparación técnica</a>
       <ol>
@@ -242,16 +284,24 @@ dialog.visor svg{width:auto;height:auto;min-width:1400px;max-width:none}
         <li><a href="#f5-migracion">Migración de datos</a></li>
         <li><a href="#f5-pruebas">Pruebas de funcionamiento</a></li>
         <li><a href="#f5-trazabilidad">Diseño ↔ código</a></li>
+        <li><a href="#f5-galeria">La aplicación en funcionamiento</a></li>
       </ol></li>
-    <li><a href="#anexos">Anexos</a></li>
+    <li><a href="#anexos">Anexos</a>
+      <ol>
+        <li><a href="#a-expediente">Expediente</a></li>
+        <li><a href="#a-enlaces">Enlaces</a></li>
+        <li><a href="#a-glosario">Glosario</a></li>
+        <li><a href="#a-entrega">Texto de la entrega</a></li>
+        <li><a href="#a-video">Guía del video</a></li>
+      </ol></li>
   </ol>
 </nav>
 
-<main>
+<main id="contenido">
 <div class="movil-indice">
   <details><summary>Contenido del informe</summary>
     <ol>
-      <li><a href="#resumen">Resumen</a></li><li><a href="#fase01">Fase 01 · Gestión comercial</a></li>
+      <li><a href="#resumen">Resumen</a></li><li><a href="#cumplimiento">Matriz de cumplimiento</a></li><li><a href="#fase01">Fase 01 · Gestión comercial</a></li>
       <li><a href="#fase02">Fase 02 · Requisitos y contratación</a></li><li><a href="#fase03">Fase 03 · Scrum, arquitectura y diseño</a></li>
       <li><a href="#fase04">Fase 04 · Preparación técnica</a></li><li><a href="#fase05">Fase 05 · Desarrollo incremental</a></li>
       <li><a href="#anexos">Anexos</a></li>
@@ -262,7 +312,7 @@ dialog.visor svg{width:auto;height:auto;min-width:1400px;max-width:none}
 <!-- =============================================================== RESUMEN -->
 <section class="fase" id="resumen">
   <div class="cabeza-fase">
-    <div class="num-fase">MUGLY<b>v1.0</b></div>
+    <div class="num-fase">MUGLY<b>v1.1</b></div>
     <div>
       <h2>Resumen del proyecto</h2>
       <p>Qué es MUGLY, qué necesidad atiende y cómo está construido.</p>
@@ -283,11 +333,69 @@ dialog.visor svg{width:auto;height:auto;min-width:1400px;max-width:none}
   </div>
 
   <div class="rejilla">
-    <div class="tarjeta primario"><h4>Para el cliente</h4><p>Registro e ingreso, catálogo con búsqueda, detalle con foto y disponibilidad, carrito limitado por el stock, confirmación del pedido, pago coordinado por WhatsApp, «Mis pedidos» con progreso, transportadora y guía, y solicitud de mugs personalizados.</p></div>
-    <div class="tarjeta acento"><h4>Para el administrador</h4><p>Productos con foto e inventario, confirmación del pago con descuento automático del stock, envío con transportadora y guía, entrega, cancelación, registro de pedidos personalizados y gestión de clientes (editar, activar o desactivar).</p></div>
-    <div class="tarjeta"><h4>Arquitectura</h4><p>Cliente-servidor con una <strong>SPA en JavaScript Vanilla y Bootstrap</strong> que consume una <strong>API REST en Flask</strong>, organizada como <strong>monolito modular por dominios y capas</strong> (controladores, DTO, servicios, repositorios y modelos) sobre <strong>MySQL</strong> con SQLAlchemy y migraciones.</p></div>
+    <div class="tarjeta primario"><h3>Para el cliente</h3><p>Registro e ingreso, una portada con presentación del producto controlada por el scroll, catálogo con búsqueda, detalle con foto y disponibilidad, carrito limitado por el stock, confirmación del pedido, pago coordinado por WhatsApp, «Mis pedidos» con progreso, transportadora y guía, y solicitud de mugs personalizados.</p></div>
+    <div class="tarjeta acento"><h3>Para el administrador</h3><p>Productos con foto e inventario, confirmación del pago con descuento automático del stock, envío con transportadora y guía, entrega, cancelación, registro de pedidos personalizados y gestión de clientes (editar, activar o desactivar).</p></div>
+    <div class="tarjeta"><h3>Arquitectura</h3><p>Cliente-servidor con una <strong>SPA en JavaScript Vanilla y Bootstrap</strong> que consume una <strong>API REST en Flask</strong>, organizada como <strong>monolito modular por dominios y capas</strong> (controladores, DTO, servicios, repositorios y modelos) sobre <strong>MySQL</strong> con SQLAlchemy y migraciones.</p></div>
   </div>
-  <div class="nota"><b>Cómo leer este informe.</b> Cada fase indica los documentos del expediente que la respaldan (códigos <span class="doc">MGL-…</span>, guardados en Google Drive) y las evidencias en Jira y GitHub. Los diagramas se generan desde <code>docs/diagramas/generar_diagramas.py</code> y los fragmentos de código se extraen del repositorio al construir el informe, por lo que corresponden a la misma versión del software. Haga clic en cualquier diagrama para ampliarlo.</div>
+  <div class="nota"><b>Cómo leer este informe.</b> Cada fase indica los documentos del expediente que la respaldan (códigos <span class="doc">MGL-…</span>, guardados en Google Drive) y las evidencias en Jira y GitHub. Los diagramas se generan desde <code>docs/diagramas/generar_diagramas.py</code> y los fragmentos de código se extraen del repositorio al construir el informe, por lo que corresponden a la misma versión del software. Haga clic en cualquier diagrama o captura para ampliarlo. La <a href="#cumplimiento">matriz de cumplimiento</a> indica dónde se atiende cada punto solicitado para la entrega.</div>
+</section>
+
+<!-- =============================================================== CUMPLIMIENTO -->
+<section class="fase" id="cumplimiento">
+  <div class="cabeza-fase">
+    <div class="num-fase">GUÍA<b>✓</b></div>
+    <div>
+      <h2>Matriz de cumplimiento</h2>
+      <p>Cada punto solicitado para la entrega, dónde se atiende en este informe y con qué evidencia.</p>
+    </div>
+  </div>
+  <div class="tabla-c cumple"><table>
+    <tr><th>Punto solicitado</th><th>Dónde</th><th>Evidencia</th></tr>
+    <tr class="grupo"><td colspan="3">Requisitos técnicos · Frontend</td></tr>
+    <tr><td>HTML5, CSS3 y JavaScript Vanilla, sin React, Angular ni Vue</td><td><a href="#f3-adr">Ver sección</a></td><td>ADR-002 y ADR-007; <code>frontend/</code> sin dependencias de compilación</td></tr>
+    <tr><td>SPA nativa: páginas, componentes reutilizables, enrutamiento y estado</td><td><a href="#f3-logica">Ver sección</a></td><td>Tabla de rutas; <code>router.js</code>, <code>estado.js</code>, <code>js/componentes/</code></td></tr>
+    <tr><td>Bootstrap o Tailwind</td><td><a href="#f3-adr">Ver sección</a></td><td>Bootstrap 5.3.3 local (ADR-002)</td></tr>
+    <tr><td>Manipulación del DOM, eventos y renderizado dinámico</td><td><a href="#f5-frontend">Ver sección</a></td><td>Fragmentos de <code>router.js</code>, <code>estado.js</code>, <code>registro.js</code>, <code>escena.js</code></td></tr>
+    <tr><td>Consumo asíncrono de la API REST</td><td><a href="#f5-recorrido">Ver sección</a></td><td><code>api.js</code> con <code>fetch</code>; recorrido de confirmar el pago</td></tr>
+    <tr><td>Validación de formularios y manejo de errores</td><td><a href="#f5-frontend">Ver sección</a></td><td>Validación propia + mensajes de la API en el formulario</td></tr>
+    <tr class="grupo"><td colspan="3">Requisitos técnicos · Backend</td></tr>
+    <tr><td>Python con Flask e implementación de una API REST</td><td><a href="#f3-api">Ver sección</a></td><td>23 endpoints, 21 bajo <code>/api/v1</code></td></tr>
+    <tr><td>Monolito modular por capas, organizado por dominios</td><td><a href="#f3-estilo">Ver sección</a></td><td>ADR-001; figura 3 (componentes)</td></tr>
+    <tr><td>Controladores, servicios, repositorios, DTO y modelos</td><td><a href="#f3-logica">Ver sección</a></td><td>Tabla de responsabilidades por capa</td></tr>
+    <tr><td>Reglas de negocio, validaciones y excepciones</td><td><a href="#f2-rnf">Ver sección</a></td><td>RN01–RN18; <code>TRANSICIONES</code>; excepciones del dominio</td></tr>
+    <tr><td>Métodos HTTP, códigos de estado y respuestas JSON</td><td><a href="#f3-api">Ver sección</a></td><td>Tabla de endpoints y de códigos</td></tr>
+    <tr><td>Autenticación y autorización</td><td><a href="#f3-seguridad">Ver sección</a></td><td>JWT, <code>@requiere_token</code>, <code>@requiere_admin</code></td></tr>
+    <tr class="grupo"><td colspan="3">Requisitos técnicos · Base de datos</td></tr>
+    <tr><td>MySQL o PostgreSQL</td><td><a href="#f3-datos">Ver sección</a></td><td>MySQL 8.0 (InnoDB, utf8mb4)</td></tr>
+    <tr><td>Modelado de entidades y relaciones</td><td><a href="#f3-datos">Ver sección</a></td><td>Figuras 10 y 11 (modelo lógico y físico)</td></tr>
+    <tr><td>Persistencia mediante ORM y operaciones CRUD</td><td><a href="#f3-api">Ver sección</a></td><td>SQLAlchemy; endpoints de creación, consulta, edición y retiro</td></tr>
+    <tr><td>Gestión de migraciones</td><td><a href="#f4-bd">Ver sección</a></td><td>6 migraciones de Alembic; sección 5.5</td></tr>
+    <tr class="grupo"><td colspan="3">Integración y calidad del software</td></tr>
+    <tr><td>Comunicación Frontend, Backend y base de datos</td><td><a href="#f5-recorrido">Ver sección</a></td><td>Recorrido de punta a punta y figura 2 (contenedores)</td></tr>
+    <tr><td>Validación en el cliente y en el servidor</td><td><a href="#f3-seguridad">Ver sección</a></td><td>Doble validación: formularios + DTO marshmallow</td></tr>
+    <tr><td>Pruebas de funcionamiento</td><td><a href="#f5-pruebas">Ver sección</a></td><td>65 pruebas automáticas, 16 casos de punta a punta y verificación visual</td></tr>
+    <tr><td>Organización, documentación y control de versiones</td><td><a href="#f4-repo">Ver sección</a></td><td>Estructura, convenciones, PR #1 a #5 y versiones</td></tr>
+    <tr class="grupo"><td colspan="3">Informe HTML · contenido obligatorio</td></tr>
+    <tr><td>Fase 01. Gestión comercial y atención inicial</td><td><a href="#fase01">Ver sección</a></td><td>Solicitud, reunión inicial y expediente</td></tr>
+    <tr><td>Fase 02. Descubrimiento, requisitos y contratación</td><td><a href="#fase02">Ver sección</a></td><td>Acuerdos, RF, RNF, alcance G1, riesgos y estimación</td></tr>
+    <tr><td>Fase 03. Scrum, arquitectura y diseño</td><td><a href="#fase03">Ver sección</a></td><td>Scrum, arquitectura completa y G2</td></tr>
+    <tr><td>Fase 04. Preparación técnica</td><td><a href="#fase04">Ver sección</a></td><td>Repositorio, entorno, base de datos y ejecución</td></tr>
+    <tr><td>Fase 05. Desarrollo incremental</td><td><a href="#fase05">Ver sección</a></td><td>Incrementos, historias, recorrido, pruebas y capturas</td></tr>
+    <tr><td>Requisitos arquitectónicamente relevantes, restricciones y atributos de calidad</td><td><a href="#f3-drivers">Ver sección</a></td><td>Drivers, restricciones y escenarios</td></tr>
+    <tr><td>Diagramas C4 de contexto, contenedores y componentes</td><td><a href="#f3-c4">Ver sección</a></td><td>Figuras 1 a 3</td></tr>
+    <tr><td>Diagramas UML del sistema</td><td><a href="#f3-uml">Ver sección</a></td><td>Casos de uso, clases, secuencia y estados</td></tr>
+    <tr><td>Arquitectura lógica: dominios, módulos y capas</td><td><a href="#f3-logica">Ver sección</a></td><td>Figura 4 y tablas</td></tr>
+    <tr><td>Arquitectura computacional y diagrama de despliegue</td><td><a href="#f3-despliegue">Ver sección</a></td><td>Figura 13</td></tr>
+    <tr><td>Modelo lógico y físico de la base de datos</td><td><a href="#f3-datos">Ver sección</a></td><td>Figuras 10 y 11</td></tr>
+    <tr><td>Diseño de la API REST y comunicación entre componentes</td><td><a href="#f3-api">Ver sección</a></td><td>Endpoints, formato de respuesta y errores</td></tr>
+    <tr><td>Diseño de seguridad</td><td><a href="#f3-seguridad">Ver sección</a></td><td>Amenazas, controles y figura de seguridad</td></tr>
+    <tr><td>Decisiones arquitectónicas (ADR), alternativas y justificación</td><td><a href="#f3-adr">Ver sección</a></td><td>ADR-001 a ADR-008</td></tr>
+    <tr><td>Rendimiento, escalabilidad, disponibilidad, seguridad, costos y riesgos</td><td><a href="#f3-calidad">Ver sección</a></td><td>Una tarjeta por atributo</td></tr>
+    <tr><td>Coherencia entre el diseño y el sistema desarrollado</td><td><a href="#f5-trazabilidad">Ver sección</a></td><td>Tabla diseño ↔ código y capturas reales</td></tr>
+    <tr class="grupo"><td colspan="3">Otros entregables</td></tr>
+    <tr><td>Video explicativo (MP4)</td><td><a href="#a-video">Ver sección</a></td><td>Guía con el orden exigido; lo graban los integrantes</td></tr>
+    <tr><td>Repositorios de GitHub en el comentario de la tarea</td><td><a href="#a-entrega">Ver sección</a></td><td>Texto listo para copiar</td></tr>
+  </table></div>
 </section>
 
 <!-- =============================================================== FASE 01 -->
@@ -579,10 +687,12 @@ dialog.visor svg{width:auto;height:auto;min-width:1400px;max-width:none}
     <tr><td><strong>Repositorios</strong> (<code>repositorios.py</code>)</td><td>Consultas y persistencia con SQLAlchemy</td><td>Decisiones de negocio</td></tr>
     <tr><td><strong>Modelos</strong> (<code>modelos.py</code>)</td><td>Entidades ORM, relaciones y serialización <code>to_dict()</code></td><td>Lógica de aplicación</td></tr>
   </table></div>
-  <p><strong>Frontend:</strong> la SPA no usa frameworks. <code>index.html</code> carga Bootstrap local y <code>js/app.js</code> como módulo ES. Cada página se importa de forma diferida con <code>import()</code> la primera vez que se visita. El enrutador traduce <code>#/ruta</code> a una página, <code>estado.js</code> guarda la sesión y el carrito en <code>localStorage</code> y notifica a los suscriptores, y <code>api.js</code> es el único punto que habla con el backend.</p>
+  <p><strong>Frontend:</strong> la SPA no usa frameworks. <code>index.html</code> carga Bootstrap local y <code>js/app.js</code> como módulo ES. Cada página se importa de forma diferida con <code>import()</code> la primera vez que se visita. El enrutador traduce <code>#/ruta</code> a una página, <code>estado.js</code> guarda la sesión y el carrito en <code>localStorage</code> y notifica a los suscriptores, y <code>api.js</code> es el único punto que habla con el backend. Cada opción del menú es una página propia de la SPA que se carga en la misma pestaña. Los componentes reutilizables son <code>ui.js</code>, <code>encabezado.js</code>, <code>adminLayout.js</code>, <code>producto.js</code> (tarjeta de producto), <code>mockups.js</code> (mug con su diseño) y <code>escena.js</code> (monta y desmonta el motor de scroll por ruta).</p>
   <div class="tabla-c"><table>
     <tr><th>Ruta de la SPA</th><th>Página</th><th>Acceso</th></tr>
-    <tr><td><code>#/</code> · <code>#/catalogo</code> · <code>#/nosotros</code></td><td>inicio.js: catálogo con búsqueda y orden</td><td><span class="chip pub">Público</span></td></tr>
+    <tr><td><code>#/</code></td><td>inicio.js: presentación del producto con scroll y productos del catálogo</td><td><span class="chip pub">Público</span></td></tr>
+    <tr><td><code>#/catalogo</code></td><td>catalogo.js: catálogo con búsqueda y orden</td><td><span class="chip pub">Público</span></td></tr>
+    <tr><td><code>#/nosotros</code></td><td>nosotros.js: cómo compras en MUGLY y contacto</td><td><span class="chip pub">Público</span></td></tr>
     <tr><td><code>#/producto/:id</code></td><td>detalle.js</td><td><span class="chip pub">Público</span></td></tr>
     <tr><td><code>#/carrito</code> · <code>#/personalizados</code></td><td>carrito.js · personalizados.js</td><td><span class="chip pub">Público</span> (confirmar exige sesión)</td></tr>
     <tr><td><code>#/ingresar</code> · <code>#/registro</code></td><td>ingresar.js · registro.js</td><td><span class="chip pub">Público</span></td></tr>
@@ -686,7 +796,7 @@ dialog.visor svg{width:auto;height:auto;min-width:1400px;max-width:none}
   <p>La separación cliente-servidor es lógica: MUGS.pdf §19.6 aclara que no implica máquinas distintas. Los tres procesos son independientes y se comunican solo por la red (HTTP y TCP), así que podrían moverse a equipos separados <strong>sin cambiar el código</strong>: basta modificar <code>API_URL</code> en <code>frontend/js/config.js</code> y las variables <code>DB_*</code> y <code>CORS_ALLOWED_ORIGINS</code> del <code>.env</code>. Hoy no se dimensionan CPU, memoria ni almacenamiento porque no se conoce el volumen de usuarios (MUGS.pdf §19.7). Esa medición queda para cuando exista operación real.</p>
 
   <h3 id="f3-adr">3.11 Decisiones de arquitectura (ADR)</h3>
-  <p>Las siete decisiones están registradas en MGL-ARQ-001 y quedaron aceptadas en la puerta G2. Para cada una se indican las alternativas consideradas y el motivo de la elección.</p>
+  <p>Las decisiones 001 a 007 están registradas en MGL-ARQ-001 y quedaron aceptadas en la puerta G2. La 008 se tomó en el incremento de rediseño (20/11/2026). Para cada una se indican las alternativas consideradas y el motivo de la elección.</p>
   <div class="tabla-c ids"><table>
     <tr><th>ADR</th><th>Decisión</th><th>Alternativas consideradas</th><th>Justificación y consecuencias</th></tr>
     <tr><td><strong>001</strong></td><td>Monolito modular por dominios (usuarios, productos, pedidos)</td><td>Microservicios; monolito sin módulos; MVC simple (MUGS.pdf §14)</td><td>Equipo de dos, sin necesidad de despliegues independientes y con transacciones que cruzan pedidos e inventario. Límites internos claros para evolucionar.</td></tr>
@@ -696,11 +806,12 @@ dialog.visor svg{width:auto;height:auto;min-width:1400px;max-width:none}
     <tr><td><strong>005</strong></td><td>El pago lo confirma el administrador</td><td>Ruta del cliente para registrar su pago (existía); integración inmediata con pasarela</td><td>La ruta del cliente era un hueco de seguridad (R2) y no hay pasarela (D8). Cuando exista, solo cambiará quién invoca <code>cambiar_estado</code>.</td></tr>
     <tr><td><strong>006</strong></td><td>Imágenes en <code>backend/uploads/</code> servidas por la API</td><td>Guardarlas en la base de datos; enlazar URL externas</td><td>Archivos fuera de la base para no inflarla, con nombre UUID, tipos permitidos y un máximo de 5 MB. En la nube se movería a un almacenamiento de objetos.</td></tr>
     <tr><td><strong>007</strong></td><td>SPA con enrutador por hash, estado central, cliente HTTP único y componentes</td><td>Páginas HTML separadas; enrutado con History API</td><td>El hash no necesita configurar el servidor estático. Un único <code>api.js</code> centraliza el token, los errores y el cierre de sesión. Sin dependencias de compilación.</td></tr>
+    <tr><td><strong>008</strong></td><td>Presentación del producto controlada por el scroll con un motor Vanilla JS incluido en el repositorio (<code>assets/vendor/scrollcraft/</code>)</td><td>GSAP con ScrollTrigger; animaciones CSS ligadas al scroll (<code>animation-timeline</code>); programar todo desde cero</td><td>Sin compilación ni frameworks de interfaz, coherente con ADR-002. Expone <code>destroy()</code>, de modo que <code>escena.js</code> lo monta al entrar a una ruta y lo desmonta al salir, sin fugas en la SPA. Anima solo <code>transform</code> y <code>opacity</code> y respeta <code>prefers-reduced-motion</code>. Consecuencia: un archivo de terceros de 62 KB versionado, cuya licencia se debe confirmar.</td></tr>
   </table></div>
 
   <h3 id="f3-calidad">3.12 Rendimiento, escalabilidad, disponibilidad, seguridad, costos y riesgos</h3>
   <div class="rejilla">
-    <div class="tarjeta"><h4>Rendimiento</h4><p>Las páginas de la SPA se cargan de forma diferida y las consultas usan índices sobre las llaves foráneas. El bloqueo <code>FOR UPDATE</code> afecta solo a las filas del pedido y de sus productos, no a toda la tabla. Bootstrap local evita depender de una CDN.</p></div>
+    <div class="tarjeta"><h4>Rendimiento</h4><p>Las páginas de la SPA se cargan de forma diferida y las consultas usan índices sobre las llaves foráneas. El bloqueo <code>FOR UPDATE</code> afecta solo a las filas del pedido y de sus productos, no a toda la tabla. Bootstrap local evita depender de una CDN. Las escenas con scroll usan un solo bucle de animación, mueven solo <code>transform</code> y <code>opacity</code>, reducen su intensidad en el celular y se desmontan al cambiar de página.</p></div>
     <div class="tarjeta"><h4>Escalabilidad</h4><p>La API no guarda sesión en memoria: el estado viaja en el JWT. Eso permitiría ejecutar varias instancias detrás de un balanceador. El límite actual es la base única y las imágenes en disco local.</p></div>
     <div class="tarjeta"><h4>Disponibilidad</h4><p>En v1.0 depende de un solo equipo, sin redundancia. Se mitiga con un respaldo verificado (mysqldump e imágenes, R8). El endpoint <code>/health</code> permite monitoreo futuro.</p></div>
     <div class="tarjeta"><h4>Seguridad</h4><p>Hash de contraseñas, JWT con expiración, autorización en el servidor, doble validación y archivos controlados (sección 3.9). La deuda conocida es el riesgo R6.</p></div>
@@ -708,8 +819,18 @@ dialog.visor svg{width:auto;height:auto;min-width:1400px;max-width:none}
     <div class="tarjeta"><h4>Riesgos</h4><p>Los ocho riesgos de MGL-RIE-001 están en la sección 2.6. Al cierre: R2 y R5 resueltos por diseño (ADR-005 y retiro lógico), R8 mitigado con respaldo y R6 aceptado.</p></div>
   </div>
 
-  <h3 id="f3-prototipos">3.13 Prototipos y puerta G2</h3>
-  <p>Antes de construir el frontend se prototiparon y aprobaron las pantallas clave del cliente (inicio, detalle, carrito, mis pedidos y personalizados) y del administrador (pedidos, productos y clientes), a partir de los mockups de MUGS.pdf §13. La identidad visual usa un azul petróleo <code>#1F4E5F</code>, un terracota <code>#A45A33</code> y un fondo cálido <code>#EFE9E1</code>, definidos como variables CSS en <code>:root</code> para que puedan cambiarse en un solo lugar. Con MGL-ARQ-001 y el backlog aprobados se cerró la <strong>puerta G2</strong> y se autorizó la construcción.</p>
+  <h3 id="f3-prototipos">3.13 Prototipos, identidad visual y puerta G2</h3>
+  <p>Antes de construir el frontend se prototiparon y aprobaron las pantallas clave del cliente (inicio, detalle, carrito, mis pedidos y personalizados) y del administrador (pedidos, productos y clientes), a partir de los mockups de MUGS.pdf §13. Con MGL-ARQ-001 y el backlog aprobados se cerró la <strong>puerta G2</strong> y se autorizó la construcción.</p>
+  <p>En la versión v1.1.0 los propietarios fijaron la identidad visual definitiva, <strong>moderna, natural y vibrante</strong>, con cinco colores oficiales definidos como variables CSS en <code>:root</code> de <code>css/estilos.css</code>:</p>
+  <div class="tabla-c"><table>
+    <tr><th>Color</th><th>Código</th><th>Uso</th></tr>
+    <tr><td>Blanco principal</td><td><code>#FFFFFF</code></td><td>Fondo general y tarjetas; predomina en todas las páginas</td></tr>
+    <tr><td>Verde salvia</td><td><code>#B7C5A4</code></td><td>Nichos, repisas y fondos secundarios</td></tr>
+    <tr><td>Verde profundo</td><td><code>#344B36</code></td><td>Títulos, navegación, botones principales y marca</td></tr>
+    <tr><td>Amarillo vibrante</td><td><code>#F2C94C</code></td><td>Solo acciones de compra, precios y etiquetas</td></tr>
+    <tr><td>Gris oscuro</td><td><code>#292929</code></td><td>Textos e iconos</td></tr>
+  </table></div>
+  <p>Las tipografías son Bricolage Grotesque para títulos y Figtree para textos. El catálogo presenta cada mug sobre una repisa con su precio en una etiqueta colgante. Las capturas de la <a href="#f5-galeria">sección 5.8</a> muestran el resultado real.</p>
 </section>
 
 <!-- =============================================================== FASE 04 -->
@@ -742,14 +863,19 @@ dialog.visor svg{width:auto;height:auto;min-width:1400px;max-width:none}
 │   ├── app.py · requirements.txt · .env.example · pytest.ini
 ├── frontend/
 │   ├── index.html
-│   ├── css/estilos.css          variables de marca y estilos propios
-│   ├── assets/vendor/bootstrap/ Bootstrap 5.3.3 local
+│   ├── css/estilos.css          paleta oficial, tipografía y estilos propios
+│   ├── assets/
+│   │   ├── vendor/bootstrap/    Bootstrap 5.3.3 local
+│   │   ├── vendor/scrollcraft/  motor de escenas con scroll (ADR-008)
+│   │   └── img/                 ícono y fotos de mug blanco para los mockups
 │   └── js/
 │       ├── app.js · router.js · estado.js · api.js · config.js
-│       ├── componentes/         ui.js · encabezado.js · adminLayout.js
-│       └── paginas/             inicio · detalle · carrito · misPedidos · personalizados ·
-│                                ingresar · registro · admin/{pedidos, productos, clientes}
-├── docs/                        diagramas, generador del informe y este informe
+│       ├── componentes/         ui.js · encabezado.js · adminLayout.js · producto.js ·
+│       │                        mockups.js · escena.js
+│       └── paginas/             inicio · catalogo · detalle · carrito · personalizados ·
+│                                nosotros · misPedidos · ingresar · registro ·
+│                                admin/{pedidos, productos, clientes}
+├── docs/                        diagramas, generador y capturas del informe, imágenes de productos
 └── README.md</pre>
 
   <h3 id="f4-entorno">4.2 Entorno y dependencias</h3>
@@ -819,7 +945,7 @@ dialog.visor svg{width:auto;height:auto;min-width:1400px;max-width:none}
       <p>Cómo se construyó MUGLY por incrementos y cómo el código implementa la arquitectura diseñada.</p>
     </div>
   </div>
-  <div class="evidencia"><span class="doc">Jira · MUGLY Sprint 1</span><span class="doc">PR #1</span><span class="doc">PR #2</span><span class="doc">release v1.0.0</span><span class="doc">MGL-TST-001</span></div>
+  <div class="evidencia"><span class="doc">Jira · MUGLY Sprint 1</span><span class="doc">PR #1</span><span class="doc">PR #2</span><span class="doc">PR #5</span><span class="doc">v1.0.0</span><span class="doc">v1.1.0</span><span class="doc">MGL-TST-001</span></div>
 
   <h3 id="f5-incrementos">5.1 Incrementos</h3>
   <ol class="linea-tiempo">
@@ -829,6 +955,8 @@ dialog.visor svg{width:auto;height:auto;min-width:1400px;max-width:none}
     <li><time>19/11</time><div><b>Backend del Sprint</b> (MUG-13 a MUG-20): ciclo de estados, pago por administrador, envíos, personalizados, imágenes, retiro lógico y gestión de clientes · <b>PR #1</b>.</div></li>
     <li><time>20/11</time><div><b>Frontend SPA</b> (MUG-21 a MUG-26) en 7 commits: base, catálogo, carrito y pedidos, personalizados, registro e ingreso, y panel de administración · <b>PR #2</b>.</div></li>
     <li><time>20/11</time><div>Pruebas de punta a punta, diagramas actualizados, respaldo verificado y <b>release v1.0.0</b> (<code>b9d0577</code>).</div></li>
+    <li><time>20/11</time><div>Informe del proyecto y diagramas de arquitectura · <b>PR #3</b>; limpieza de código sin uso · <b>PR #4</b>.</div></li>
+    <li class="nuevo"><time>20/11</time><div><b>Rediseño visual y presentación del producto con scroll</b>: paleta oficial, Catálogo y Nosotros como páginas propias, escenas con scroll en Inicio y Personalizados, mockups de producto y tarjeta reutilizable · <b>PR #5</b> (<code>c57a3b4</code>) · versión <b>v1.1.0</b>.</div></li>
   </ol>
 
   <h3 id="f5-sprint">5.2 Historias del Sprint y su resultado</h3>
@@ -843,7 +971,7 @@ dialog.visor svg{width:auto;height:auto;min-width:1400px;max-width:none}
     <tr><td>MUG-19</td><td>Catálogo solo con disponibles</td><td><code>listar_disponibles()</code>; el admin ve todos</td></tr>
     <tr><td>MUG-20</td><td>Retirar productos sin perder pedidos</td><td><code>tiene_pedidos()</code> → retiro lógico</td></tr>
     <tr><td>MUG-21</td><td>Navegar MUGLY como aplicación web</td><td>router, estado, api, componentes y estilos</td></tr>
-    <tr><td>MUG-22</td><td>Catálogo, detalle y carrito</td><td>inicio.js, detalle.js, carrito.js</td></tr>
+    <tr><td>MUG-22</td><td>Catálogo, detalle y carrito</td><td>catalogo.js, detalle.js, carrito.js y la tarjeta producto.js (v1.1.0)</td></tr>
     <tr><td>MUG-23</td><td>Comprar y ver mis pedidos</td><td>Confirmación con enlace de pago por WhatsApp; misPedidos.js</td></tr>
     <tr><td>MUG-24</td><td>Personalizado por WhatsApp</td><td>personalizados.js</td></tr>
     <tr><td>MUG-25</td><td>Registro e ingreso</td><td>registro.js e ingresar.js con validación</td></tr>
@@ -851,6 +979,7 @@ dialog.visor svg{width:auto;height:auto;min-width:1400px;max-width:none}
     <tr><td>MUG-27</td><td>Verificar flujos de punta a punta</td><td>16 casos aprobados (E01–E16)</td></tr>
     <tr><td>MUG-28</td><td>Respaldo de la base</td><td>mysqldump e imágenes, restauración verificada</td></tr>
   </table></div>
+  <p>El rediseño de la versión v1.1.0 no agregó funcionalidades: cambió la presentación del frontend sobre las mismas historias y la misma API. Por eso no tiene historias nuevas en el backlog y se registró como un incremento de la interfaz (PR #5).</p>
 
   <h3 id="f5-recorrido">5.3 Recorrido completo de una funcionalidad: confirmar el pago</h3>
   <p>Esta funcionalidad atraviesa todas las capas y aplica las reglas más importantes del negocio (D1, D3, RF16 y RNF05). Sigue la secuencia de la <a href="#f3-uml">figura 8</a>.</p>
@@ -882,6 +1011,9 @@ dialog.visor svg{width:auto;height:auto;min-width:1400px;max-width:none}
   <h4>Validación de formularios y manejo de errores</h4>
   <p>Los formularios usan <code>novalidate</code> y validación propia con las clases de Bootstrap. Si el servidor rechaza los datos, el mensaje de la API se muestra en el formulario.</p>
 {{codigo:js:frontend/js/paginas/registro.js:form.addEventListener('submit'=>});}}
+  <h4>Escenas con scroll sin fugas entre rutas</h4>
+  <p><code>escena.js</code> carga el motor una sola vez, lo monta sobre <code>#app</code> al entrar a Inicio o Personalizados y lo desmonta cuando el router anuncia otra ruta con el evento <code>mugly:ruta</code>. Así la SPA cambia de página sin dejar escuchas ni bucles activos (ADR-008).</p>
+{{codigo:js:frontend/js/componentes/escena.js:export async function montarEscena(=>document.addEventListener('mugly:ruta', alSalir);}}
 
   <h3 id="f5-migracion">5.5 Migración del modelo de pedidos con traslado de datos</h3>
   <p>Cambiar de dos campos de estado a uno (ADR-004) no podía perder la información existente. La migración crea el historial, agrega las columnas nuevas, traslada los valores y solo después elimina la columna antigua. Su <code>downgrade()</code> reconstruye <code>estado_pago</code>, y se probó en ambos sentidos sobre MySQL.</p>
@@ -897,6 +1029,7 @@ dialog.visor svg{width:auto;height:auto;min-width:1400px;max-width:none}
     <tr><td colspan="2"><strong>Total</strong></td><td><strong>65</strong></td><td><span class="chip ok">65 aprobadas</span></td></tr>
   </table></div>
   <p>Además se ejecutaron <strong>16 casos de punta a punta</strong> en Chrome contra la API y MySQL. Entre ellos: crear productos y subir fotos (E01–E02), registrarse y comprar 3 unidades por $98.000 (E03–E06), confirmar el pago y verificar el descuento de stock (E07), rechazar un envío sin guía (E08), el ciclo completo hasta entregado (E09), un personalizado de $45.000 (E10), cliente desactivado (E11) y rutas protegidas (E14). Los cuatro hallazgos se cerraron: el menú que se partía en pantallas medianas (<code>2c8f482</code>), el comando de migraciones en la documentación, un diagrama con una caja vacía (<code>cd632bb</code>) y una limitación de la herramienta de pruebas.</p>
+  <p>En la versión v1.1.0 se verificó en Chrome, en escritorio y en 390 px de ancho, el recorrido completo de las escenas con scroll, la navegación entre páginas, el carrito, Mis pedidos y el panel de administración, sin errores en la consola. El detector de calidad visual de Impeccable no reportó problemas en Inicio, Catálogo, Personalizados y Nosotros, y las 65 pruebas siguieron aprobadas porque el backend no cambió.</p>
 
   <h3 id="f5-trazabilidad">5.7 Relación entre la arquitectura diseñada y la implementación</h3>
   <div class="tabla-c"><table>
@@ -910,20 +1043,39 @@ dialog.visor svg{width:auto;height:auto;min-width:1400px;max-width:none}
     <tr><td>Máquina de estados (figura 9)</td><td><code>TRANSICIONES</code> en <code>pedidos/servicios.py</code></td></tr>
     <tr><td>Modelo físico (figura 11)</td><td>Migración <code>9ed994615ffd</code> y anteriores</td></tr>
     <tr><td>ADR-007 · enrutador, estado y cliente HTTP</td><td><code>js/router.js</code>, <code>js/estado.js</code>, <code>js/api.js</code></td></tr>
+    <tr><td>ADR-008 · escenas con scroll</td><td><code>js/componentes/escena.js</code> y <code>assets/vendor/scrollcraft/</code></td></tr>
+    <tr><td>Identidad visual (sección 3.13)</td><td>Variables de <code>:root</code> en <code>css/estilos.css</code></td></tr>
   </table></div>
   <div class="nota ambar"><b>Desviación conocida.</b> En <code>PedidoServicio</code>, tres consultas con bloqueo (<code>with_for_update</code>) usan <code>db.session</code> directamente en lugar de pasar por <code>PedidoRepositorio</code>. Se hizo así para mantener el bloqueo y el commit dentro de la misma transacción del servicio. El paso natural es mover esas consultas a métodos del repositorio que reciban la misma sesión, sin cambiar el comportamiento.</div>
+
+  <h3 id="f5-galeria">5.8 La aplicación en funcionamiento</h3>
+  <p>Capturas reales de la versión v1.1.0 en Chrome, con la API y MySQL en ejecución. La captura 1 es la portada de este informe. Haga clic en una captura para ampliarla.</p>
+  <div class="galeria">
+    <figure class="captura"><img src="{{img:02-inicio-impresion.jpg}}" alt="Inicio · la impresión: Al bajar, una línea amarilla recorre el mug blanco y deja el diseño impreso." width="1152" height="548" loading="lazy"><figcaption><span><b>Captura 2. Inicio · la impresión.</b> Al bajar, una línea amarilla recorre el mug blanco y deja el diseño impreso.</span></figcaption></figure>
+    <figure class="captura"><img src="{{img:03-inicio-composicion.jpg}}" alt="Inicio · la composición: Los elementos del diseño se reúnen alrededor del mug." width="1152" height="548" loading="lazy"><figcaption><span><b>Captura 3. Inicio · la composición.</b> Los elementos del diseño se reúnen alrededor del mug.</span></figcaption></figure>
+    <figure class="captura"><img src="{{img:04-inicio-detalle.jpg}}" alt="Inicio · de cerca: La cámara se acerca al diseño, sincronizada con el scroll." width="1152" height="548" loading="lazy"><figcaption><span><b>Captura 4. Inicio · de cerca.</b> La cámara se acerca al diseño, sincronizada con el scroll.</span></figcaption></figure>
+    <figure class="captura"><img src="{{img:05-inicio-final.jpg}}" alt="Inicio · cierre de la escena: Vista de tres cuartos e invitación a pedir el estilo." width="1152" height="548" loading="lazy"><figcaption><span><b>Captura 5. Inicio · cierre de la escena.</b> Vista de tres cuartos e invitación a pedir el estilo.</span></figcaption></figure>
+    <figure class="captura"><img src="{{img:06-inicio-coleccion.jpg}}" alt="Inicio · colección: Seis estilos en un recorrido lateral." width="1152" height="548" loading="lazy"><figcaption><span><b>Captura 6. Inicio · colección.</b> Seis estilos en un recorrido lateral.</span></figcaption></figure>
+    <figure class="captura"><img src="{{img:07-catalogo.jpg}}" alt="Catálogo: Página propia, cuatro productos por fila, precio en etiqueta." width="1152" height="548" loading="lazy"><figcaption><span><b>Captura 7. Catálogo.</b> Página propia, cuatro productos por fila, precio en etiqueta.</span></figcaption></figure>
+    <figure class="captura"><img src="{{img:08-detalle.jpg}}" alt="Detalle del producto: Disponibilidad, cantidad limitada por el stock y carrito." width="1152" height="548" loading="lazy"><figcaption><span><b>Captura 8. Detalle del producto.</b> Disponibilidad, cantidad limitada por el stock y carrito.</span></figcaption></figure>
+    <figure class="captura"><img src="{{img:09-carrito.jpg}}" alt="Carrito: El pedido queda pendiente hasta confirmar el pago por WhatsApp." width="1152" height="548" loading="lazy"><figcaption><span><b>Captura 9. Carrito.</b> El pedido queda pendiente hasta confirmar el pago por WhatsApp.</span></figcaption></figure>
+    <figure class="captura"><img src="{{img:10-personalizados.jpg}}" alt="Personalizados: El mismo mug recibe distintos diseños al bajar." width="1152" height="548" loading="lazy"><figcaption><span><b>Captura 10. Personalizados.</b> El mismo mug recibe distintos diseños al bajar.</span></figcaption></figure>
+    <figure class="captura"><img src="{{img:11-nosotros.jpg}}" alt="Nosotros: Cómo compras en MUGLY y contacto." width="1152" height="548" loading="lazy"><figcaption><span><b>Captura 11. Nosotros.</b> Cómo compras en MUGLY y contacto.</span></figcaption></figure>
+    <figure class="captura"><img src="{{img:12-mis-pedidos.jpg}}" alt="Mis pedidos: Progreso, transportadora y número de guía." width="1152" height="548" loading="lazy"><figcaption><span><b>Captura 12. Mis pedidos.</b> Progreso, transportadora y número de guía.</span></figcaption></figure>
+    <figure class="captura"><img src="{{img:13-admin-pedidos.jpg}}" alt="Administración · pedidos: Filtros por estado y acciones según la transición permitida." width="1152" height="548" loading="lazy"><figcaption><span><b>Captura 13. Administración · pedidos.</b> Filtros por estado y acciones según la transición permitida.</span></figcaption></figure>
+  </div>
 </section>
 
 <!-- =============================================================== ANEXOS -->
 <section class="fase" id="anexos">
   <div class="cabeza-fase">
-    <div class="num-fase">ANEXOS<b>A–C</b></div>
+    <div class="num-fase">ANEXOS<b>A–E</b></div>
     <div>
       <h2>Anexos</h2>
-      <p>Índice documental, enlaces del proyecto y glosario.</p>
+      <p>Índice documental, enlaces, glosario, texto de la entrega y guía del video.</p>
     </div>
   </div>
-  <h3>A. Índice del expediente documental</h3>
+  <h3 id="a-expediente">A. Índice del expediente documental</h3>
   <div class="tabla-c ids"><table>
     <tr><th>Código</th><th>Documento</th><th>Fase / etapa</th><th>Estado</th></tr>
     <tr><td>MGL-REQ-001</td><td>Requisitos y propuesta arquitectónica (MUGS.pdf)</td><td>02 · Descubrimiento</td><td><span class="chip ok">Vigente</span></td></tr>
@@ -943,16 +1095,17 @@ dialog.visor svg{width:auto;height:auto;min-width:1400px;max-width:none}
   </table></div>
   <p>El expediente incluye además los documentos de las fases posteriores (MGL-TST-001, MGL-REL-001, MGL-ENT-001 y MGL-CIE-001), que no forman parte del alcance de este informe.</p>
 
-  <h3>B. Enlaces del proyecto</h3>
+  <h3 id="a-enlaces">B. Enlaces del proyecto</h3>
   <div class="tabla-c"><table>
     <tr><th>Elemento</th><th>Enlace</th></tr>
     <tr><td>Repositorio (frontend y backend en carpetas separadas)</td><td><a href="https://github.com/peddiazd/Backend-MUGLY">github.com/peddiazd/Backend-MUGLY</a></td></tr>
     <tr><td>Frontend</td><td><a href="https://github.com/peddiazd/Backend-MUGLY/tree/main/frontend">…/Backend-MUGLY/tree/main/frontend</a></td></tr>
     <tr><td>Backend</td><td><a href="https://github.com/peddiazd/Backend-MUGLY/tree/main/backend">…/Backend-MUGLY/tree/main/backend</a></td></tr>
     <tr><td>Versión v1.0.0</td><td><a href="https://github.com/peddiazd/Backend-MUGLY/releases/tag/v1.0.0">…/releases/tag/v1.0.0</a></td></tr>
+    <tr><td>Rediseño v1.1.0 (PR #5)</td><td><a href="https://github.com/peddiazd/Backend-MUGLY/pull/5">…/Backend-MUGLY/pull/5</a></td></tr>
   </table></div>
 
-  <h3>C. Glosario</h3>
+  <h3 id="a-glosario">C. Glosario</h3>
   <div class="tabla-c"><table>
     <tr><td><strong>ADR</strong></td><td>Registro de una decisión de arquitectura con su contexto y consecuencias.</td></tr>
     <tr><td><strong>C4</strong></td><td>Modelo de diagramas por niveles: contexto, contenedores, componentes y código.</td></tr>
@@ -962,15 +1115,36 @@ dialog.visor svg{width:auto;height:auto;min-width:1400px;max-width:none}
     <tr><td><strong>SPA</strong></td><td>Aplicación de una sola página que cambia de vista sin recargar el navegador.</td></tr>
     <tr><td><strong>Retiro lógico</strong></td><td>Marcar un registro como no disponible en lugar de borrarlo.</td></tr>
     <tr><td><strong>Puertas G1–G4</strong></td><td>Puntos de aprobación del manual: alcance, diseño, línea base técnica y entrega.</td></tr>
+    <tr><td><strong>Mockup</strong></td><td>Imagen del producto que combina la foto de un mug blanco con su diseño impreso.</td></tr>
+  </table></div>
+
+  <h3 id="a-entrega">D. Texto para el comentario de la entrega</h3>
+  <p>La entrega exige registrar estos datos directamente en el comentario de la tarea. MUGLY usa un único repositorio con el frontend y el backend en carpetas separadas, opción permitida por la asignatura.</p>
+<pre class="arbol">Proyecto: MUGLY · tienda virtual de mugs
+Integrantes: Pedro Díaz · Assael Zapata
+Repositorio Frontend: https://github.com/peddiazd/Backend-MUGLY/tree/main/frontend
+Repositorio Backend:  https://github.com/peddiazd/Backend-MUGLY/tree/main/backend
+Repositorio completo: https://github.com/peddiazd/Backend-MUGLY</pre>
+  <div class="nota ambar"><b>Escribir los nombres completos.</b> La entrega pide los nombres completos de los integrantes; complételos antes de enviar el comentario.</div>
+
+  <h3 id="a-video">E. Guía del video explicativo</h3>
+  <p>El video <code>Video_Proyecto_Final_MUGLY.mp4</code> debe seguir este orden. Todos los integrantes participan y no se muestran contraseñas, tokens ni claves.</p>
+  <div class="tabla-c"><table>
+    <tr><th>Parte</th><th>Qué mostrar</th><th>Apoyo en este informe</th></tr>
+    <tr><td>1. Presentación</td><td>Nombres completos, MUGLY, su propósito, la necesidad que atiende y sus funcionalidades</td><td><a href="#resumen">Resumen</a></td></tr>
+    <tr><td>2. Demostración</td><td>Navegación entre páginas, catálogo, carrito, compra, formularios con errores, ingreso y permisos, pestaña Network con peticiones y respuestas, persistencia en MySQL y manejo de errores</td><td><a href="#f5-recorrido">5.3</a> y <a href="#f5-galeria">5.8</a></td></tr>
+    <tr><td>3. Informe y arquitectura</td><td>Recorrido de las fases, C4, UML, despliegue, capas, comunicación, ADR y relación con el código</td><td><a href="#fase03">Fase 03</a> y <a href="#f5-trazabilidad">5.7</a></td></tr>
+    <tr><td>4. Frontend en VS Code</td><td>Carpetas, SPA, páginas y componentes, router y estado, DOM y eventos, <code>api.js</code>, validaciones y fragmentos clave</td><td><a href="#f4-repo">4.1</a> y <a href="#f5-frontend">5.4</a></td></tr>
+    <tr><td>5. Backend en VS Code</td><td>Capas y dominios, endpoints, reglas, autenticación, ORM y migraciones, excepciones; recorrido completo de una funcionalidad</td><td><a href="#f3-logica">3.5</a> y <a href="#f5-recorrido">5.3</a></td></tr>
   </table></div>
 </section>
 </main>
 </div>
 
-<footer class="pie">MUGLY · Informe del proyecto final · Pedro Díaz y Assael Zapata · Arquitectura de Software 2026-2 · Universidad Cooperativa de Colombia</footer>
+<footer class="pie">MUGLY v1.1.0 · Informe del proyecto final · Pedro Díaz y Assael Zapata · Arquitectura de Software 2026-2 · Universidad Cooperativa de Colombia</footer>
 <a class="arriba" href="#inicio" aria-label="Volver al inicio">↑</a>
 
-<dialog class="visor" aria-label="Diagrama ampliado">
+<dialog class="visor" aria-label="Vista ampliada">
   <div class="barra"><span class="visor-titulo"></span><button type="button">Cerrar ✕</button></div>
   <div class="contenido"></div>
 </dialog>
@@ -988,6 +1162,14 @@ dialog.visor svg{width:auto;height:auto;min-width:1400px;max-width:none}
   document.querySelectorAll('figure.diagrama').forEach(function (fig) {
     fig.querySelector('.lienzo').addEventListener('click', function () { abrir(fig); });
     fig.querySelector('.ampliar').addEventListener('click', function () { abrir(fig); });
+  });
+  document.querySelectorAll('figure.captura img').forEach(function (img) {
+    img.addEventListener('click', function () {
+      cont.innerHTML = '';
+      var copia = img.cloneNode(); copia.removeAttribute('loading'); cont.appendChild(copia);
+      visor.querySelector('.visor-titulo').textContent = img.alt.split(':')[0];
+      if (visor.showModal) visor.showModal(); else visor.setAttribute('open', '');
+    });
   });
   visor.querySelector('.barra button').addEventListener('click', function () { visor.close(); });
   visor.addEventListener('click', function (e) { if (e.target === visor) visor.close(); });
@@ -1010,6 +1192,8 @@ dialog.visor svg{width:auto;height:auto;min-width:1400px;max-width:none}
       actual = elegido;
     }
     document.querySelector('.arriba').classList.toggle('visible', window.scrollY > 600);
+    var total = document.documentElement.scrollHeight - window.innerHeight;
+    document.querySelector('.progreso').style.transform = 'scaleX(' + (total > 0 ? window.scrollY / total : 0).toFixed(4) + ')';
   }
   window.addEventListener('scroll', marcar, { passive: true });
   marcar();

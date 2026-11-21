@@ -38,3 +38,43 @@ class PedidoRepositorio:
         db.session.add(detalle)
         db.session.commit()
         return detalle
+
+    @staticmethod
+    def buscar(q="", estado="todos", tipo="todos", inicio=None, fin=None):
+        """Pedidos con el correo del cliente, filtrados en la base.
+
+        q acepta un número de pedido (con o sin #) o parte del correo.
+        inicio/fin son datetimes UTC del rango [inicio, fin).
+        """
+        from app.dominios.usuarios.modelos import Usuario
+
+        consulta = (
+            db.session.query(Pedido, Usuario.correo)
+            .join(Usuario, Usuario.id == Pedido.usuario_id)
+        )
+        texto = (q or "").strip()
+        if texto:
+            if texto.lstrip("#").isdigit():
+                consulta = consulta.filter(Pedido.id == int(texto.lstrip("#")))
+            else:
+                consulta = consulta.filter(Usuario.correo.ilike(f"%{texto}%"))
+        if estado != "todos":
+            consulta = consulta.filter(Pedido.estado == estado)
+        if tipo != "todos":
+            consulta = consulta.filter(Pedido.tipo == tipo)
+        if inicio is not None:
+            consulta = consulta.filter(Pedido.fecha_creacion >= inicio)
+        if fin is not None:
+            consulta = consulta.filter(Pedido.fecha_creacion < fin)
+        return consulta.order_by(Pedido.id.desc())
+
+    @staticmethod
+    def contar_por_estado():
+        """Número de pedidos en cada estado (para los filtros del panel)."""
+        from sqlalchemy import func
+
+        return dict(
+            db.session.query(Pedido.estado, func.count(Pedido.id))
+            .group_by(Pedido.estado)
+            .all()
+        )

@@ -67,3 +67,20 @@ class CrearPedidoPersonalizadoDTO(Schema):
         places=2,
         validate=validate.Range(min=Decimal("0.01")),
     )
+
+
+class BusquedaPedidosDTO(Schema):
+    """Parámetros de la búsqueda paginada de pedidos (vista administrativa)."""
+
+    q = fields.String(load_default="", validate=validate.Length(max=100))
+    estado = fields.String(
+        load_default="todos",
+        validate=validate.OneOf(["todos", "pendiente", "pagado", "enviado", "entregado", "cancelado"]),
+    )
+    tipo = fields.String(
+        load_default="todos", validate=validate.OneOf(["todos", "catalogo", "personalizado"])
+    )
+    desde = fields.Date(load_default=None)
+    hasta = fields.Date(load_default=None)
+    pagina = fields.Integer(load_default=1, validate=validate.Range(min=1))
+    por_pagina = fields.Integer(load_default=20, validate=validate.Range(min=1, max=100))

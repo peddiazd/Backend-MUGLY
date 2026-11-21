@@ -75,9 +75,9 @@ def c4_contenedores():
            "Reglas de negocio, autenticación JWT y autorización por rol. Prefijo /api/v1.")
     d.cilindro(470, 430, 210, 160, "Base de datos",
                "[Contenedor: MySQL 8.0 · InnoDB · utf8mb4]",
-               "usuarios, perfiles, productos, pedidos, detalles e historial de estados")
+               "usuarios, perfiles, productos, pedidos, detalles, historial y contenido de la tienda")
     d.cilindro(712, 440, 168, 140, "Almacén de imágenes", "[Carpeta backend/uploads]",
-               "Fotos de productos con nombre UUID", relleno="#4A6550")
+               "Fotos de productos y del contenido, nombre UUID", relleno="#4A6550")
     d.caja(940, 250, 180, 100, "WhatsApp", "[Sistema externo]", relleno=C["gris"])
     d.flecha([(250, 140), (250, 240)], "Usa [navegador]", 250, 196)
     d.flecha([(620, 140), (620, 240)], "Usa [navegador]", 620, 196)
@@ -95,21 +95,24 @@ def c4_contenedores():
 # =====================================================================
 @registrar
 def c4_componentes():
-    d = Diagrama("c4_componentes", 1180, 950, "C4 nivel 3: componentes de la API REST de MUGLY")
-    d.caja(440, 8, 300, 66, "Aplicación web (SPA)", "[Contenedor]", relleno=C["primario2"],
+    d = Diagrama("c4_componentes", 1940, 950, "C4 nivel 3: componentes de la API REST de MUGLY")
+    d.caja(820, 8, 300, 66, "Aplicación web (SPA)", "[Contenedor]", relleno=C["primario2"],
            tam_titulo=14)
-    d.frontera(20, 104, 1140, 730, "API REST de MUGLY [contenedor Flask]")
+    d.frontera(20, 104, 1900, 730, "API REST de MUGLY [contenedor Flask]")
     comp = "#E6ECDD"
     claro = dict(relleno=comp, borde=C["primario"], color=C["texto"], tam_titulo=13.5,
                  tam_desc=11.2, tam_tipo=10.5)
-    d.caja(45, 130, 340, 84, "Fábrica crear_app()", "[app/__init__.py]",
+    d.caja(45, 130, 430, 84, "Fábrica crear_app()", "[app/__init__.py]",
            "Registra blueprints, CORS, /uploads y manejadores de error → JSON {success, error}",
            **claro)
-    d.caja(425, 130, 330, 84, "Seguridad", "[app/seguridad.py]",
+    d.caja(515, 130, 430, 84, "Seguridad", "[app/seguridad.py]",
            "@requiere_token y @requiere_admin: JWT HS256, cuenta activa y rol → 401 / 403",
            **claro)
-    d.caja(795, 130, 340, 84, "Configuración", "[app/config.py + .env]",
+    d.caja(985, 130, 430, 84, "Configuración", "[app/config.py + .env]",
            "SECRET_KEY, conexión MySQL, orígenes CORS, carpeta de imágenes y límite de 5 MB",
+           **claro)
+    d.caja(1455, 130, 440, 84, "Utilidades compartidas", "[archivos.py · paginacion.py · fechas.py]",
+           "Validación de imágenes, paginación de consultas y rangos de fecha en hora de Colombia",
            **claro)
     columnas = [
         (45, "Dominio usuarios", [
@@ -133,6 +136,20 @@ def c4_componentes():
             ("PedidoRepositorio", "repositorio", "Por id, todos, por usuario; guardar pedido y detalle"),
             ("Pedido · DetallePedido · HistorialEstadoPedido", "modelos SQLAlchemy", None),
         ]),
+        (1185, "Dominio contenido", [
+            ("Controladores", "contenido_bp · admin_bp", "/contenido · /admin/contenido · /admin/configuracion"),
+            ("DTO", "marshmallow", "dto_bloque(clave) por bloque · OrdenSeccionesDTO"),
+            ("ContenidoServicio", "servicio", "Borrador, vista previa, publicar y descartar; configuración"),
+            ("ContenidoRepositorio", "repositorio", "Listar, obtener por clave, agregar y confirmar"),
+            ("ContenidoBloque", "modelo SQLAlchemy", None),
+        ]),
+        (1565, "Dominio reportes", [
+            ("Controladores", "admin_bp", "/admin/resumen · /admin/reportes/ventas · exportes .csv"),
+            ("DTO", "marshmallow", "RangoFechasDTO: desde, hasta y agrupar (día o mes)"),
+            ("ReporteServicio", "servicio", "Indicadores, serie por período, ventas por producto y CSV"),
+            ("ReporteRepositorio", "repositorio", "Consultas de agregación (SUM, COUNT) sobre pedidos e historial"),
+            ("Sin modelo propio", "lee Pedido, Producto y Usuario", None),
+        ]),
     ]
     filas_y = [262, 370, 478, 586, 694]
     rotulos = ["valida la entrada", "datos validados", "consulta / guarda", "ORM"]
@@ -145,12 +162,14 @@ def c4_componentes():
                 d.flecha([(x + w / 2, filas_y[i] + 78), (x + w / 2, filas_y[i + 1])],
                          rotulos[i], x + w / 2, filas_y[i] + 93, tam=10)
     d.flecha([(805, 517), (781, 517), (781, 733), (755, 733)], "stock", 781, 625, tam=10)
-    d.flecha([(590, 74), (590, 130)], "HTTP · JSON · /api/v1", 590, 102)
-    d.cilindro(440, 858, 300, 82, "MySQL · mugly_db", "[Base de datos]")
-    for x in (210, 970):
-        xd = 440 if x < 590 else 740
-        d.flecha([(x, 772), (x, 899), (xd, 899)])
-    d.flecha([(590, 772), (590, 858)], "SQLAlchemy + PyMySQL", 590, 834, tam=10.5)
+    d.flecha([(1565, 517), (1515, 517)], "umbral", 1540, 505, tam=10, discontinuo=True)
+    d.flecha([(970, 74), (970, 130)], "HTTP · JSON · /api/v1", 970, 102)
+    d.cilindro(820, 858, 300, 82, "MySQL · mugly_db", "[Base de datos]")
+    for x in (210, 590):
+        d.flecha([(x, 772), (x, 899), (820, 899)], punta=None if x == 210 else "flecha")
+    for x in (1350, 1730):
+        d.flecha([(x, 772), (x, 899), (1120, 899)], punta=None if x == 1730 else "flecha")
+    d.flecha([(970, 772), (970, 858)], "SQLAlchemy + PyMySQL", 970, 834, tam=10.5)
     return d
 
 
@@ -168,24 +187,27 @@ def arquitectura_logica():
         ("Vista", "index.html · css/estilos.css · Bootstrap 5.3.3 local",
          "Contenedores #encabezado, #app, #pie y #toasts; variables de marca en :root"),
         ("Páginas", "js/paginas/",
-         "inicio · catalogo · detalle · carrito · personalizados · nosotros · misPedidos · ingresar · "
-         "registro · admin/pedidos · admin/productos · admin/clientes"),
+         "Tienda: inicio · catalogo · detalle · carrito · personalizados · nosotros · misPedidos · "
+         "ingresar · registro. Panel: admin/dashboard · pedidos · productos · clientes · finanzas · "
+         "contenido · configuracion · cuenta"),
         ("Componentes reutilizables", "js/componentes/",
-         "ui.js · encabezado.js · adminLayout.js · producto.js (tarjeta) · mockups.js · "
-         "escena.js (monta y desmonta el motor de scroll)"),
+         "ui.js · encabezado.js · adminLayout.js (menú del panel) · producto.js · mockups.js · "
+         "escena.js · graficos.js (barras SVG) · contenidoTienda.js (contenido publicado)"),
         ("Núcleo de la SPA", "js/",
          "router.js (rutas hash y protección por rol) · estado.js (sesión y carrito) · "
          "api.js (cliente HTTP único) · config.js"),
     ]
     be = [
         ("Presentación HTTP · Controladores", "Blueprints Flask",
-         "usuarios_bp · productos_bp · pedidos_bp · admin_bp. Reciben la petición y responden JSON."),
+         "usuarios_bp · productos_bp · pedidos_bp · contenido_bp · admin_bp. Reciben la petición "
+         "y responden JSON o CSV."),
         ("Validación · DTO", "marshmallow",
          "Esquemas de entrada por caso de uso. Datos inválidos → 400 con detalle por campo."),
         ("Aplicación · Servicios", "Reglas de negocio",
-         "UsuarioServicio · ProductoServicio · PedidoServicio: RN01–RN18, transiciones, stock y JWT."),
+         "Usuario · Producto · Pedido · Contenido · Reporte: RN01–RN18, transiciones, stock, JWT, "
+         "borradores e indicadores."),
         ("Datos · Repositorios y Modelos", "SQLAlchemy",
-         "UsuarioRepositorio · ProductoRepositorio · PedidoRepositorio y las 6 entidades ORM."),
+         "Un repositorio por dominio (búsqueda paginada y agregaciones) y las 7 entidades ORM."),
     ]
     ys = [56, 171, 286, 401]
     for i, y in enumerate(ys):
@@ -195,7 +217,8 @@ def arquitectura_logica():
             d.flecha([(285, y + 95), (285, y + 115)])
             d.flecha([(830, y + 95), (830, y + 115)])
     d.caja(1040, 56, 120, 440, "Transversal", None,
-           "seguridad.py\n(JWT, roles)\n\nconfig.py\n(.env)\n\nmanejadores\nde error\n(__init__.py)",
+           "seguridad.py\n(JWT, roles)\n\nconfig.py\n(.env)\n\nmanejadores\nde error\n\narchivos.py\n"
+           "paginacion.py\nfechas.py",
            relleno=C["calido"], borde=C["acento"], color=C["texto"], tam_titulo=13.5, tam_desc=11)
     d.flecha([(540, 448), (590, 448), (590, 103), (640, 103)],
              "HTTP + JSON\nfetch · JWT", 590, 275)
@@ -207,7 +230,7 @@ def arquitectura_logica():
     d.caja(290, 532, 250, 90, "localStorage", "[Navegador]", "Sesión (token y usuario) y carrito",
            relleno=C["calido"], borde=C["acento"], color=C["texto"], tam_desc=11)
     d.flecha([(415, 496), (415, 532)])
-    d.caja(985, 532, 175, 90, "uploads/", "[Archivos]", "Imágenes de productos",
+    d.caja(985, 532, 175, 90, "uploads/", "[Archivos]", "Imágenes de productos y del contenido",
            relleno="#4A6550", tam_desc=11)
     d.flecha([(1010, 496), (1010, 532)], discontinuo=True)
     return d
@@ -231,9 +254,11 @@ def uml_casos_uso():
         ("CU08", "Consultar estado del pedido", 510), ("CU09", "Solicitar mug personalizado", 580),
     ]
     admin = [
-        ("CU10", "Gestionar productos", 150), ("CU11", "Gestionar inventario", 225),
-        ("CU12", "Gestionar pedidos (confirma pago)", 300), ("CU13", "Gestionar clientes", 375),
-        ("CU14", "Gestionar información de envío", 450), ("CU15", "Registrar guía de envío", 525),
+        ("CU10", "Gestionar productos", 95), ("CU11", "Gestionar inventario", 155),
+        ("CU12", "Gestionar pedidos (confirma pago)", 215), ("CU13", "Gestionar clientes", 275),
+        ("CU14", "Gestionar información de envío", 335), ("CU15", "Registrar guía de envío", 395),
+        ("CU16", "Gestionar contenido de la tienda", 455), ("CU17", "Consultar finanzas y reportes", 515),
+        ("CU18", "Configurar la tienda", 575),
     ]
     for cu, t, y in cliente:
         d.caso_uso(395, y, 125, 28, f"{cu} · {t}")
@@ -244,10 +269,12 @@ def uml_casos_uso():
     d.caso_uso(550, 690, 130, 30, "CU02 · Iniciar sesión", relleno="#F3E3D6", borde=C["acento"])
     d.flecha([(130, 395), (420, 690)], punta=None, color="#8A9184", grosor=1.1)
     d.flecha([(975, 355), (680, 690)], punta=None, color="#8A9184", grosor=1.1)
-    d.flecha([(964, 610), (520, 580)], punta=None, color="#8A9184", grosor=1.1, discontinuo=True)
+    d.flecha([(964, 610), (860, 650), (520, 585)], punta=None, color="#8A9184", grosor=1.1, discontinuo=True)
     d.nota(20, 560, 210,
            "Sin pasarela en v1.0 (D3, D8): el cliente paga por WhatsApp y el "
            "administrador confirma el pago en CU12, que descuenta el inventario (CU11).")
+    d.nota(20, 680, 210,
+           "CU16–CU18: ampliación del panel en v1.2.0 (solicitud de cambio CR-01).", tam=10.5)
     return d
 
 
@@ -256,7 +283,7 @@ def uml_casos_uso():
 # =====================================================================
 @registrar
 def uml_clases():
-    d = Diagrama("uml_clases", 1180, 740, "UML: diagrama de clases del modelo de dominio")
+    d = Diagrama("uml_clases", 1180, 880, "UML: diagrama de clases del modelo de dominio")
     d.clase(40, 40, 300, "Usuario", [
         "id: int  «PK»", "correo: str(255)  «único»", "contrasena: str  (hash)",
         "rol: str = \"usuario\" | \"admin\"", "activo: bool = true", "fecha_creacion: datetime"])
@@ -283,6 +310,10 @@ def uml_clases():
     d.clase(220, 560, 160, "EstadoPedido", ["pendiente", "pagado", "enviado", "entregado",
                                             "cancelado"], estereotipo="enumeration",
             relleno=C["calido2"])
+    h_cb = d.clase(870, 650, 280, "ContenidoBloque", [
+        "id: int  «PK»", "clave: str(40)  «único»", "borrador: JSON", "publicado: JSON",
+        "actualizado_en: datetime", "actualizado_por: int [0..1]  «FK»",
+        "publicado_en: datetime [0..1]"])
     m = 10.5
     # Usuario ◆— PerfilUsuario
     d.flecha([(190, 205), (190, 330)], "perfil", 190, 270, punta=None, inicio="rombo")
@@ -308,6 +339,10 @@ def uml_clases():
              discontinuo=True, punta="abierta")
     d.flecha([(410, 640), (410, 718), (120, 718), (120, 653)], None, discontinuo=True,
              punta="abierta")
+    # Usuario — ContenidoBloque (último administrador que lo editó)
+    d.flecha([(40, 185), (22, 185), (22, 862), (1010, 862), (1010, 650 + h_cb)], "actualiza (actualizado_por)",
+             600, 862, punta=None)
+    d.texto(6, 178, "0..1", m, ancla="start"); d.texto(1020, 650 + h_cb + 14, "0..*", m, ancla="start")
     return d
 
 
@@ -486,7 +521,7 @@ def uml_estados_pedido():
 # =====================================================================
 @registrar
 def despliegue():
-    d = Diagrama("despliegue", 1180, 650, "Diagrama de despliegue de MUGLY (entorno local v1.0)")
+    d = Diagrama("despliegue", 1180, 650, "Diagrama de despliegue de MUGLY (entorno local v1.2)")
     d.actor(85, 150, "Cliente /\nAdministrador")
     d.nodo(200, 30, 950, 560, "Equipo local · Windows 11", "dispositivo")
     d.nodo(240, 110, 270, 200, "Navegador web (Chrome)", "entorno de ejecución",
@@ -502,12 +537,12 @@ def despliegue():
     d.artefacto(588, 180, 264, 112, "API Flask · app.py :5000",
                 "crear_app(): blueprints /api/v1, JWT, CORS, manejadores de error")
     d.artefacto(588, 306, 264, 96, "backend/uploads/",
-                "Imágenes de productos servidas en /uploads/<archivo>")
+                "Imágenes de productos y del contenido, servidas en /uploads/<archivo>")
     d.artefacto(588, 416, 264, 112, "migrations/ (Alembic)",
-                "Flask-Migrate · 6 versiones; versión actual 9ed994615ffd")
+                "Flask-Migrate · 7 versiones; versión actual b4f2c8a91d3e")
     d.nodo(930, 110, 200, 300, "MySQL Server 8.0", "servidor de BD", relleno=C["blanco"])
     d.artefacto(946, 180, 168, 140, "mugly_db",
-                "InnoDB · utf8mb4_unicode_ci · 7 tablas")
+                "InnoDB · utf8mb4_unicode_ci · 8 tablas")
     d.caja(40, 470, 140, 100, "WhatsApp", "[Internet · wa.me]", relleno=C["gris"], tam_titulo=13)
     d.flecha([(110, 220), (240, 220)], "HTTP", 175, 208, capa="sobre")
     d.flecha([(375, 310), (375, 360)], "HTTP GET :5173\n(descarga la SPA)", 445, 335, tam=10.5, capa="sobre")
@@ -515,7 +550,7 @@ def despliegue():
     d.flecha([(870, 236), (930, 236)], "TCP 3306\nPyMySQL", 900, 270, tam=10, capa="sobre")
     d.flecha([(240, 290), (110, 290), (110, 470)], "HTTPS\n(enlace)", 150, 380, tam=10.5, capa="sobre")
     d.nota(930, 440, 200,
-           "v1.0 se ejecuta en local (MGL-ALC-001). La nube queda fuera de esta versión.",
+           "MUGLY se ejecuta en local (MGL-ALC-001). La nube queda fuera de esta versión.",
            tam=10.5)
     return d
 
@@ -525,7 +560,7 @@ def despliegue():
 # =====================================================================
 @registrar
 def bd_logico():
-    d = Diagrama("bd_logico", 1120, 560, "Modelo lógico de la base de datos (entidad-relación)")
+    d = Diagrama("bd_logico", 1120, 790, "Modelo lógico de la base de datos (entidad-relación)")
 
     def entidad(x, y, nombre, attrs, w=230):
         h = 34 + len(attrs) * 21 + 10
@@ -567,6 +602,16 @@ def bd_logico():
     rel([(675, 90), (850, 90)], "registra cambios", 762, 78, "1", "N", (688, 108), (838, 108))
     rel([(155, 40), (155, 18), (965, 18), (965, 40)], "hace el cambio", 560, 18,
         "1", "N", (168, 34), (978, 34))
+    entidad(40, 570, "CONTENIDO_BLOQUE", [("id", "PK"), ("clave", "UQ"), ("borrador", None),
+                                          ("publicado", None), ("actualizado_en", None),
+                                          ("actualizado_por", "FK"), ("publicado_en", None)])
+    rel([(40, 120), (20, 120), (20, 660), (40, 660)], "actualiza", 64, 540,
+        "0..1", "N", (22, 108), (30, 648))
+    d.nota(445, 590, 640,
+           "Los reportes y el panel no tienen tablas propias: calculan sobre PEDIDO, "
+           "HISTORIAL_ESTADO, DETALLE_PEDIDO y PRODUCTO. CONTENIDO_BLOQUE guarda cada sección "
+           "de la tienda con dos versiones JSON {visible, orden, datos}: borrador y publicado.",
+           tam=11)
     return d
 
 
@@ -575,7 +620,7 @@ def bd_logico():
 # =====================================================================
 @registrar
 def bd_fisico():
-    d = Diagrama("bd_fisico", 1300, 720, "Modelo físico de la base de datos en MySQL 8.0")
+    d = Diagrama("bd_fisico", 1300, 960, "Modelo físico de la base de datos en MySQL 8.0")
 
     def tabla(x, y, nombre, cols, w=360):
         fila = 21
@@ -623,7 +668,12 @@ def bd_fisico():
         ("descripcion", "TEXT", "NOT NULL"), ("precio", "DECIMAL(10,2)", "NOT NULL"),
         ("disponible", "TINYINT(1)", "NOT NULL"), ("cantidad_stock", "INT", "NOT NULL"),
         ("imagen", "VARCHAR(255)", "NULL")])
-    tabla(30, 560, "alembic_version", [("version_num", "VARCHAR(32)", "PK")])
+    tabla(30, 560, "contenido_bloques", [
+        ("id", "INT", "PK · AUTO_INCREMENT"), ("clave", "VARCHAR(40)", "NOT NULL · UNIQUE"),
+        ("borrador", "JSON", "NOT NULL"), ("publicado", "JSON", "NOT NULL"),
+        ("actualizado_en", "DATETIME", "NOT NULL"), ("actualizado_por", "INT", "FK · NULL · IDX"),
+        ("publicado_en", "DATETIME", "NULL")])
+    tabla(30, 800, "alembic_version", [("version_num", "VARCHAR(32)", "PK")])
     k = dict(color=C["acento"], tam=10, color_texto=C["acento"], grosor=1.6)
     d.flecha([(210, 330), (210, 210)], "FK usuario_id", 210, 270, **k)
     d.flecha([(470, 140), (390, 140)], "FK\nusuario_id", 430, 165, **k)
@@ -632,15 +682,18 @@ def bd_fisico():
     d.flecha([(910, 110), (830, 110)], "FK\npedido_id", 870, 135, **k)
     d.flecha([(1090, 40), (1090, 16), (300, 16), (300, 40)], "FK usuario_id (quién hizo el cambio)",
              695, 16, **k)
+    d.flecha([(30, 680), (14, 680), (14, 120), (30, 120)], "FK\nactualizado_por\nSET NULL", 60, 520,
+             **k)
     d.nota(910, 600, 360,
            "utf8mb4 · utf8mb4_unicode_ci. Las FK no usan ON DELETE CASCADE: por eso un "
            "producto con pedidos se retira de forma lógica (disponible = 0) y no se "
            "borra (RNF04).", tam=10.5)
     d.nota(470, 560, 360,
            "Restricciones: perfiles_ibfk_1, pedidos_ibfk_1, detalles_pedido_ibfk_1 y _2, "
-           "historial_estados_pedido_ibfk_1 y _2.", tam=10.5)
-    d.nota(30, 640, 360,
-           "alembic_version guarda la revisión aplicada por Flask-Migrate (9ed994615ffd).",
+           "historial_estados_pedido_ibfk_1 y _2, contenido_bloques_ibfk_1 (ON DELETE SET NULL).",
+           tam=10.5)
+    d.nota(30, 880, 360,
+           "alembic_version guarda la revisión aplicada por Flask-Migrate (b4f2c8a91d3e).",
            tam=10.5)
     return d
 

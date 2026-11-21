@@ -26,6 +26,7 @@ Diagrama: [`arquitectura.drawio.xml`](./arquitectura.drawio.xml)
 
 - **Seguridad:** JWT (HS256), hash de contraseñas con Werkzeug, decoradores `requiere_token` y `requiere_admin` (`app/seguridad.py`)
 - **Configuracion:** Variables de entorno cargadas con `python-dotenv` (`app/config.py`)
+- **Utilidades compartidas:** validación de imágenes (`app/archivos.py`), paginación (`app/paginacion.py`) y fechas en hora de Colombia (`app/fechas.py`)
 - **Migraciones:** Alembic para versionado del esquema (`migrations/`)
 - **Pruebas:** pytest con SQLite en memoria (`tests/`)
 
@@ -45,6 +46,7 @@ Diagrama: [`base_datos.drawio.xml`](./base_datos.drawio.xml)
 | `pedidos` | id (PK), usuario_id (FK), estado, tipo, descripcion, transportadora, numero_guia, total, fecha_creacion | N:1 con `usuarios`, 1:N con `detalles_pedido` e `historial_estados_pedido` |
 | `detalles_pedido` | id (PK), pedido_id (FK), producto_id (FK), cantidad, precio_unitario | N:1 con `pedidos`, N:1 con `productos` |
 | `historial_estados_pedido` | id (PK), pedido_id (FK), estado, fecha, usuario_id (FK) | N:1 con `pedidos` |
+| `contenido_bloques` | id (PK), clave (UK), borrador (JSON), publicado (JSON), actualizado_en, actualizado_por (FK, SET NULL), publicado_en | N:1 con `usuarios` |
 
 ### Estados de pedido (ADR-004)
 
@@ -95,22 +97,32 @@ Un usuario desactivado recibe `403` al iniciar sesión o al usar su token.
 
 | Método | Endpoint | Descripcion |
 |--------|----------|-------------|
-| GET | `/usuarios` | Listar usuarios |
+| GET | `/usuarios` | Listar usuarios; con parámetros (`q`, `estado`, `pedidos`, `registro`, `orden`, `pagina`, `por_pagina`) busca clientes paginados |
 | GET | `/usuarios/:id` | Detalle de usuario con perfil |
 | PATCH | `/usuarios/:id` | Editar perfil y activar/desactivar (`activo`) |
 | GET | `/productos` | Todos los productos, incluidos los no disponibles |
-| GET | `/pedidos` | Todos los pedidos |
+| GET | `/pedidos` | Todos los pedidos; con parámetros (`q`, `estado`, `tipo`, `desde`, `hasta`, `pagina`, `por_pagina`) busca paginado |
 | GET | `/pedidos/:id` | Detalle de cualquier pedido |
 | PATCH | `/pedidos/:id/estado` | Cambiar estado (`pagado` descuenta inventario; `enviado` exige `transportadora` y `numero_guia`) |
 | POST | `/pedidos/personalizados` | Registrar pedido personalizado (`usuario_id`, `descripcion`, `total`) |
+| GET | `/resumen` | Indicadores del inicio del panel |
+| GET | `/reportes/ventas` | Reporte por rango (`desde`, `hasta`, `agrupar` = dia o mes) |
+| GET | `/reportes/ventas.csv` · `/reportes/pedidos.csv` · `/reportes/clientes.csv` | Exportaciones CSV para Excel |
+| GET | `/contenido` · `/contenido/vista-previa` | Contenido con borrador y publicado; vista previa del borrador |
+| PATCH | `/contenido/:clave` | Guardar el borrador de una sección |
+| PUT | `/contenido/orden` | Orden de las secciones de Inicio |
+| POST · DELETE | `/contenido/:clave/imagen` | Subir o quitar la imagen de una sección |
+| POST | `/contenido/publicar` · `/contenido/descartar` | Publicar el borrador o volver a lo publicado |
+| GET · PATCH | `/configuracion` | Nombre de la tienda, WhatsApp y umbral de inventario bajo |
 
-Todas requieren token de un usuario con rol `admin`.
+Todas requieren token de un usuario con rol `admin`. Las definiciones de los reportes (ventas confirmadas, pagos confirmados, pendiente de cobro, cancelados) están en `app/dominios/reportes/servicios.py`; no se calcula utilidad porque no hay costos registrados.
 
 ### Otros
 
 | Método | Endpoint | Descripcion | Auth |
 |--------|----------|-------------|------|
 | GET | `/health` | Health check del servicio | No |
+| GET | `/api/v1/contenido` | Contenido publicado de la tienda | No |
 | GET | `/uploads/:archivo` | Imagen de producto | No |
 
 ### Formato de respuesta
@@ -185,12 +197,23 @@ MUGLY/
 │       │   ├── repositorios.py
 │       │   ├── modelos.py      # Producto
 │       │   └── dtos.py         # CrearProductoDTO, ActualizarProductoDTO
-│       └── pedidos/            # Dominio de pedidos
+│       ├── pedidos/            # Dominio de pedidos
+│       │   ├── controladores.py
+│       │   ├── servicios.py
+│       │   ├── repositorios.py
+│       │   ├── modelos.py      # Pedido, DetallePedido, HistorialEstadoPedido
+│       │   └── dtos.py         # CrearPedidoDTO, CambiarEstadoPedidoDTO, BusquedaPedidosDTO
+│       ├── contenido/          # Contenido administrable de la tienda (v1.2.0)
+│       │   ├── controladores.py
+│       │   ├── servicios.py
+│       │   ├── repositorios.py
+│       │   ├── modelos.py      # ContenidoBloque
+│       │   └── dtos.py         # dto_bloque, OrdenSeccionesDTO
+│       └── reportes/           # Dashboard, finanzas y exportes CSV (v1.2.0)
 │           ├── controladores.py
 │           ├── servicios.py
 │           ├── repositorios.py
-│           ├── modelos.py      # Pedido, DetallePedido
-│           └── dtos.py         # CrearPedidoDTO
+│           └── dtos.py         # RangoFechasDTO
 ├── migrations/                 # Migraciones de Alembic
 │   └── versions/
 ├── scripts/
@@ -289,7 +312,7 @@ export FLASK_TESTING=true     # Linux/Mac
 python -m pytest -q
 ```
 
-Se esperan **65 pruebas pasando**.
+Se esperan **107 pruebas pasando**.
 
 ---
 

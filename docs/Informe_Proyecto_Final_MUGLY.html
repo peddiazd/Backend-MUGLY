@@ -572,7 +572,7 @@ dialog.visor img{display:block;max-width:100%;height:auto;margin:0 auto}
     <tr><td>R3</td><td>Dos personas para todo el ciclo</td><td>Alta</td><td>Medio</td><td>Reparto backend/frontend; asistente de IA con revisión humana</td></tr>
     <tr><td>R4</td><td>Cambios de alcance tardíos</td><td>Media</td><td>Alto</td><td>Línea base G1 y control de cambios</td></tr>
     <tr><td>R5</td><td>Borrar productos con pedidos fallaba en MySQL</td><td>Media</td><td>Medio</td><td>Retiro lógico (disponible = falso)</td></tr>
-    <tr><td>R6</td><td><code>SECRET_KEY</code> en el repositorio público</td><td>Media</td><td>Alto</td><td><span class="chip dif">Aceptado</span> para la entrega local; rotarla antes de cualquier despliegue</td></tr>
+    <tr><td>R6</td><td><code>SECRET_KEY</code> en el repositorio público</td><td>Media</td><td>Alto</td><td><span class="chip ok">Resuelto</span> el 21/11/2026: clave nueva en el <code>.env</code> local y valor de ejemplo en <code>.env.example</code></td></tr>
     <tr><td>R7</td><td>Errores al registrar manualmente pagos y personalizados</td><td>Media</td><td>Medio</td><td>Transiciones validadas e historial con fecha y usuario</td></tr>
     <tr><td>R8</td><td>Pérdida de datos por MySQL local sin respaldo</td><td>Baja</td><td>Alto</td><td>Respaldo con mysqldump verificado con restauración</td></tr>
   </table></div>
@@ -808,7 +808,7 @@ dialog.visor img{display:block;max-width:100%;height:auto;margin:0 auto}
     <tr><td>Configuración</td><td>Credenciales de la base y clave en <code>.env</code>, fuera del control de versiones</td></tr>
     <tr><td>Panel administrativo (v1.2.0)</td><td>Las 16 rutas nuevas de administración usan <code>@requiere_admin</code> y están cubiertas por pruebas de 401 y 403; ocultar un botón en la SPA no reemplaza esta verificación. La búsqueda de clientes nunca devuelve contraseñas ni hashes. Los enlaces editables del contenido solo aceptan rutas internas <code>#/…</code> o <code>https://</code>, lo que bloquea <code>javascript:</code>; los textos se escapan al pintarlos.</td></tr>
   </table></div>
-  <div class="nota rojo"><b>Riesgo aceptado R6.</b> El archivo <code>backend/.env.example</code> del repositorio público contiene la misma <code>SECRET_KEY</code> del entorno local. Los propietarios aceptaron este riesgo para la entrega académica en local, y antes de cualquier despliegue real deben generar una clave nueva con <code>scripts/generate_secret.py</code> y cambiar las contraseñas de prueba.</div>
+  <div class="nota verde"><b>Riesgo R6 resuelto.</b> Hasta el 21/11/2026, <code>backend/.env.example</code> del repositorio público tenía la misma <code>SECRET_KEY</code> del entorno local. Ese día se generó una clave nueva para el <code>.env</code> local, que no se versiona, y el ejemplo quedó con un texto que indica generarla con <code>scripts/generate_secret.py</code>. La clave anterior sigue en el historial de Git, pero ya no firma ningún token. Antes de un despliegue real también hay que cambiar las contraseñas de las cuentas de prueba.</div>
 
   <h3 id="f3-despliegue">3.10 Arquitectura computacional y diagrama de despliegue</h3>
   <figure class="diagrama" data-titulo="Diagrama de despliegue">
@@ -846,9 +846,9 @@ dialog.visor img{display:block;max-width:100%;height:auto;margin:0 auto}
     <div class="tarjeta"><h4>Rendimiento</h4><p>Las páginas de la SPA se cargan de forma diferida y las consultas usan índices sobre las llaves foráneas. El bloqueo <code>FOR UPDATE</code> afecta solo a las filas del pedido y de sus productos, no a toda la tabla. Bootstrap local evita depender de una CDN. Las escenas con scroll usan un solo bucle de animación, mueven solo <code>transform</code> y <code>opacity</code>, reducen su intensidad en el celular y se desmontan al cambiar de página. El panel pagina en el servidor y agrega con <code>SUM</code> y <code>COUNT</code> en la base.</p></div>
     <div class="tarjeta"><h4>Escalabilidad</h4><p>La API no guarda sesión en memoria: el estado viaja en el JWT. Eso permitiría ejecutar varias instancias detrás de un balanceador. El límite actual es la base única y las imágenes en disco local. Los reportes se calculan al consultar (ADR-010); con un volumen alto se pasaría a tablas de agregados.</p></div>
     <div class="tarjeta"><h4>Disponibilidad</h4><p>En v1.0 depende de un solo equipo, sin redundancia. Se mitiga con un respaldo verificado (mysqldump e imágenes, R8). El endpoint <code>/health</code> permite monitoreo futuro.</p></div>
-    <div class="tarjeta"><h4>Seguridad</h4><p>Hash de contraseñas, JWT con expiración, autorización en el servidor, doble validación y archivos controlados (sección 3.9). La deuda conocida es el riesgo R6.</p></div>
+    <div class="tarjeta"><h4>Seguridad</h4><p>Hash de contraseñas, JWT con expiración, autorización en el servidor, doble validación y archivos controlados (sección 3.9). El riesgo R6 (clave en el repositorio) se resolvió el 21/11/2026 con una clave nueva.</p></div>
     <div class="tarjeta"><h4>Costos</h4><p>La estimación del proyecto es de 24 horas, sin valor monetario. Todo el software usado es libre o gratuito (Python, Flask, MySQL Community, Bootstrap) y la ejecución local no tiene costo de infraestructura. El costo de un hosting se definirá cuando se decida publicar.</p></div>
-    <div class="tarjeta"><h4>Riesgos</h4><p>Los ocho riesgos de MGL-RIE-001 están en la sección 2.6. Al cierre: R2 y R5 resueltos por diseño (ADR-005 y retiro lógico), R8 mitigado con respaldo y R6 aceptado.</p></div>
+    <div class="tarjeta"><h4>Riesgos</h4><p>Los ocho riesgos de MGL-RIE-001 están en la sección 2.6. Al cierre: R2 y R5 resueltos por diseño (ADR-005 y retiro lógico), R8 mitigado con respaldo y R6 resuelto al cambiar la clave.</p></div>
   </div>
 
   <h3 id="f3-prototipos">3.13 Prototipos, identidad visual y puerta G2</h3>

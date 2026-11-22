@@ -48,7 +48,7 @@ function fila(item) {
 }
 
 function pedidoCreado(app, pedido) {
-  const mensaje = `Hola MUGLY, quiero pagar mi pedido #${pedido.id} por ${moneda(pedido.total)}.`;
+  const mensaje = `Hola ${CONFIG.NOMBRE}, quiero pagar mi pedido #${pedido.id} por ${moneda(pedido.total)}.`;
   app.innerHTML = `
     <div class="container py-5" style="max-width: 760px">
       <div class="mg-hero rounded-4 p-4 p-md-5 d-flex flex-column gap-3">

@@ -52,7 +52,7 @@ export async function render(app, { query = {} } = {}) {
           <h2 class="h3 mb-1">¿Hablamos?</h2>
           <p class="text-suave mb-0">WhatsApp ${esc(telefono)}</p>
         </div>
-        <a class="btn btn-primary btn-lg" target="_blank" rel="noopener" href="${esc(enlaceWhatsApp(CONFIG.WHATSAPP, 'Hola MUGLY, tengo una pregunta.'))}">${icono('chat')} Escribir por WhatsApp</a>
+        <a class="btn btn-primary btn-lg" target="_blank" rel="noopener" href="${esc(enlaceWhatsApp(CONFIG.WHATSAPP, `Hola ${CONFIG.NOMBRE}, tengo una pregunta.`))}">${icono('chat')} Escribir por WhatsApp</a>
       </div>
     </section>`;
 }

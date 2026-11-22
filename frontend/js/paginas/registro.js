@@ -3,6 +3,7 @@ import { api, textoError } from '../api.js';
 import { iniciarSesion } from '../estado.js';
 import { alerta, avisar } from '../componentes/ui.js';
 import { navegar } from '../router.js';
+import { CONFIG } from '../config.js';
 
 const CORREO = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -58,7 +59,7 @@ export async function render(app, { query }) {
       await api('/usuarios/registro', { metodo: 'POST', cuerpo: credenciales });
       const datos = await api('/usuarios/login', { metodo: 'POST', cuerpo: credenciales });
       iniciarSesion(datos.access_token, datos.usuario);
-      avisar('Cuenta creada. ¡Bienvenido a MUGLY!');
+      avisar(`Cuenta creada. ¡Bienvenido a ${CONFIG.NOMBRE}!`);
       navegar(volver ?? '/');
     } catch (error) {
       document.getElementById('errores').innerHTML = alerta(textoError(error));

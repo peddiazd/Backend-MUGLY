@@ -48,7 +48,7 @@ export function fecha(iso) {
 
 const NOMBRES_ESTADO = {
   pendiente: 'Pendiente', pagado: 'Pagado', enviado: 'Enviado',
-  entregado: 'Entregado', cancelado: 'Cancelado',
+  entregado: 'Entregado', cancelado: 'Cancelado', reembolsado: 'Reembolsado', reembolso_parcial: 'Reembolso parcial',
 };
 export const nombreEstado = (e) => NOMBRES_ESTADO[e] ?? e;
 

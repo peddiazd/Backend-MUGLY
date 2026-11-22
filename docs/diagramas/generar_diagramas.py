@@ -283,34 +283,44 @@ def uml_casos_uso():
 # =====================================================================
 @registrar
 def uml_clases():
-    d = Diagrama("uml_clases", 1180, 880, "UML: diagrama de clases del modelo de dominio")
+    d = Diagrama("uml_clases", 1180, 1010, "UML: diagrama de clases del modelo de dominio")
     d.clase(40, 40, 300, "Usuario", [
         "id: int  «PK»", "correo: str(255)  «único»", "contrasena: str  (hash)",
         "rol: str = \"usuario\" | \"admin\"", "activo: bool = true", "fecha_creacion: datetime"])
     d.clase(40, 330, 300, "PerfilUsuario", [
         "id: int  «PK»", "nombre: str(50) [0..1]", "apellido: str(50) [0..1]",
-        "telefono: str(20) [0..1]", "usuario_id: int  «FK, único»"])
-    d.clase(450, 40, 310, "Pedido", [
+        "telefono: str(20) [0..1]", "tipo y numero_documento [0..1]",
+        "departamento, ciudad [0..1]", "direccion, complemento [0..1]",
+        "usuario_id: int  «FK, único»"])
+    h_pedido = d.clase(450, 40, 310, "Pedido", [
         "id: int  «PK»", "usuario_id: int  «FK»", "estado: EstadoPedido",
         "tipo: TipoPedido = catalogo", "descripcion: text [0..1]",
         "transportadora: str(100) [0..1]", "numero_guia: str(100) [0..1]",
-        "total: Decimal(10,2)", "fecha_creacion: datetime"])
+        "total: Decimal(10,2)", "fecha_creacion: datetime",
+        "envio_*: copia de la dirección", "archivado: bool = false"])
     d.clase(450, 420, 310, "DetallePedido", [
         "id: int  «PK»", "pedido_id: int  «FK»", "producto_id: int  «FK»",
         "cantidad: int  (≥ 1)", "precio_unitario: Decimal(10,2)"])
-    d.clase(870, 420, 280, "Producto", [
+    h_producto = d.clase(870, 420, 280, "Producto", [
         "id: int  «PK»", "nombre: str(200)", "descripcion: text",
         "precio: Decimal(10,2)", "disponible: bool", "cantidad_stock: int  (≥ 0)",
-        "imagen: str(255) [0..1]"])
+        "imagen: str(255) [0..1]", "referencia: str(30)  «único»",
+        "tipo_id: int [0..1]  «FK»"])
     d.clase(870, 40, 280, "HistorialEstadoPedido", [
         "id: int  «PK»", "pedido_id: int  «FK»", "estado: str(30)",
         "fecha: datetime", "usuario_id: int  «FK»"])
     d.clase(40, 560, 160, "TipoPedido", ["catalogo", "personalizado"], estereotipo="enumeration",
             relleno=C["calido2"])
     d.clase(220, 560, 160, "EstadoPedido", ["pendiente", "pagado", "enviado", "entregado",
-                                            "cancelado"], estereotipo="enumeration",
+                                            "cancelado", "reembolsado"], estereotipo="enumeration",
             relleno=C["calido2"])
-    h_cb = d.clase(870, 650, 280, "ContenidoBloque", [
+    d.clase(870, 710, 280, "TipoProducto", [
+        "id: int  «PK»", "nombre: str(40)  «único»", "descripcion: str(120) [0..1]"])
+    d.clase(450, 620, 310, "ReembolsoPedido", [
+        "id: int  «PK»", "pedido_id: int  «FK»", "tipo: reembolso | devolucion",
+        "monto: Decimal(10,2)", "motivo: str(120)", "detalle: text [0..1]",
+        "unidades_reingresadas: int = 0", "usuario_id: int  «FK»", "fecha: datetime"])
+    d.clase(40, 790, 300, "ContenidoBloque", [
         "id: int  «PK»", "clave: str(40)  «único»", "borrador: JSON", "publicado: JSON",
         "actualizado_en: datetime", "actualizado_por: int [0..1]  «FK»",
         "publicado_en: datetime [0..1]"])
@@ -322,8 +332,8 @@ def uml_clases():
     d.flecha([(340, 110), (450, 110)], "realiza", 395, 98, punta=None)
     d.texto(348, 128, "1", m, ancla="start"); d.texto(442, 128, "0..*", m, ancla="end")
     # Pedido ◆— DetallePedido
-    d.flecha([(605, 265), (605, 420)], "detalles", 605, 340, punta=None, inicio="rombo")
-    d.texto(615, 285, "1", m, ancla="start"); d.texto(615, 414, "1..*", m, ancla="start")
+    d.flecha([(605, 40 + h_pedido), (605, 420)], "detalles", 605, 385, punta=None, inicio="rombo")
+    d.texto(615, 40 + h_pedido + 16, "1", m, ancla="start"); d.texto(615, 414, "1..*", m, ancla="start")
     # Producto — DetallePedido
     d.flecha([(870, 500), (760, 500)], "se vende en", 815, 488, punta=None)
     d.texto(862, 518, "1", m, ancla="end"); d.texto(768, 518, "0..*", m, ancla="start")
@@ -337,12 +347,17 @@ def uml_clases():
     # Dependencias con las enumeraciones
     d.flecha([(450, 160), (410, 160), (410, 640), (380, 640)], "«usa»", 410, 400,
              discontinuo=True, punta="abierta")
-    d.flecha([(410, 640), (410, 718), (120, 718), (120, 653)], None, discontinuo=True,
+    d.flecha([(410, 640), (410, 748), (120, 748), (120, 653)], None, discontinuo=True,
              punta="abierta")
     # Usuario — ContenidoBloque (último administrador que lo editó)
-    d.flecha([(40, 185), (22, 185), (22, 862), (1010, 862), (1010, 650 + h_cb)], "actualiza (actualizado_por)",
-             600, 862, punta=None)
-    d.texto(6, 178, "0..1", m, ancla="start"); d.texto(1020, 650 + h_cb + 14, "0..*", m, ancla="start")
+    d.flecha([(40, 185), (22, 185), (22, 772), (120, 772), (120, 790)], "actualiza", 72, 772, punta=None)
+    d.texto(6, 178, "0..1", m, ancla="start"); d.texto(130, 785, "0..*", m, ancla="start")
+    # Pedido ◆— ReembolsoPedido
+    d.flecha([(450, 250), (424, 250), (424, 660), (450, 660)], "reembolsos", 500, 596, punta=None, inicio="rombo")
+    d.texto(430, 268, "1", m, ancla="start"); d.texto(428, 650, "0..*", m, ancla="start")
+    # TipoProducto — Producto
+    d.flecha([(1010, 420 + h_producto), (1010, 710)], "clasifica", 1010, 420 + (h_producto + 290) / 2, punta=None)
+    d.texto(1020, 704, "1", m, ancla="start"); d.texto(1020, 420 + h_producto + 16, "0..*", m, ancla="start")
     return d
 
 
@@ -353,7 +368,7 @@ def uml_clases():
 def uml_clases_pedidos():
     d = Diagrama("uml_clases_pedidos", 1180, 640,
                  "UML: clases por capas del dominio pedidos")
-    d.clase(30, 30, 350, "pedidos/controladores.py", [], [
+    h_ctrl = d.clase(30, 30, 350, "pedidos/controladores.py", [], [
         "+ crear_pedido()          POST /pedidos",
         "+ listar_pedidos()        GET /pedidos",
         "+ obtener_pedido(id)      GET /pedidos/{id}",
@@ -361,6 +376,9 @@ def uml_clases_pedidos():
         "+ obtener_pedido_admin(id)    GET /admin/…/{id}",
         "+ cambiar_estado_pedido(id)   PATCH …/estado",
         "+ crear_pedido_personalizado() POST …",
+        "+ archivar_pedido(id)    PATCH …/archivo",
+        "+ archivar_cerrados()    POST …/archivar-cerrados",
+        "+ reembolsar_pedido(id)  POST …/reembolsos",
     ], estereotipo="blueprint · pedidos_bp / admin_bp", tam=10.8)
     d.clase(30, 330, 350, "CambiarEstadoPedidoDTO", [
         "estado: OneOf(pagado, enviado,",
@@ -370,7 +388,7 @@ def uml_clases_pedidos():
     d.clase(30, 500, 350, "CrearPedidoDTO · CrearPedidoPersonalizadoDTO", [
         "detalles: List[producto_id, cantidad ≥ 1]",
         "usuario_id · descripcion (1–2000) · total ≥ 0.01"], estereotipo="DTO")
-    d.clase(440, 30, 340, "PedidoServicio", [
+    h_serv = d.clase(440, 30, 340, "PedidoServicio", [
         "TRANSICIONES: dict  (pendiente→pagado|cancelado,",
         "   pagado→enviado, enviado→entregado)"], [
         "+ crear_pedido(usuario_id, datos)",
@@ -380,31 +398,38 @@ def uml_clases_pedidos():
         "+ obtener_pedido_admin(pedido_id)",
         "+ listar_pedidos_usuario(usuario_id)",
         "+ obtener_pedido_usuario(pedido_id, usuario_id)",
+        "+ buscar_pedidos(parametros)",
+        "+ archivar(pedido_id, archivado)",
+        "+ archivar_cerrados()",
+        "+ reembolsar(pedido_id, admin_id, datos)",
         "- _descontar_inventario(pedido)",
         "- _serializar_pedido(pedido)"], estereotipo="servicio", tam=10.8)
     d.clase(440, 430, 340, "Excepciones del dominio", [
         "PedidoNoEncontradoError        → 404",
         "ProductoPedidoNoDisponibleError → 400",
         "TransicionEstadoInvalidaError  → 400",
-        "DatosEnvioRequeridosError      → 400"], estereotipo="Exception", tam=10.8,
+        "DatosEnvioRequeridosError      → 400",
+        "OperacionPedidoInvalidaError   → 400"], estereotipo="Exception", tam=10.8,
         relleno="#FBEDEA")
-    d.clase(840, 30, 310, "PedidoRepositorio", [], [
+    h_repo = d.clase(840, 30, 310, "PedidoRepositorio", [], [
         "+ guardar(pedido)", "+ obtener_por_id(pedido_id)", "+ obtener_todos()",
-        "+ obtener_por_usuario(usuario_id)", "+ guardar_detalle(detalle)"],
+        "+ obtener_por_usuario(usuario_id)", "+ buscar(filtros, orden, página)",
+        "+ contar_por_estado(vista)", "+ contar_archivo()", "+ guardar_detalle(detalle)"],
         estereotipo="repositorio")
     d.clase(840, 260, 310, "Modelos (SQLAlchemy)", [
-        "Pedido", "DetallePedido", "HistorialEstadoPedido", "Producto  (dominio productos)"],
+        "Pedido", "DetallePedido", "HistorialEstadoPedido", "ReembolsoPedido",
+        "Producto  (dominio productos)"],
         estereotipo="db.Model")
-    d.nota(840, 450, 310,
+    d.nota(840, 470, 310,
            "app/__init__.py registra un manejador por excepción y responde "
            "{\"success\": false, \"error\": {\"message\": …}} con el código indicado.")
-    d.flecha([(205, 206), (205, 330)], "valida con", 205, 268, discontinuo=True, punta="abierta")
+    d.flecha([(205, 30 + h_ctrl), (205, 330)], "valida con", 205, (30 + h_ctrl + 330) / 2, discontinuo=True, punta="abierta")
     d.flecha([(380, 120), (440, 120)], "usa", 410, 108, discontinuo=True, punta="abierta")
     d.flecha([(780, 100), (840, 100)], "usa", 810, 88, discontinuo=True, punta="abierta")
     d.flecha([(780, 275), (840, 275)], "bloquea con\nFOR UPDATE", 810, 305, discontinuo=True,
              punta="abierta", tam=10)
-    d.flecha([(995, 172), (995, 260)], "persiste", 995, 216, discontinuo=True, punta="abierta")
-    d.flecha([(610, 287), (610, 430)], "lanza", 610, 358, discontinuo=True, punta="abierta")
+    d.flecha([(995, 30 + h_repo), (995, 260)], "persiste", 995, (30 + h_repo + 260) / 2, discontinuo=True, punta="abierta")
+    d.flecha([(610, 30 + h_serv), (610, 430)], "lanza", 610, (30 + h_serv + 430) / 2, discontinuo=True, punta="abierta")
     d.flecha([(780, 520), (840, 520)], "traducidas\na JSON", 810, 548, discontinuo=True,
              punta="abierta", tam=10)
     return d
@@ -515,7 +540,7 @@ def uml_estados_pedido():
     d.flecha([(550, 161), (550, 430)],
              "reembolso total (admin)\ndesde pagado, enviado\no entregado (RN22)", 610, 250, tam=10.5)
     d.nota(40, 530, 1040,
-           "Toda transición se valida contra TRANSICIONES en PedidoServicio y se registra en "
+           "El ciclo se valida contra TRANSICIONES en PedidoServicio; el reembolso, en reembolsar(). Todo se registra en "
            "historial_estados_pedido con fecha y usuario. Un reembolso parcial no cambia el estado "
            "(queda como evento reembolso_parcial). Archivar no es un estado (CR-02).")
     return d

@@ -362,21 +362,21 @@ dialog.visor img{display:block;max-width:100%;height:auto;margin:0 auto}
     <tr><td>Validación de formularios y manejo de errores</td><td><a href="#f5-frontend">Ver sección</a></td><td>Validación propia + mensajes de la API en el formulario</td></tr>
     <tr class="grupo"><td colspan="3">Requisitos técnicos · Backend</td></tr>
     <tr><td>Python con Flask e implementación de una API REST</td><td><a href="#f3-api">Ver sección</a></td><td>52 operaciones, 50 bajo <code>/api/v1</code></td></tr>
-    <tr><td>Monolito modular por capas, organizado por dominios</td><td><a href="#f3-estilo">Ver sección</a></td><td>ADR-001; figura 3 (cinco dominios con las mismas capas)</td></tr>
+    <tr><td>Monolito modular por capas, organizado por dominios</td><td><a href="#f3-estilo">Ver sección</a></td><td>ADR-001; figura 3 (cinco dominios por capas; reportes no tiene tablas propias)</td></tr>
     <tr><td>Controladores, servicios, repositorios, DTO y modelos</td><td><a href="#f3-logica">Ver sección</a></td><td>Tabla de responsabilidades por capa</td></tr>
-    <tr><td>Reglas de negocio, validaciones y excepciones</td><td><a href="#f2-rnf">Ver sección</a></td><td>RN01–RN18; <code>TRANSICIONES</code>; excepciones del dominio</td></tr>
+    <tr><td>Reglas de negocio, validaciones y excepciones</td><td><a href="#f2-rnf">Ver sección</a></td><td>RN01–RN27; <code>TRANSICIONES</code>; excepciones del dominio</td></tr>
     <tr><td>Métodos HTTP, códigos de estado y respuestas JSON</td><td><a href="#f3-api">Ver sección</a></td><td>Tabla de endpoints y de códigos</td></tr>
     <tr><td>Autenticación y autorización</td><td><a href="#f3-seguridad">Ver sección</a></td><td>JWT, <code>@requiere_token</code>, <code>@requiere_admin</code></td></tr>
     <tr class="grupo"><td colspan="3">Requisitos técnicos · Base de datos</td></tr>
     <tr><td>MySQL o PostgreSQL</td><td><a href="#f3-datos">Ver sección</a></td><td>MySQL 8.0 (InnoDB, utf8mb4)</td></tr>
     <tr><td>Modelado de entidades y relaciones</td><td><a href="#f3-datos">Ver sección</a></td><td>Figuras 10 y 11 (modelo lógico y físico)</td></tr>
     <tr><td>Persistencia mediante ORM y operaciones CRUD</td><td><a href="#f3-api">Ver sección</a></td><td>SQLAlchemy; endpoints de creación, consulta, edición y retiro</td></tr>
-    <tr><td>Gestión de migraciones</td><td><a href="#f4-bd">Ver sección</a></td><td>7 migraciones de Alembic; secciones 5.5 y 5.9</td></tr>
+    <tr><td>Gestión de migraciones</td><td><a href="#f4-bd">Ver sección</a></td><td>8 migraciones de Alembic; secciones 4.3, 5.5 y 5.10</td></tr>
     <tr class="grupo"><td colspan="3">Integración y calidad del software</td></tr>
     <tr><td>Comunicación Frontend, Backend y base de datos</td><td><a href="#f5-recorrido">Ver sección</a></td><td>Recorrido de punta a punta y figura 2 (contenedores)</td></tr>
     <tr><td>Validación en el cliente y en el servidor</td><td><a href="#f3-seguridad">Ver sección</a></td><td>Doble validación: formularios + DTO marshmallow</td></tr>
     <tr><td>Pruebas de funcionamiento</td><td><a href="#f5-pruebas">Ver sección</a></td><td>127 pruebas automáticas, 31 casos de punta a punta (E01–E31) y verificación en Chrome</td></tr>
-    <tr><td>Organización, documentación y control de versiones</td><td><a href="#f4-repo">Ver sección</a></td><td>Estructura, convenciones, PR #1 a #6 y versiones</td></tr>
+    <tr><td>Organización, documentación y control de versiones</td><td><a href="#f4-repo">Ver sección</a></td><td>Estructura, convenciones, Pull Requests y versiones v1.0.0 a v1.3.0</td></tr>
     <tr class="grupo"><td colspan="3">Informe HTML · contenido obligatorio</td></tr>
     <tr><td>Fase 01. Gestión comercial y atención inicial</td><td><a href="#fase01">Ver sección</a></td><td>Solicitud, reunión inicial y expediente</td></tr>
     <tr><td>Fase 02. Descubrimiento, requisitos y contratación</td><td><a href="#fase02">Ver sección</a></td><td>Acuerdos, RF, RNF, alcance G1, riesgos y estimación</td></tr>
@@ -556,7 +556,7 @@ dialog.visor img{display:block;max-width:100%;height:auto;margin:0 auto}
     <div class="tarjeta"><h4>Personalizados (RN13–RN16)</h4><p>Siguen un proceso distinto: inician en MUGLY, se definen por WhatsApp fuera del sistema y el administrador registra el resultado.</p></div>
     <div class="tarjeta"><h4>Administración (RN17–RN18)</h4><p>El administrador gestiona productos, pedidos, clientes e inventario con funciones diferenciadas de las del cliente.</p></div>
     <div class="tarjeta"><h4>Operación (RN22–RN27, CR-02)</h4><p>Solo se reembolsa un pedido pagado y nunca más de lo pagado; el reembolso total lo deja en «reembolsado». Ventas netas = confirmadas − reembolsos. Un cliente con pedidos no se borra, se desactiva. Archivar no cambia estado ni cifras. Un tipo de mug con productos no se elimina y la referencia es única.</p></div>
-    <div class="tarjeta"><h4>Panel (RN19–RN21, CR-01)</h4><p>Las ventas confirmadas son los pedidos pagados, enviados o entregados, y los cancelados nunca suman. No se calcula utilidad sin costos registrados. Los clientes solo ven el contenido publicado.</p></div>
+    <div class="tarjeta"><h4>Panel (RN19–RN21, CR-01)</h4><p>Las ventas confirmadas son los pedidos pagados, enviados, entregados o reembolsados (CR-02); los reembolsos se restan aparte para las ventas netas y los cancelados nunca suman. No se calcula utilidad sin costos registrados. Los clientes solo ven el contenido publicado.</p></div>
   </div>
   <p><strong>Restricciones y supuestos (MUGS.pdf §9):</strong> la pasarela y la transportadora no están seleccionadas; la conversación de WhatsApp ocurre fuera de MUGLY; el procesamiento del pago y la operación física de los envíos son responsabilidad de terceros. La pregunta abierta sobre la tecnología quedó resuelta por los requisitos de la asignatura (ADR-002), y la del mecanismo de confirmación del pago por el acuerdo D3.</p>
 
@@ -711,7 +711,7 @@ dialog.visor img{display:block;max-width:100%;height:auto;margin:0 auto}
     <tr><td><strong>Repositorios</strong> (<code>repositorios.py</code>)</td><td>Consultas y persistencia con SQLAlchemy</td><td>Decisiones de negocio</td></tr>
     <tr><td><strong>Modelos</strong> (<code>modelos.py</code>)</td><td>Entidades ORM, relaciones y serialización <code>to_dict()</code></td><td>Lógica de aplicación</td></tr>
   </table></div>
-  <p><strong>Frontend:</strong> la SPA no usa frameworks. <code>index.html</code> carga Bootstrap local y <code>js/app.js</code> como módulo ES. Cada página se importa de forma diferida con <code>import()</code> la primera vez que se visita. El enrutador traduce <code>#/ruta</code> a una página, <code>estado.js</code> guarda la sesión y el carrito en <code>localStorage</code> y notifica a los suscriptores, y <code>api.js</code> es el único punto que habla con el backend. Cada opción del menú es una página propia de la SPA que se carga en la misma pestaña. Los componentes reutilizables son <code>ui.js</code>, <code>encabezado.js</code>, <code>adminLayout.js</code> (menú lateral y encabezado del panel), <code>producto.js</code> (tarjeta de producto), <code>mockups.js</code> (mug con su diseño), <code>escena.js</code> (monta y desmonta el motor de scroll por ruta), <code>graficos.js</code> (barras en SVG con tooltip) y <code>contenidoTienda.js</code> (lee el contenido publicado o el borrador para la vista previa).</p>
+  <p><strong>Frontend:</strong> la SPA no usa frameworks. <code>index.html</code> carga Bootstrap local y <code>js/app.js</code> como módulo ES. Cada página se importa de forma diferida con <code>import()</code> la primera vez que se visita. El enrutador traduce <code>#/ruta</code> a una página, <code>estado.js</code> guarda la sesión y el carrito en <code>localStorage</code> y notifica a los suscriptores, y <code>api.js</code> es el único punto que habla con el backend. Cada opción del menú es una página propia de la SPA que se carga en la misma pestaña. Los componentes reutilizables son <code>ui.js</code>, <code>encabezado.js</code>, <code>adminLayout.js</code> (menú lateral y encabezado del panel), <code>adminUI.js</code> (tablas, menús, diálogos, panel lateral y delegación de eventos), <code>ajustes.js</code> (estructura de Configuración y Mi cuenta), <code>producto.js</code> (tarjeta de producto), <code>mockups.js</code> (mug con su diseño), <code>escena.js</code> (monta y desmonta el motor de scroll por ruta), <code>graficos.js</code> (barras en SVG con tooltip) y <code>contenidoTienda.js</code> (lee el contenido publicado o el borrador para la vista previa).</p>
   <div class="tabla-c"><table>
     <tr><th>Ruta de la SPA</th><th>Página</th><th>Acceso</th></tr>
     <tr><td><code>#/</code></td><td>inicio.js: presentación del producto con scroll y productos del catálogo</td><td><span class="chip pub">Público</span></td></tr>
@@ -719,9 +719,9 @@ dialog.visor img{display:block;max-width:100%;height:auto;margin:0 auto}
     <tr><td><code>#/nosotros</code></td><td>nosotros.js: cómo compras en MUGLY y contacto</td><td><span class="chip pub">Público</span></td></tr>
     <tr><td><code>#/producto/:id</code></td><td>detalle.js</td><td><span class="chip pub">Público</span></td></tr>
     <tr><td><code>#/carrito</code> · <code>#/personalizados</code></td><td>carrito.js · personalizados.js</td><td><span class="chip pub">Público</span> (confirmar exige sesión)</td></tr>
-    <tr><td><code>#/ingresar</code> · <code>#/registro</code></td><td>ingresar.js · registro.js</td><td><span class="chip pub">Público</span></td></tr>
+    <tr><td><code>#/ingresar</code> · <code>#/registro</code> · <code>#/restablecer</code></td><td>ingresar.js · registro.js · restablecer.js (crear la contraseña con el enlace)</td><td><span class="chip pub">Público</span></td></tr>
     <tr><td><code>#/mis-pedidos</code> · <code>#/mis-pedidos/:id</code></td><td>misPedidos.js</td><td><span class="chip cli">Sesión</span></td></tr>
-    <tr><td><code>#/admin</code></td><td>admin/dashboard.js: indicadores, ventas de 7 días y alertas</td><td><span class="chip adm">Administrador</span></td></tr>
+    <tr><td><code>#/admin</code></td><td>admin/dashboard.js: indicadores del período elegido, ventas y alertas</td><td><span class="chip adm">Administrador</span></td></tr>
     <tr><td><code>#/admin/pedidos</code> · <code>/productos</code> · <code>/clientes</code></td><td>admin/pedidos.js · productos.js · clientes.js con adminLayout.js</td><td><span class="chip adm">Administrador</span></td></tr>
     <tr><td><code>#/admin/finanzas</code> · <code>/contenido</code> · <code>/configuracion</code> · <code>/cuenta</code></td><td>admin/finanzas.js · contenido.js · configuracion.js · cuenta.js</td><td><span class="chip adm">Administrador</span></td></tr>
   </table></div>
@@ -733,7 +733,7 @@ dialog.visor img{display:block;max-width:100%;height:auto;margin:0 auto}
   </figure>
   <figure class="diagrama" data-titulo="UML · Clases del dominio">
     <div class="lienzo">{{svg:uml_clases}}</div>
-    <figcaption><span><b>Figura 6. Clases del modelo de dominio.</b> Las siete entidades persistentes con sus tipos reales. Los rombos indican composición: el perfil, los detalles y el historial se eliminan con su dueño.</span><button class="ampliar" type="button">Ampliar</button></figcaption>
+    <figcaption><span><b>Figura 6. Clases del modelo de dominio.</b> Las nueve entidades persistentes con sus tipos reales, incluidas las de v1.3.0 (TipoProducto y ReembolsoPedido). Los rombos indican composición: el perfil, los detalles, el historial y los reembolsos se eliminan con su dueño.</span><button class="ampliar" type="button">Ampliar</button></figcaption>
   </figure>
   <figure class="diagrama" data-titulo="UML · Clases por capas del dominio pedidos">
     <div class="lienzo">{{svg:uml_clases_pedidos}}</div>
@@ -751,7 +751,7 @@ dialog.visor img{display:block;max-width:100%;height:auto;margin:0 auto}
   <h3 id="f3-datos">3.7 Modelo de datos lógico y físico</h3>
   <figure class="diagrama" data-titulo="Modelo lógico">
     <div class="lienzo">{{svg:bd_logico}}</div>
-    <figcaption><span><b>Figura 10. Modelo lógico (entidad-relación).</b> Un usuario tiene un perfil y realiza pedidos; un pedido contiene detalles y acumula historial; un producto aparece en muchos detalles.</span><button class="ampliar" type="button">Ampliar</button></figcaption>
+    <figcaption><span><b>Figura 10. Modelo lógico (entidad-relación).</b> Un usuario tiene un perfil y realiza pedidos; un pedido contiene detalles y acumula historial y reembolsos; un producto pertenece a un tipo y aparece en muchos detalles.</span><button class="ampliar" type="button">Ampliar</button></figcaption>
   </figure>
   <figure class="diagrama" data-titulo="Modelo físico en MySQL 8.0">
     <div class="lienzo">{{svg:bd_fisico}}</div>
@@ -763,18 +763,18 @@ dialog.visor img{display:block;max-width:100%;height:auto;margin:0 auto}
   <div class="rejilla">
     <div class="tarjeta"><h4>Convenciones</h4><ul><li>Prefijo y versión: <code>/api/v1</code></li><li>Recursos en plural; acciones de administración bajo <code>/admin</code></li><li>JSON en ambos sentidos; imágenes en <code>multipart/form-data</code></li><li>Autenticación: <code>Authorization: Bearer &lt;JWT&gt;</code></li></ul></div>
     <div class="tarjeta"><h4>Formato de respuesta</h4><p>Éxito: <code>{"success": true, "message": …, "data": …}</code></p><p>Error: <code>{"success": false, "error": {"message": …, "details": …}}</code></p></div>
-    <div class="tarjeta"><h4>Códigos usados</h4><p><code>200</code> correcto · <code>201</code> creado · <code>204</code> eliminado · <code>400</code> validación o regla · <code>401</code> sin token o inválido · <code>403</code> sin permiso o desactivado · <code>404</code> no existe · <code>413</code> imagen &gt; 5 MB · <code>500</code> error interno</p></div>
+    <div class="tarjeta"><h4>Códigos usados</h4><p><code>200</code> correcto · <code>201</code> creado · <code>204</code> eliminado · <code>400</code> validación o regla, incluido un correo ya registrado · <code>401</code> sin token o inválido · <code>403</code> sin permiso o desactivado · <code>404</code> no existe · <code>409</code> referencia o tipo de mug repetidos, o tipo en uso · <code>413</code> imagen &gt; 5 MB · <code>500</code> error interno</p></div>
   </div>
   <div class="tabla-c"><table>
     <tr><th>Método</th><th>Ruta</th><th>Acceso</th><th>Uso</th><th>Respuestas</th></tr>
     <tr><td><span class="metodo POST">POST</span></td><td><code>/usuarios/registro</code></td><td><span class="chip pub">Público</span></td><td>Registrar cliente</td><td>201 · 400</td></tr>
     <tr><td><span class="metodo POST">POST</span></td><td><code>/usuarios/login</code></td><td><span class="chip pub">Público</span></td><td>Iniciar sesión y obtener el token</td><td>200 · 400 · 401 · 403</td></tr>
     <tr><td><span class="metodo GET">GET</span></td><td><code>/usuarios/perfil</code></td><td><span class="chip cli">Token</span></td><td>Perfil propio</td><td>200 · 401</td></tr>
-    <tr><td><span class="metodo PATCH">PATCH</span></td><td><code>/usuarios/perfil</code></td><td><span class="chip cli">Token</span></td><td>Actualizar nombre, apellido y teléfono</td><td>200 · 400 · 401</td></tr>
+    <tr><td><span class="metodo PATCH">PATCH</span></td><td><code>/usuarios/perfil</code></td><td><span class="chip cli">Token</span></td><td>Actualizar nombre, apellido, teléfono, documento y dirección de envío</td><td>200 · 400 · 401</td></tr>
     <tr><td><span class="metodo GET">GET</span></td><td><code>/productos</code></td><td><span class="chip pub">Público</span></td><td>Catálogo: solo disponibles</td><td>200</td></tr>
     <tr><td><span class="metodo GET">GET</span></td><td><code>/productos/{id}</code></td><td><span class="chip pub">Público</span></td><td>Detalle con imagen</td><td>200 · 404</td></tr>
-    <tr><td><span class="metodo POST">POST</span></td><td><code>/productos</code></td><td><span class="chip adm">Admin</span></td><td>Crear producto</td><td>201 · 400 · 403</td></tr>
-    <tr><td><span class="metodo PATCH">PATCH</span></td><td><code>/productos/{id}</code></td><td><span class="chip adm">Admin</span></td><td>Editar datos, disponibilidad y stock</td><td>200 · 400 · 404</td></tr>
+    <tr><td><span class="metodo POST">POST</span></td><td><code>/productos</code></td><td><span class="chip adm">Admin</span></td><td>Crear producto</td><td>201 · 400 · 403 · 409</td></tr>
+    <tr><td><span class="metodo PATCH">PATCH</span></td><td><code>/productos/{id}</code></td><td><span class="chip adm">Admin</span></td><td>Editar datos, disponibilidad y stock</td><td>200 · 400 · 404 · 409</td></tr>
     <tr><td><span class="metodo DELETE">DELETE</span></td><td><code>/productos/{id}</code></td><td><span class="chip adm">Admin</span></td><td>Eliminar, o retirar si tiene pedidos</td><td>204 · 200 · 404</td></tr>
     <tr><td><span class="metodo POST">POST</span></td><td><code>/productos/{id}/imagen</code></td><td><span class="chip adm">Admin</span></td><td>Subir foto JPG, PNG o WEBP</td><td>200 · 400 · 413</td></tr>
     <tr><td><span class="metodo POST">POST</span></td><td><code>/pedidos</code></td><td><span class="chip cli">Token</span></td><td>Confirmar compra (queda pendiente)</td><td>201 · 400 · 401</td></tr>
@@ -858,7 +858,7 @@ dialog.visor img{display:block;max-width:100%;height:auto;margin:0 auto}
   <p>Las decisiones 001 a 007 están registradas en MGL-ARQ-001 y quedaron aceptadas en la puerta G2. La 008 se tomó en el incremento de rediseño (20/11/2026), las 009 a 011 en la ampliación del panel (CR-01) y las 012 a 015 en el rediseño del panel (CR-02), ambas el 21/11/2026. Para cada una se indican las alternativas consideradas y el motivo de la elección.</p>
   <div class="tabla-c ids"><table>
     <tr><th>ADR</th><th>Decisión</th><th>Alternativas consideradas</th><th>Justificación y consecuencias</th></tr>
-    <tr><td><strong>001</strong></td><td>Monolito modular por dominios (usuarios, productos, pedidos)</td><td>Microservicios; monolito sin módulos; MVC simple (MUGS.pdf §14)</td><td>Equipo de dos, sin necesidad de despliegues independientes y con transacciones que cruzan pedidos e inventario. Límites internos claros para evolucionar.</td></tr>
+    <tr><td><strong>001</strong></td><td>Monolito modular por dominios (usuarios, productos y pedidos; después, contenido y reportes)</td><td>Microservicios; monolito sin módulos; MVC simple (MUGS.pdf §14)</td><td>Equipo de dos, sin necesidad de despliegues independientes y con transacciones que cruzan pedidos e inventario. Límites internos claros para evolucionar.</td></tr>
     <tr><td><strong>002</strong></td><td>Python + Flask + SQLAlchemy + Flask-Migrate; MySQL; JWT; SPA Vanilla JS con Bootstrap local</td><td>PostgreSQL; Tailwind CSS (ambos permitidos por la asignatura)</td><td>MySQL ya era la base del proyecto y Bootstrap ofrece componentes listos (modales, toasts) sin compilación. Bootstrap se copió en local para funcionar sin CDN.</td></tr>
     <tr><td><strong>003</strong></td><td>Comunicación REST síncrona con <code>fetch</code> y JSON</td><td>Colas o eventos asíncronos</td><td>Operaciones cortas y sin integraciones asíncronas; menos piezas que operar. Si llega una pasarela con webhooks, se agregaría un endpoint.</td></tr>
     <tr><td><strong>004</strong></td><td>Un solo campo <code>estado</code> en el pedido, con historial</td><td>Mantener <code>estado</code> + <code>estado_pago</code> (diseño previo)</td><td>Dos campos permitían combinaciones inválidas. La migración trasladó los datos (confirmado → pagado, rechazado → cancelado) y el historial registra fecha y usuario (mitiga R7).</td></tr>
@@ -867,7 +867,7 @@ dialog.visor img{display:block;max-width:100%;height:auto;margin:0 auto}
     <tr><td><strong>007</strong></td><td>SPA con enrutador por hash, estado central, cliente HTTP único y componentes</td><td>Páginas HTML separadas; enrutado con History API</td><td>El hash no necesita configurar el servidor estático. Un único <code>api.js</code> centraliza el token, los errores y el cierre de sesión. Sin dependencias de compilación.</td></tr>
     <tr><td><strong>008</strong></td><td>Presentación del producto controlada por el scroll con un motor Vanilla JS incluido en el repositorio (<code>assets/vendor/scrollcraft/</code>)</td><td>GSAP con ScrollTrigger; animaciones CSS ligadas al scroll (<code>animation-timeline</code>); programar todo desde cero</td><td>Sin compilación ni frameworks de interfaz, coherente con ADR-002. Expone <code>destroy()</code>, de modo que <code>escena.js</code> lo monta al entrar a una ruta y lo desmonta al salir, sin fugas en la SPA. Anima solo <code>transform</code> y <code>opacity</code> y respeta <code>prefers-reduced-motion</code>. Consecuencia: un archivo de terceros de 62 KB versionado, cuya licencia se debe confirmar.</td></tr>
     <tr><td><strong>009</strong></td><td>Contenido de la tienda administrable como bloques con <strong>borrador y publicado</strong> en JSON, dentro de un nuevo dominio <code>contenido</code></td><td>Una tabla con columnas por sección; un CMS externo (WordPress o un headless CMS); archivos JSON en disco</td><td>Cada sección tiene campos distintos, así que una tabla rígida exigiría una migración por cambio. Un CMS externo agrega otro sistema que operar y rompe el monolito. El borrador permite revisar en la vista previa antes de publicar. La forma de cada bloque la valida un DTO por clave. Consecuencia: el contenido no es consultable por SQL campo a campo, lo cual no hace falta.</td></tr>
-    <tr><td><strong>010</strong></td><td>Reportes financieros <strong>calculados al consultar</strong> sobre pedidos e historial, con definiciones explícitas y sin utilidad</td><td>Tablas de resumen precalculadas; una herramienta de BI externa; calcular la utilidad con costos estimados</td><td>Con el volumen actual el cálculo es inmediato y siempre coincide con los pedidos. Las definiciones (ventas confirmadas, pagos confirmados, pendiente, cancelados) se documentan en el servicio y en pantalla. No se calcula utilidad porque no existen costos registrados, y no se inventan estados como reembolsado. Consecuencia: con muchos pedidos convendría una tabla de agregados.</td></tr>
+    <tr><td><strong>010</strong></td><td>Reportes financieros <strong>calculados al consultar</strong> sobre pedidos e historial, con definiciones explícitas y sin utilidad</td><td>Tablas de resumen precalculadas; una herramienta de BI externa; calcular la utilidad con costos estimados</td><td>Con el volumen actual el cálculo es inmediato y siempre coincide con los pedidos. Las definiciones (ventas confirmadas, pagos confirmados, pendiente, cancelados) se documentan en el servicio y en pantalla. No se calcula utilidad porque no existen costos registrados, y en esa versión no se agregó un estado de reembolso (lo introdujo después ADR-013). Consecuencia: con muchos pedidos convendría una tabla de agregados.</td></tr>
     <tr><td><strong>011</strong></td><td>Búsqueda, filtros y paginación de clientes y pedidos <strong>en el servidor</strong>, reutilizando los endpoints existentes</td><td>Descargar todo y filtrar en el navegador (la versión anterior pedía cada cliente por separado); crear endpoints nuevos de búsqueda</td><td>Escala con muchos registros y elimina el problema N+1 de la página de clientes. Reutilizar <code>/admin/usuarios</code> y <code>/admin/pedidos</code> con parámetros evita rutas duplicadas y conserva la compatibilidad. La SPA espera 300 ms tras cada tecla antes de consultar.</td></tr>
   <tr><td><strong>012</strong></td><td>El pedido guarda una <strong>copia de la dirección de envío</strong> (columnas <code>envio_*</code>)</td><td>Leer siempre la dirección del perfil del cliente; una tabla de direcciones con varias por cliente</td><td>El perfil puede cambiar después de la compra; la copia conserva a dónde se envió, igual que el precio en <code>detalles_pedido</code>. Una libreta de direcciones no la pidió el negocio. El análisis por ciudad usa la copia.</td></tr>
     <tr><td><strong>013</strong></td><td><strong>Reembolsos en una tabla propia</strong> (<code>reembolsos_pedido</code>) y estado <code>reembolsado</code> solo para el total</td><td>Un campo de monto reembolsado en el pedido; cambiar el pedido a cancelado</td><td>Permite varios reembolsos parciales con motivo, fecha y unidades reingresadas sin borrar lo pagado. Ventas netas = confirmadas − reembolsos (RN23); el pedido sigue contando como venta confirmada.</td></tr>
@@ -925,7 +925,7 @@ dialog.visor img{display:block;max-width:100%;height:auto;margin:0 auto}
 │   │       ├── pedidos/         controladores · dtos · servicios · repositorios · modelos
 │   │       ├── contenido/       controladores · dtos · servicios · repositorios · modelos
 │   │       └── reportes/        controladores · dtos · servicios · repositorios
-│   ├── migrations/versions/     7 migraciones de Alembic
+│   ├── migrations/versions/     8 migraciones de Alembic
 │   ├── tests/                   conftest + 127 pruebas (pytest)
 │   ├── scripts/                 create_db.py · generate_secret.py · promover_admin.py
 │   ├── uploads/                 imágenes de productos (ignoradas por git)
@@ -933,6 +933,7 @@ dialog.visor img{display:block;max-width:100%;height:auto;margin:0 auto}
 ├── frontend/
 │   ├── index.html
 │   ├── css/estilos.css          paleta oficial, tipografía y estilos propios
+│   ├── css/admin.css            estilos del panel, con los mismos tokens de color
 │   ├── assets/
 │   │   ├── vendor/bootstrap/    Bootstrap 5.3.3 local
 │   │   ├── vendor/scrollcraft/  motor de escenas con scroll (ADR-008)
@@ -940,9 +941,10 @@ dialog.visor img{display:block;max-width:100%;height:auto;margin:0 auto}
 │   └── js/
 │       ├── app.js · router.js · estado.js · api.js · config.js
 │       ├── componentes/         ui.js · encabezado.js · adminLayout.js · producto.js ·
-│       │                        mockups.js · escena.js · graficos.js · contenidoTienda.js
+│       │                        mockups.js · escena.js · graficos.js · contenidoTienda.js ·
+│       │                        adminUI.js · ajustes.js
 │       └── paginas/             inicio · catalogo · detalle · carrito · personalizados ·
-│                                nosotros · misPedidos · ingresar · registro ·
+│                                nosotros · misPedidos · ingresar · registro · restablecer ·
 │                                admin/{dashboard, pedidos, productos, clientes, finanzas,
 │                                       contenido, configuracion, cuenta}
 ├── docs/                        diagramas, generador y capturas del informe, imágenes de productos
@@ -986,6 +988,7 @@ dialog.visor img{display:block;max-width:100%;height:auto;margin:0 auto}
     <tr><td><code>e5d10d2eef4a</code></td><td>30/10/2026</td><td>Agregar estado de pago a pedidos (luego reemplazado por ADR-004)</td></tr>
     <tr><td><code>9ed994615ffd</code></td><td>19/11/2026</td><td>Historial de estados, tipo, envío y personalizados; traslada <code>estado_pago</code> a <code>estado</code>; imagen de producto y usuario activo</td></tr>
     <tr><td><code>b4f2c8a91d3e</code></td><td>21/11/2026</td><td>Crear tabla <code>contenido_bloques</code> (contenido administrable de la tienda); probada en MySQL con upgrade, downgrade y upgrade</td></tr>
+    <tr><td><code>c7e3a1d9f204</code></td><td>21/11/2026</td><td>CR-02: documento y dirección en perfiles, <code>tipos_producto</code>, referencia y tipo en productos, copia de la dirección y archivo en pedidos, y <code>reembolsos_pedido</code></td></tr>
   </table></div>
 
   <h3 id="f4-convenciones">4.4 Convenciones de trabajo</h3>
@@ -1113,10 +1116,10 @@ dialog.visor img{display:block;max-width:100%;height:auto;margin:0 auto}
     <tr><td>Contenedor «API REST»</td><td><code>backend/app/__init__.py</code> → <code>crear_app()</code>; <code>backend/app.py</code></td></tr>
     <tr><td>Contenedor «Base de datos»</td><td>Modelos SQLAlchemy y <code>backend/migrations/</code></td></tr>
     <tr><td>Contenedor «Almacén de imágenes»</td><td><code>UPLOAD_FOLDER</code> en <code>config.py</code>; <code>ProductoServicio.guardar_imagen</code></td></tr>
-    <tr><td>Componentes por dominio y capa (figura 3)</td><td><code>backend/app/dominios/{usuarios,productos,pedidos}/{controladores,dtos,servicios,repositorios,modelos}.py</code></td></tr>
+    <tr><td>Componentes por dominio y capa (figura 3)</td><td><code>backend/app/dominios/{usuarios,productos,pedidos,contenido}/{controladores,dtos,servicios,repositorios,modelos}.py</code> y <code>dominios/reportes/</code>, sin modelos propios</td></tr>
     <tr><td>Componente Seguridad</td><td><code>backend/app/seguridad.py</code></td></tr>
     <tr><td>Máquina de estados (figura 9)</td><td><code>TRANSICIONES</code> en <code>pedidos/servicios.py</code></td></tr>
-    <tr><td>Modelo físico (figura 11)</td><td>Migración <code>9ed994615ffd</code> y anteriores</td></tr>
+    <tr><td>Modelo físico (figura 11)</td><td>Migración <code>c7e3a1d9f204</code> y anteriores</td></tr>
     <tr><td>ADR-007 · enrutador, estado y cliente HTTP</td><td><code>js/router.js</code>, <code>js/estado.js</code>, <code>js/api.js</code></td></tr>
     <tr><td>ADR-008 · escenas con scroll</td><td><code>js/componentes/escena.js</code> y <code>assets/vendor/scrollcraft/</code></td></tr>
     <tr><td>Identidad visual (sección 3.13)</td><td>Variables de <code>:root</code> en <code>css/estilos.css</code></td></tr>
@@ -1155,7 +1158,7 @@ dialog.visor img{display:block;max-width:100%;height:auto;margin:0 auto}
   </div>
   <div class="tabla-c"><table>
     <tr><th>Indicador</th><th>Definición usada en la API, el panel y los CSV</th></tr>
-    <tr><td><strong>Ventas confirmadas</strong></td><td>Total de los pedidos del período cuyo estado actual es pagado, enviado o entregado. Cada pedido cuenta una vez.</td></tr>
+    <tr><td><strong>Ventas confirmadas</strong></td><td>Total de los pedidos del período cuyo estado actual es pagado, enviado, entregado o reembolsado (CR-02). Cada pedido cuenta una vez; las ventas netas restan los reembolsos.</td></tr>
     <tr><td><strong>Pagos confirmados</strong></td><td>Pedidos cuyo paso a «pagado» ocurrió en el período, según el historial. Lo marca el administrador tras verificar el pago por WhatsApp; no hay pasarela que lo certifique.</td></tr>
     <tr><td><strong>Pendiente de cobro</strong></td><td>Pedidos del período en estado pendiente.</td></tr>
     <tr><td><strong>Cancelados</strong></td><td>Se informan aparte y nunca suman a las ventas. Un pedido pagado no puede cancelarse.</td></tr>

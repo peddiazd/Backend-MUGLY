@@ -12,6 +12,7 @@ from app.dominios.pedidos.modelos import (
 )
 from app.dominios.pedidos.repositorios import PedidoRepositorio
 from app.dominios.productos.modelos import Producto
+from app.dominios.productos.repositorios import ProductoRepositorio
 
 
 class PedidoNoEncontradoError(Exception):
@@ -77,10 +78,7 @@ class PedidoServicio:
         total = Decimal("0.00")
 
         for item in datos["detalles"]:
-            producto = db.session.get(
-                Producto,
-                item["producto_id"],
-            )
+            producto = ProductoRepositorio.obtener_por_id(item["producto_id"])
 
             if producto is None or not producto.disponible:
                 raise ProductoPedidoNoDisponibleError(
@@ -328,14 +326,14 @@ class PedidoServicio:
         if archivado and pedido.estado not in ESTADOS_CERRADOS:
             raise OperacionPedidoInvalidaError("Solo se archivan pedidos entregados, cancelados o reembolsados.")
         pedido.archivado = archivado
-        db.session.commit()
+        PedidoRepositorio.confirmar_cambios()
         return self._serializar_pedido(pedido)
 
     def archivar_cerrados(self):
         pedidos = PedidoRepositorio.cerrados_activos()
         for p in pedidos:
             p.archivado = True
-        db.session.commit()
+        PedidoRepositorio.confirmar_cambios()
         return {"archivados": len(pedidos)}
 
     def reembolsar(self, pedido_id, admin_id, datos):

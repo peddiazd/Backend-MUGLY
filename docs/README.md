@@ -312,7 +312,7 @@ export FLASK_TESTING=true     # Linux/Mac
 python -m pytest -q
 ```
 
-Se esperan **107 pruebas pasando**.
+Se esperan **127 pruebas pasando**.
 
 ---
 

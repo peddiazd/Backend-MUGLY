@@ -168,10 +168,9 @@ class ReporteServicio:
     def detalle_producto(self, producto_id, desde=None, hasta=None, agrupar="dia"):
         """Análisis de un producto en el período (RF33): ritmo, hora, día, compradores y ciudades."""
         from app.dominios.productos.servicios import ProductoNoEncontradoError
-        from app import db
-        from app.dominios.productos.modelos import Producto
+        from app.dominios.productos.repositorios import ProductoRepositorio
 
-        prod = db.session.get(Producto, producto_id)
+        prod = ProductoRepositorio.obtener_por_id(producto_id)
         if not prod:
             raise ProductoNoEncontradoError(f"Producto con ID {producto_id} no encontrado.")
         desde, hasta = self._rango_por_defecto(desde, hasta)

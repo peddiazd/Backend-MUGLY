@@ -21,10 +21,9 @@ class TipoEnUsoError(Exception):
 
 def _validar_producto(datos, producto_id=None):
     """Referencia única (RN27) y tipo existente."""
-    from app import db
     ref = (datos.get("referencia") or "").strip().upper() or None
     if ref:
-        otro = db.session.query(Producto).filter_by(referencia=ref).first()
+        otro = ProductoRepositorio.por_referencia(ref)
         if otro and otro.id != producto_id:
             raise DatoDuplicadoError(f"La referencia {ref} ya existe.")
         datos["referencia"] = ref

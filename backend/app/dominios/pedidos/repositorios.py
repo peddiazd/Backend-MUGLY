@@ -14,6 +14,11 @@ class PedidoRepositorio:
         return pedido
 
     @staticmethod
+    def confirmar_cambios():
+        """Guarda los cambios hechos a pedidos ya cargados (archivo)."""
+        db.session.commit()
+
+    @staticmethod
     def obtener_por_id(pedido_id):
         """Busca un pedido por su ID."""
         return db.session.get(Pedido, pedido_id)

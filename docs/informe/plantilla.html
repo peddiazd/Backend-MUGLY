@@ -225,6 +225,7 @@ dialog.visor img{display:block;max-width:100%;height:auto;margin:0 auto}
     <div><dt>Entrega</dt><dd>Sábado 21 de noviembre de 2026</dd></div>
     <div><dt>Versión del software</dt><dd>v1.3.0 · migración c7e3a1d9f204</dd></div>
     <div><dt>Repositorio</dt><dd><a href="https://github.com/peddiazd/Backend-MUGLY">github.com/peddiazd/Backend-MUGLY</a></dd></div>
+    <div><dt>Expediente (Google Drive)</dt><dd><a href="https://drive.google.com/drive/folders/1LVuXN624FypZuMwd1-zN0lkBZjsMHdPY">Carpeta MUGLY en Google Drive</a></dd></div>
   </dl>
 </header>
 
@@ -360,7 +361,7 @@ dialog.visor img{display:block;max-width:100%;height:auto;margin:0 auto}
     <tr><td>Consumo asíncrono de la API REST</td><td><a href="#f5-recorrido">Ver sección</a></td><td><code>api.js</code> con <code>fetch</code>; recorrido de confirmar el pago</td></tr>
     <tr><td>Validación de formularios y manejo de errores</td><td><a href="#f5-frontend">Ver sección</a></td><td>Validación propia + mensajes de la API en el formulario</td></tr>
     <tr class="grupo"><td colspan="3">Requisitos técnicos · Backend</td></tr>
-    <tr><td>Python con Flask e implementación de una API REST</td><td><a href="#f3-api">Ver sección</a></td><td>39 endpoints, 37 bajo <code>/api/v1</code></td></tr>
+    <tr><td>Python con Flask e implementación de una API REST</td><td><a href="#f3-api">Ver sección</a></td><td>52 operaciones, 50 bajo <code>/api/v1</code></td></tr>
     <tr><td>Monolito modular por capas, organizado por dominios</td><td><a href="#f3-estilo">Ver sección</a></td><td>ADR-001; figura 3 (cinco dominios con las mismas capas)</td></tr>
     <tr><td>Controladores, servicios, repositorios, DTO y modelos</td><td><a href="#f3-logica">Ver sección</a></td><td>Tabla de responsabilidades por capa</td></tr>
     <tr><td>Reglas de negocio, validaciones y excepciones</td><td><a href="#f2-rnf">Ver sección</a></td><td>RN01–RN18; <code>TRANSICIONES</code>; excepciones del dominio</td></tr>
@@ -374,7 +375,7 @@ dialog.visor img{display:block;max-width:100%;height:auto;margin:0 auto}
     <tr class="grupo"><td colspan="3">Integración y calidad del software</td></tr>
     <tr><td>Comunicación Frontend, Backend y base de datos</td><td><a href="#f5-recorrido">Ver sección</a></td><td>Recorrido de punta a punta y figura 2 (contenedores)</td></tr>
     <tr><td>Validación en el cliente y en el servidor</td><td><a href="#f3-seguridad">Ver sección</a></td><td>Doble validación: formularios + DTO marshmallow</td></tr>
-    <tr><td>Pruebas de funcionamiento</td><td><a href="#f5-pruebas">Ver sección</a></td><td>107 pruebas automáticas, 16 casos de punta a punta y verificación en Chrome</td></tr>
+    <tr><td>Pruebas de funcionamiento</td><td><a href="#f5-pruebas">Ver sección</a></td><td>127 pruebas automáticas, 31 casos de punta a punta (E01–E31) y verificación en Chrome</td></tr>
     <tr><td>Organización, documentación y control de versiones</td><td><a href="#f4-repo">Ver sección</a></td><td>Estructura, convenciones, PR #1 a #6 y versiones</td></tr>
     <tr class="grupo"><td colspan="3">Informe HTML · contenido obligatorio</td></tr>
     <tr><td>Fase 01. Gestión comercial y atención inicial</td><td><a href="#fase01">Ver sección</a></td><td>Solicitud, reunión inicial y expediente</td></tr>
@@ -390,11 +391,13 @@ dialog.visor img{display:block;max-width:100%;height:auto;margin:0 auto}
     <tr><td>Modelo lógico y físico de la base de datos</td><td><a href="#f3-datos">Ver sección</a></td><td>Figuras 10 y 11</td></tr>
     <tr><td>Diseño de la API REST y comunicación entre componentes</td><td><a href="#f3-api">Ver sección</a></td><td>Endpoints, formato de respuesta y errores</td></tr>
     <tr><td>Diseño de seguridad</td><td><a href="#f3-seguridad">Ver sección</a></td><td>Amenazas, controles y figura de seguridad</td></tr>
-    <tr><td>Decisiones arquitectónicas (ADR), alternativas y justificación</td><td><a href="#f3-adr">Ver sección</a></td><td>ADR-001 a ADR-011</td></tr>
+    <tr><td>Decisiones arquitectónicas (ADR), alternativas y justificación</td><td><a href="#f3-adr">Ver sección</a></td><td>ADR-001 a ADR-015</td></tr>
     <tr><td>Rendimiento, escalabilidad, disponibilidad, seguridad, costos y riesgos</td><td><a href="#f3-calidad">Ver sección</a></td><td>Una tarjeta por atributo</td></tr>
     <tr><td>Coherencia entre el diseño y el sistema desarrollado</td><td><a href="#f5-trazabilidad">Ver sección</a></td><td>Tabla diseño ↔ código y capturas reales</td></tr>
     <tr><td>Ampliación del panel administrativo (v1.2.0)</td><td><a href="#f5-panel">Ver sección</a></td><td>Solicitud de cambio, endpoints, migración, código, pruebas y capturas</td></tr>
+    <tr><td>Rediseño del panel y datos de operación (v1.3.0)</td><td><a href="#f5-v13">Ver sección</a></td><td>MGL-CR-002, RF29–RF35, 13 operaciones nuevas, migración c7e3a1d9f204, ADR-012 a ADR-015, 20 pruebas y capturas 21–26</td></tr>
     <tr class="grupo"><td colspan="3">Otros entregables</td></tr>
+    <tr><td>Expediente documental en Google Drive</td><td><a href="#a-enlaces">Ver sección</a></td><td>Enlace a la carpeta MUGLY y a cada carpeta por fase</td></tr>
     <tr><td>Repositorios de GitHub en el comentario de la tarea</td><td><a href="#a-entrega">Ver sección</a></td><td>Texto listo para copiar</td></tr>
   </table></div>
 </section>
@@ -442,14 +445,14 @@ dialog.visor img{display:block;max-width:100%;height:auto;margin:0 auto}
   <p>En la reunión inicial de octubre de 2026 (MGL-REU-001) se acordó desarrollar MUGLY como tienda virtual y gestionar los mugs personalizados por WhatsApp. La fecha exacta de la reunión no quedó registrada y figura como pendiente no bloqueante.</p>
 
   <h3 id="f1-expediente">1.3 Apertura del expediente y cierre de la fase</h3>
-  <p>El expediente se abrió en Google Drive (<code>MUGLY/</code>) con una carpeta por fase del manual y un índice maestro en Excel. Cada documento recibe un código <code>MGL-&lt;TIPO&gt;-&lt;NNN&gt;</code>. El prefijo MGL evita confundir los documentos con las claves de Jira (<code>MUG-n</code>).</p>
+  <p>El expediente se abrió en Google Drive (<a href="https://drive.google.com/drive/folders/1LVuXN624FypZuMwd1-zN0lkBZjsMHdPY"><code>MUGLY/</code></a>; enlaces por carpeta en el <a href="#a-enlaces">anexo B</a>) con una carpeta por fase del manual y un índice maestro en Excel. Cada documento recibe un código <code>MGL-&lt;TIPO&gt;-&lt;NNN&gt;</code>. El prefijo MGL evita confundir los documentos con las claves de Jira (<code>MUG-n</code>).</p>
 <pre class="arbol">MUGLY/
 ├── 00_Control_Documental/      Indice_Documental_MUGLY.xlsx
 ├── 01_Gestion_Comercial/       MGL-COM-001 · MGL-DEC-001 · MGL-REU-001 · MGL-REU-002
 ├── 02_Descubrimiento_Requisitos/  MUGS.pdf (MGL-REQ-001) · MGL-REU-003 · MGL-REQ-002 · MGL-ALC-001
 ├── 03_Propuesta_Contratacion/  MGL-EST-001 · MGL-AUT-001
 ├── 04_Gestion_Proyecto/        MGL-RIE-001 · MGL-SCR-001 · MGL-BKL-001 · MGL-CR-001
-├── 05_Arquitectura_Diseno/     MGL-ARQ-001 (ADR-001 a ADR-011) · copia de este informe
+├── 05_Arquitectura_Diseno/     MGL-ARQ-001 (ADR-001 a ADR-015) · copia de este informe
 ├── 06_Desarrollo_Pruebas/      MGL-TST-001
 ├── 07_Despliegue_Entregas/     MGL-REL-001 · MGL-REL-002 · MGL-ENT-001 · MGL-ENT-002
 └── 08_Operacion_Mantenimiento/ MGL-CIE-001</pre>
@@ -799,7 +802,7 @@ dialog.visor img{display:block;max-width:100%;height:auto;margin:0 auto}
     <tr><td><span class="metodo GET">GET</span></td><td><code>/admin/reportes/ventas.csv</code> · <code>pedidos.csv</code> · <code>clientes.csv</code></td><td><span class="chip adm">Admin</span></td><td>Exportaciones para Excel (BOM y separador <code>;</code>)</td><td>200 · 400</td></tr>
   </table></div>
   <p><strong>Búsqueda paginada sin endpoints nuevos.</strong> <code>GET /admin/usuarios</code> y <code>GET /admin/pedidos</code> aceptan ahora parámetros (<code>q</code>, <code>estado</code>, <code>tipo</code>, <code>desde</code>, <code>hasta</code>, <code>orden</code>, <code>pagina</code>, <code>por_pagina</code>) validados con <code>BusquedaClientesDTO</code> y <code>BusquedaPedidosDTO</code>, y responden <code>{items, total, pagina, paginas}</code>. Sin parámetros siguen devolviendo la lista completa, así que los clientes anteriores de la API no se rompieron.</p>
-  <p>En total son <strong>39 operaciones</strong>: 37 bajo <code>/api/v1</code> y 2 sin prefijo. La comunicación es <strong>síncrona</strong> (ADR-003): la SPA espera la respuesta de cada <code>fetch</code> y actualiza el DOM con el resultado. No hay colas ni eventos de servidor porque todas las operaciones son cortas y no existen integraciones asíncronas en esta versión.</p>
+  <p>En total son <strong>52 operaciones</strong>: 50 bajo <code>/api/v1</code> y 2 sin prefijo (39 hasta v1.2.0 y 13 agregadas en v1.3.0). La comunicación es <strong>síncrona</strong> (ADR-003): la SPA espera la respuesta de cada <code>fetch</code> y actualiza el DOM con el resultado. No hay colas ni eventos de servidor porque todas las operaciones son cortas y no existen integraciones asíncronas en esta versión.</p>
 
   <h4>Endpoints agregados en v1.3.0 (CR-02)</h4>
   <div class="tabla-c"><table>
@@ -840,7 +843,7 @@ dialog.visor img{display:block;max-width:100%;height:auto;margin:0 auto}
   <h3 id="f3-despliegue">3.10 Arquitectura computacional y diagrama de despliegue</h3>
   <figure class="diagrama" data-titulo="Diagrama de despliegue">
     <div class="lienzo">{{svg:despliegue}}</div>
-    <figcaption><span><b>Figura 13. Despliegue de la versión v1.2.0.</b> Todos los nodos se ejecutan en un equipo local; el navegador habla con dos procesos Python y la API con MySQL.</span><button class="ampliar" type="button">Ampliar</button></figcaption>
+    <figcaption><span><b>Figura 13. Despliegue de la versión v1.3.0.</b> Todos los nodos se ejecutan en un equipo local; el navegador habla con dos procesos Python y la API con MySQL.</span><button class="ampliar" type="button">Ampliar</button></figcaption>
   </figure>
   <div class="tabla-c"><table>
     <tr><th>Nodo</th><th>Software</th><th>Puerto</th><th>Recurso que más usa (MUGS.pdf §19)</th></tr>
@@ -852,7 +855,7 @@ dialog.visor img{display:block;max-width:100%;height:auto;margin:0 auto}
   <p>La separación cliente-servidor es lógica: MUGS.pdf §19.6 aclara que no implica máquinas distintas. Los tres procesos son independientes y se comunican solo por la red (HTTP y TCP), así que podrían moverse a equipos separados <strong>sin cambiar el código</strong>: basta modificar <code>API_URL</code> en <code>frontend/js/config.js</code> y las variables <code>DB_*</code> y <code>CORS_ALLOWED_ORIGINS</code> del <code>.env</code>. Hoy no se dimensionan CPU, memoria ni almacenamiento porque no se conoce el volumen de usuarios (MUGS.pdf §19.7). Esa medición queda para cuando exista operación real.</p>
 
   <h3 id="f3-adr">3.11 Decisiones de arquitectura (ADR)</h3>
-  <p>Las decisiones 001 a 007 están registradas en MGL-ARQ-001 y quedaron aceptadas en la puerta G2. La 008 se tomó en el incremento de rediseño (20/11/2026) y las 009 a 011 en la ampliación del panel (21/11/2026). Para cada una se indican las alternativas consideradas y el motivo de la elección.</p>
+  <p>Las decisiones 001 a 007 están registradas en MGL-ARQ-001 y quedaron aceptadas en la puerta G2. La 008 se tomó en el incremento de rediseño (20/11/2026), las 009 a 011 en la ampliación del panel (CR-01) y las 012 a 015 en el rediseño del panel (CR-02), ambas el 21/11/2026. Para cada una se indican las alternativas consideradas y el motivo de la elección.</p>
   <div class="tabla-c ids"><table>
     <tr><th>ADR</th><th>Decisión</th><th>Alternativas consideradas</th><th>Justificación y consecuencias</th></tr>
     <tr><td><strong>001</strong></td><td>Monolito modular por dominios (usuarios, productos, pedidos)</td><td>Microservicios; monolito sin módulos; MVC simple (MUGS.pdf §14)</td><td>Equipo de dos, sin necesidad de despliegues independientes y con transacciones que cruzan pedidos e inventario. Límites internos claros para evolucionar.</td></tr>
@@ -866,6 +869,10 @@ dialog.visor img{display:block;max-width:100%;height:auto;margin:0 auto}
     <tr><td><strong>009</strong></td><td>Contenido de la tienda administrable como bloques con <strong>borrador y publicado</strong> en JSON, dentro de un nuevo dominio <code>contenido</code></td><td>Una tabla con columnas por sección; un CMS externo (WordPress o un headless CMS); archivos JSON en disco</td><td>Cada sección tiene campos distintos, así que una tabla rígida exigiría una migración por cambio. Un CMS externo agrega otro sistema que operar y rompe el monolito. El borrador permite revisar en la vista previa antes de publicar. La forma de cada bloque la valida un DTO por clave. Consecuencia: el contenido no es consultable por SQL campo a campo, lo cual no hace falta.</td></tr>
     <tr><td><strong>010</strong></td><td>Reportes financieros <strong>calculados al consultar</strong> sobre pedidos e historial, con definiciones explícitas y sin utilidad</td><td>Tablas de resumen precalculadas; una herramienta de BI externa; calcular la utilidad con costos estimados</td><td>Con el volumen actual el cálculo es inmediato y siempre coincide con los pedidos. Las definiciones (ventas confirmadas, pagos confirmados, pendiente, cancelados) se documentan en el servicio y en pantalla. No se calcula utilidad porque no existen costos registrados, y no se inventan estados como reembolsado. Consecuencia: con muchos pedidos convendría una tabla de agregados.</td></tr>
     <tr><td><strong>011</strong></td><td>Búsqueda, filtros y paginación de clientes y pedidos <strong>en el servidor</strong>, reutilizando los endpoints existentes</td><td>Descargar todo y filtrar en el navegador (la versión anterior pedía cada cliente por separado); crear endpoints nuevos de búsqueda</td><td>Escala con muchos registros y elimina el problema N+1 de la página de clientes. Reutilizar <code>/admin/usuarios</code> y <code>/admin/pedidos</code> con parámetros evita rutas duplicadas y conserva la compatibilidad. La SPA espera 300 ms tras cada tecla antes de consultar.</td></tr>
+  <tr><td><strong>012</strong></td><td>El pedido guarda una <strong>copia de la dirección de envío</strong> (columnas <code>envio_*</code>)</td><td>Leer siempre la dirección del perfil del cliente; una tabla de direcciones con varias por cliente</td><td>El perfil puede cambiar después de la compra; la copia conserva a dónde se envió, igual que el precio en <code>detalles_pedido</code>. Una libreta de direcciones no la pidió el negocio. El análisis por ciudad usa la copia.</td></tr>
+    <tr><td><strong>013</strong></td><td><strong>Reembolsos en una tabla propia</strong> (<code>reembolsos_pedido</code>) y estado <code>reembolsado</code> solo para el total</td><td>Un campo de monto reembolsado en el pedido; cambiar el pedido a cancelado</td><td>Permite varios reembolsos parciales con motivo, fecha y unidades reingresadas sin borrar lo pagado. Ventas netas = confirmadas − reembolsos (RN23); el pedido sigue contando como venta confirmada.</td></tr>
+    <tr><td><strong>014</strong></td><td><strong>Enlaces de acceso firmados</strong> (JWT con propósito, vencimiento y huella del hash de la contraseña) que el administrador envía por WhatsApp</td><td>Contraseña temporal dictada por el administrador; envío por correo; tabla de tokens</td><td>No hay servicio de correo aprobado (D8). La huella hace que el enlace sirva una sola vez sin guardar tokens; el administrador nunca conoce la contraseña. Vencen en 30 minutos (restablecer) o 7 días (activar).</td></tr>
+    <tr><td><strong>015</strong></td><td><strong>Una sola paleta</strong>: <code>css/admin.css</code> usa los tokens <code>--mg-*</code> de <code>estilos.css</code> y aplica solo dentro de <code>body.modo-admin</code></td><td>Una hoja de colores propia para el panel; Tailwind solo para el panel</td><td>El panel mostraba estados con colores distintos a los de la tienda. Con tokens únicos un cambio de color se hace en un lugar; el alcance <code>body.modo-admin</code> evita choques con Bootstrap. Contraste verificado ≥ 4,5:1.</td></tr>
   </table></div>
 
   <h3 id="f3-calidad">3.12 Rendimiento, escalabilidad, disponibilidad, seguridad, costos y riesgos</h3>
@@ -919,7 +926,7 @@ dialog.visor img{display:block;max-width:100%;height:auto;margin:0 auto}
 │   │       ├── contenido/       controladores · dtos · servicios · repositorios · modelos
 │   │       └── reportes/        controladores · dtos · servicios · repositorios
 │   ├── migrations/versions/     7 migraciones de Alembic
-│   ├── tests/                   conftest + 107 pruebas (pytest)
+│   ├── tests/                   conftest + 127 pruebas (pytest)
 │   ├── scripts/                 create_db.py · generate_secret.py · promover_admin.py
 │   ├── uploads/                 imágenes de productos (ignoradas por git)
 │   ├── app.py · requirements.txt · .env.example · pytest.ini
@@ -1093,10 +1100,11 @@ dialog.visor img{display:block;max-width:100%;height:auto;margin:0 auto}
     <tr><td>Productos</td><td><code>tests/test_productos.py</code></td><td>16</td><td>CRUD, catálogo disponible, imagen y retiro lógico</td></tr>
     <tr><td>Pedidos</td><td><code>tests/test_pedidos.py</code></td><td>28</td><td>Stock, pertenencia, transiciones, pago por administrador, envío y personalizados</td></tr>
     <tr><td>Panel administrativo</td><td><code>tests/test_panel_admin.py</code></td><td>42</td><td>401/403 en las rutas nuevas, búsqueda y paginación, ficha del cliente, cálculos financieros, rangos inválidos, CSV, borrador y publicación, enlaces inseguros, imágenes y configuración</td></tr>
-    <tr><td colspan="2"><strong>Total</strong></td><td><strong>107</strong></td><td><span class="chip ok">107 aprobadas</span></td></tr>
+    <tr><td>Rediseño del panel (CR-02)</td><td><code>tests/test_cr02.py</code></td><td>20</td><td>Clientes y enlaces de acceso, tipos y referencia, dirección en el pedido, archivo, reembolsos, período anterior y análisis por producto</td></tr>
+    <tr><td colspan="2"><strong>Total</strong></td><td><strong>127</strong></td><td><span class="chip ok">127 aprobadas</span></td></tr>
   </table></div>
   <p>Además se ejecutaron <strong>16 casos de punta a punta</strong> en Chrome contra la API y MySQL. Entre ellos: crear productos y subir fotos (E01–E02), registrarse y comprar 3 unidades por $98.000 (E03–E06), confirmar el pago y verificar el descuento de stock (E07), rechazar un envío sin guía (E08), el ciclo completo hasta entregado (E09), un personalizado de $45.000 (E10), cliente desactivado (E11) y rutas protegidas (E14). Los cuatro hallazgos se cerraron: el menú que se partía en pantallas medianas (<code>2c8f482</code>), el comando de migraciones en la documentación, un diagrama con una caja vacía (<code>cd632bb</code>) y una limitación de la herramienta de pruebas.</p>
-  <p>En la versión v1.1.0 se verificó en Chrome, en escritorio y en 390 px de ancho, el recorrido completo de las escenas con scroll, la navegación entre páginas, el carrito, Mis pedidos y el panel de administración, sin errores en la consola. El detector de calidad visual de Impeccable no reportó problemas en Inicio, Catálogo, Personalizados y Nosotros, y las 65 pruebas siguieron aprobadas porque el backend no cambió. En v1.2.0 se recorrieron en Chrome todas las páginas del panel con la API y MySQL reales, sin errores en la consola, y la suite completa quedó en 107 pruebas aprobadas.</p>
+  <p>En la versión v1.1.0 se verificó en Chrome, en escritorio y en 390 px de ancho, el recorrido completo de las escenas con scroll, la navegación entre páginas, el carrito, Mis pedidos y el panel de administración, sin errores en la consola. El detector de calidad visual de Impeccable no reportó problemas en Inicio, Catálogo, Personalizados y Nosotros, y las 65 pruebas siguieron aprobadas porque el backend no cambió. En v1.2.0 se recorrieron en Chrome todas las páginas del panel con la API y MySQL reales, sin errores en la consola, y la suite completa quedó en 107 pruebas aprobadas. En v1.3.0 se agregaron 20 pruebas (127 en total) y los casos E26–E31: Inicio con selector de período, detalle del pedido, inventario, alta de cliente con enlace de un solo uso, Finanzas y Configuración, todos aprobados con la API y MySQL reales.</p>
 
   <h3 id="f5-trazabilidad">5.7 Relación entre la arquitectura diseñada y la implementación</h3>
   <div class="tabla-c"><table>
@@ -1115,8 +1123,12 @@ dialog.visor img{display:block;max-width:100%;height:auto;margin:0 auto}
     <tr><td>ADR-009 · contenido con borrador y publicado</td><td><code>backend/app/dominios/contenido/</code>; <code>js/paginas/admin/contenido.js</code></td></tr>
     <tr><td>ADR-010 · reportes calculados al consultar</td><td><code>backend/app/dominios/reportes/servicios.py</code>; <code>js/paginas/admin/finanzas.js</code></td></tr>
     <tr><td>ADR-011 · búsqueda paginada en el servidor</td><td><code>UsuarioRepositorio.buscar_clientes</code>, <code>PedidoRepositorio.buscar</code>, <code>app/paginacion.py</code>; <code>js/paginas/admin/clientes.js</code></td></tr>
+  <tr><td>ADR-012 · dirección copiada en el pedido</td><td><code>PedidoServicio._copiar_envio</code>; columnas <code>envio_*</code> en <code>pedidos/modelos.py</code></td></tr>
+    <tr><td>ADR-013 · reembolsos</td><td><code>ReembolsoPedido</code> y <code>PedidoServicio.reembolsar</code>; <code>reportes/servicios.py</code> (ventas netas)</td></tr>
+    <tr><td>ADR-014 · enlaces de acceso</td><td><code>UsuarioServicio.generar_enlace_acceso</code> y <code>restablecer_contrasena</code>; <code>js/paginas/restablecer.js</code></td></tr>
+    <tr><td>ADR-015 · una sola paleta</td><td><code>css/estilos.css</code> (tokens <code>--mg-*</code>) y <code>css/admin.css</code>; <code>js/componentes/adminUI.js</code></td></tr>
   </table></div>
-  <div class="nota ambar"><b>Desviación conocida.</b> En <code>PedidoServicio</code>, tres consultas con bloqueo (<code>with_for_update</code>) usan <code>db.session</code> directamente en lugar de pasar por <code>PedidoRepositorio</code>. Se hizo así para mantener el bloqueo y el commit dentro de la misma transacción del servicio. El paso natural es mover esas consultas a métodos del repositorio que reciban la misma sesión, sin cambiar el comportamiento.</div>
+  <div class="nota ambar"><b>Desviación conocida.</b> En <code>PedidoServicio</code>, las consultas con bloqueo (<code>with_for_update</code>) de <code>cambiar_estado</code> y <code>reembolsar</code> usan <code>db.session</code> directamente en lugar de pasar por <code>PedidoRepositorio</code>. Las demás consultas de los servicios pasan por su repositorio (en v1.3.0 se movieron la búsqueda por referencia, la carga de productos al crear el pedido y el archivo de pedidos). Se hizo así para mantener el bloqueo y el commit dentro de la misma transacción del servicio. El paso natural es mover esas consultas a métodos del repositorio que reciban la misma sesión, sin cambiar el comportamiento.</div>
 
   <h3 id="f5-galeria">5.8 La aplicación en funcionamiento</h3>
   <p>Capturas reales de la tienda en Chrome, con la API y MySQL en ejecución. La captura 1 es la portada de este informe. Haga clic en una captura para ampliarla.</p>
@@ -1218,17 +1230,18 @@ dialog.visor img{display:block;max-width:100%;height:auto;margin:0 auto}
     <tr><td>MGL-REU-001</td><td>Reunión inicial y responsables</td><td>01.04 · 01.05</td><td><span class="chip ok">Aprobado</span></td></tr>
     <tr><td>MGL-REU-002</td><td>Cierre de la fase 01</td><td>01.07</td><td><span class="chip ok">Aprobado</span></td></tr>
     <tr><td>MGL-REU-003</td><td>Acta de definiciones de negocio (D1–D8)</td><td>02.01 · 02.02</td><td><span class="chip ok">Aprobado</span></td></tr>
-    <tr><td>MGL-REQ-002</td><td>Matriz de requisitos y trazabilidad (v1.0 aprobada; v1.1 agrega RF23–RF28)</td><td>02.05 · 02.06</td><td><span class="chip ok">Aprobado</span></td></tr>
+    <tr><td>MGL-REQ-002</td><td>Matriz de requisitos y trazabilidad (v1.0 aprobada; v1.1 agrega RF23–RF28; v1.2 agrega RF29–RF35 y RN22–RN27)</td><td>02.05 · 02.06</td><td><span class="chip ok">Aprobado</span></td></tr>
     <tr><td>MGL-ALC-001</td><td>Línea base de alcance (G1)</td><td>02.07 · 02.08</td><td><span class="chip ok">Aprobado</span></td></tr>
     <tr><td>MGL-RIE-001</td><td>Registro de riesgos</td><td>02.09</td><td><span class="chip ok">Aprobado</span></td></tr>
     <tr><td>MGL-EST-001</td><td>Estimación en horas y cronograma</td><td>02.10</td><td><span class="chip ok">Aprobado</span></td></tr>
     <tr><td>MGL-AUT-001</td><td>Registro de autorización</td><td>02.10 · 02.11</td><td><span class="chip ok">Aprobado</span></td></tr>
     <tr><td>MGL-SCR-001</td><td>Plan Scrum y acuerdos del equipo</td><td>03.01–03.06</td><td><span class="chip ok">Aprobado</span></td></tr>
-    <tr><td>MGL-BKL-001</td><td>Backlog del producto (v1.0 aprobada; v1.1 agrega H21–H27)</td><td>03.04 · 03.05</td><td><span class="chip ok">Aprobado</span></td></tr>
-    <tr><td>MGL-ARQ-001</td><td>Arquitectura y decisiones (v1.0 aprobada en G2; v1.1 agrega ADR-008 a ADR-011)</td><td>03.07–03.15</td><td><span class="chip ok">Aprobado</span></td></tr>
+    <tr><td>MGL-BKL-001</td><td>Backlog del producto (v1.0 aprobada; v1.1 agrega H21–H27; v1.2 agrega H28–H35)</td><td>03.04 · 03.05</td><td><span class="chip ok">Aprobado</span></td></tr>
+    <tr><td>MGL-ARQ-001</td><td>Arquitectura y decisiones (v1.0 aprobada en G2; v1.1 agrega ADR-008 a ADR-011; v1.2 agrega ADR-012 a ADR-015)</td><td>03.07–03.15</td><td><span class="chip ok">Aprobado</span></td></tr>
     <tr><td>MGL-CR-001</td><td>Solicitud de cambio CR-01: panel administrativo</td><td>05.12 · control de cambios</td><td><span class="chip ok">Aprobado</span></td></tr>
+    <tr><td>MGL-CR-002</td><td>Solicitud de cambio CR-02: rediseño del panel y datos de operación</td><td>05.12 · control de cambios</td><td><span class="chip ok">Aprobado</span></td></tr>
   </table></div>
-  <p>El expediente incluye además los documentos de las fases posteriores (MGL-TST-001 en su versión 1.1, MGL-REL-001, MGL-REL-002, MGL-ENT-001, MGL-ENT-002 y MGL-CIE-001), que no forman parte del alcance de este informe. Los documentos de la versión v1.2.0 (MGL-CR-001, MGL-REL-002, MGL-ENT-002 y las versiones 1.1 de MGL-REQ-002, MGL-BKL-001, MGL-ARQ-001 y MGL-TST-001) fueron aprobados por los propietarios el 21/11/2026.</p>
+  <p>El expediente incluye además los documentos de las fases posteriores (MGL-TST-001 en su versión 1.2, MGL-REL-001 a MGL-REL-003, MGL-ENT-001 a MGL-ENT-003 y MGL-CIE-001), que no forman parte del alcance de este informe. Los documentos de la versión v1.2.0 (MGL-CR-001, MGL-REL-002, MGL-ENT-002 y las versiones 1.1 de MGL-REQ-002, MGL-BKL-001, MGL-ARQ-001 y MGL-TST-001) fueron aprobados por los propietarios el 21/11/2026, igual que los de la versión v1.3.0 (MGL-CR-002, MGL-REL-003, MGL-ENT-003 y las versiones 1.2 de MGL-REQ-002, MGL-BKL-001, MGL-ARQ-001 y MGL-TST-001).</p>
 
   <h3 id="a-enlaces">B. Enlaces del proyecto</h3>
   <div class="tabla-c"><table>
@@ -1239,6 +1252,23 @@ dialog.visor img{display:block;max-width:100%;height:auto;margin:0 auto}
     <tr><td>Versión v1.0.0</td><td><a href="https://github.com/peddiazd/Backend-MUGLY/releases/tag/v1.0.0">…/releases/tag/v1.0.0</a></td></tr>
     <tr><td>Rediseño v1.1.0 (PR #5)</td><td><a href="https://github.com/peddiazd/Backend-MUGLY/pull/5">…/Backend-MUGLY/pull/5</a></td></tr>
     <tr><td>Panel administrativo v1.2.0 (PR #6)</td><td><a href="https://github.com/peddiazd/Backend-MUGLY/pull/6">…/Backend-MUGLY/pull/6</a></td></tr>
+    <tr><td>Rediseño del panel v1.3.0 (PR #15)</td><td><a href="https://github.com/peddiazd/Backend-MUGLY/pull/15">…/Backend-MUGLY/pull/15</a></td></tr>
+    <tr><td>Versión entregada v1.3.0 (etiqueta)</td><td><a href="https://github.com/peddiazd/Backend-MUGLY/tree/v1.3.0">…/Backend-MUGLY/tree/v1.3.0</a></td></tr>
+    <tr><td>Jira · épica de la versión v1.3.0</td><td><a href="https://julidi032.atlassian.net/browse/MUG-37">julidi032.atlassian.net/browse/MUG-37</a></td></tr>
+    <tr><td><strong>Expediente documental (Google Drive)</strong></td><td><a href="https://drive.google.com/drive/folders/1LVuXN624FypZuMwd1-zN0lkBZjsMHdPY">drive.google.com/…/MUGLY</a></td></tr>
+  </table></div>
+  <h4>Carpetas del expediente en Google Drive</h4>
+  <div class="tabla-c"><table>
+    <tr><th>Carpeta</th><th>Contenido</th></tr>
+    <tr><td><a href="https://drive.google.com/drive/folders/1epdKCQ8K-oYHt5QvlxrnDEiLCW53R4xT">00_Control_Documental</a></td><td>Índice documental maestro</td></tr>
+    <tr><td><a href="https://drive.google.com/drive/folders/1aORCEb_tTKlapN8pP2F27Mb9L_Qddhym">01_Gestion_Comercial</a></td><td>Fase 01 · comunicaciones, reuniones y seguimiento</td></tr>
+    <tr><td><a href="https://drive.google.com/drive/folders/1tC3ED3saroIHdGJpilfjQSGU4RKDJuDn">02_Descubrimiento_Requisitos</a></td><td>Fase 02 · MUGS.pdf, actas, matriz de requisitos y alcance</td></tr>
+    <tr><td><a href="https://drive.google.com/drive/folders/1pX-_7sch29IUy2n90KJv5dvWkhodDiwP">03_Propuesta_Contratacion</a></td><td>Fase 02 · estimación, cronograma y autorización</td></tr>
+    <tr><td><a href="https://drive.google.com/drive/folders/1_jV48a9JUNHbT43S0FouylIYFy1laDYx">04_Gestion_Proyecto</a></td><td>Fase 03 · plan Scrum, backlog, riesgos y solicitudes de cambio</td></tr>
+    <tr><td><a href="https://drive.google.com/drive/folders/1NoWnlgaA7Kn7No6J0HGGhKQNfOh4vf4U">05_Arquitectura_Diseno</a></td><td>Fase 03 · arquitectura, ADR y copia de este informe</td></tr>
+    <tr><td><a href="https://drive.google.com/drive/folders/1QXvUTkWb53vicMHDa-Pa9akrlzNGGsvI">06_Desarrollo_Pruebas</a></td><td>Fases 04–05 · plan y resultados de pruebas</td></tr>
+    <tr><td><a href="https://drive.google.com/drive/folders/14dcowPCOLQho_N3g0y1ynpvQEwWKXBwW">07_Despliegue_Entregas</a></td><td>Notas de versión y actas de entrega (fuera del alcance)</td></tr>
+    <tr><td><a href="https://drive.google.com/drive/folders/1slvR9YmYFGfTinhvfegaVoBlW8IA68VH">08_Operacion_Mantenimiento</a></td><td>Cierre (fuera del alcance)</td></tr>
   </table></div>
 
   <h3 id="a-glosario">C. Glosario</h3>
@@ -1263,13 +1293,15 @@ dialog.visor img{display:block;max-width:100%;height:auto;margin:0 auto}
 Integrantes: Pedro Díaz · Assael Zapata
 Repositorio Frontend: https://github.com/peddiazd/Backend-MUGLY/tree/main/frontend
 Repositorio Backend:  https://github.com/peddiazd/Backend-MUGLY/tree/main/backend
-Repositorio completo: https://github.com/peddiazd/Backend-MUGLY</pre>
+Repositorio completo: https://github.com/peddiazd/Backend-MUGLY
+Versión entregada:    v1.3.0 (https://github.com/peddiazd/Backend-MUGLY/tree/v1.3.0)
+Expediente (Drive):   https://drive.google.com/drive/folders/1LVuXN624FypZuMwd1-zN0lkBZjsMHdPY</pre>
 
 </section>
 </main>
 </div>
 
-<footer class="pie">MUGLY v1.2.0 · Informe del proyecto final · Pedro Díaz y Assael Zapata · Arquitectura de Software 2026-2 · Universidad Cooperativa de Colombia</footer>
+<footer class="pie">MUGLY v1.3.0 · Informe del proyecto final · Pedro Díaz y Assael Zapata · Arquitectura de Software 2026-2 · Universidad Cooperativa de Colombia</footer>
 <a class="arriba" href="#inicio" aria-label="Volver al inicio">↑</a>
 
 <dialog class="visor" aria-label="Vista ampliada">

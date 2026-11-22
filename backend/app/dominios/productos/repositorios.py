@@ -18,6 +18,11 @@ class ProductoRepositorio:
         return db.session.get(Producto, producto_id)
 
     @staticmethod
+    def por_referencia(referencia):
+        """Busca un producto por su referencia única (RN27)."""
+        return Producto.query.filter_by(referencia=referencia).first()
+
+    @staticmethod
     def obtener_todos():
         """Devuelve todos los productos."""
         return db.session.query(Producto).all()

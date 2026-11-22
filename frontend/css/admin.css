@@ -602,3 +602,4 @@ body.modo-admin #pie, body.modo-admin #encabezado { display: none; }
 body.modo-admin #app { height: 100vh; }
 body.modo-admin .fs legend { float: none; width: auto; font-size: 12px; }
 body.modo-admin dl, body.modo-admin ol, body.modo-admin ul { margin-bottom: 0; }
+body.modo-admin .mga-app { height: 100vh; height: 100dvh; }

@@ -22,7 +22,7 @@
         </mxArray>
       </mxGeometry>
     </mxCell>
-    <mxCell id="perfiles_label" value="&lt;b&gt;perfiles&lt;/b&gt;&lt;br&gt;id (PK)&lt;br&gt;nombre&lt;br&gt;apellido&lt;br&gt;telefono&lt;br&gt;usuario_id (FK, UK)" style="text;html=1;strokeColor=#333333;fillColor=#ffffff;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=12;" vertex="1" parent="1">
+    <mxCell id="perfiles_label" value="&lt;b&gt;perfiles&lt;/b&gt;&lt;br&gt;id (PK)&lt;br&gt;nombre&lt;br&gt;apellido&lt;br&gt;telefono&lt;br&gt;tipo_documento&lt;br&gt;numero_documento&lt;br&gt;departamento&lt;br&gt;ciudad&lt;br&gt;direccion&lt;br&gt;complemento&lt;br&gt;usuario_id (FK, UK)" style="text;html=1;strokeColor=#333333;fillColor=#ffffff;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=12;" vertex="1" parent="1">
       <mxGeometry x="300" y="60" width="200" height="100" as="geometry" />
     </mxCell>
     <mxCell id="productos" value="productos" style="text;html=1;strokeColor=#333333;fillColor=#ffffff;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1" vertex="1" parent="1">
@@ -32,7 +32,7 @@
         </mxArray>
       </mxGeometry>
     </mxCell>
-    <mxCell id="productos_label" value="&lt;b&gt;productos&lt;/b&gt;&lt;br&gt;id (PK)&lt;br&gt;nombre&lt;br&gt;descripcion&lt;br&gt;precio&lt;br&gt;disponible&lt;br&gt;cantidad_stock&lt;br&gt;imagen" style="text;html=1;strokeColor=#333333;fillColor=#ffffff;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=12;" vertex="1" parent="1">
+    <mxCell id="productos_label" value="&lt;b&gt;productos&lt;/b&gt;&lt;br&gt;id (PK)&lt;br&gt;nombre&lt;br&gt;descripcion&lt;br&gt;precio&lt;br&gt;disponible&lt;br&gt;cantidad_stock&lt;br&gt;imagen&lt;br&gt;referencia (UK)&lt;br&gt;tipo_id (FK)" style="text;html=1;strokeColor=#333333;fillColor=#ffffff;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=12;" vertex="1" parent="1">
       <mxGeometry x="560" y="60" width="200" height="140" as="geometry" />
     </mxCell>
     <mxCell id="pedidos" value="pedidos" style="text;html=1;strokeColor=#333333;fillColor=#ffffff;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1" vertex="1" parent="1">
@@ -42,7 +42,7 @@
         </mxArray>
       </mxGeometry>
     </mxCell>
-    <mxCell id="pedidos_label" value="&lt;b&gt;pedidos&lt;/b&gt;&lt;br&gt;id (PK)&lt;br&gt;usuario_id (FK)&lt;br&gt;estado&lt;br&gt;tipo&lt;br&gt;descripcion&lt;br&gt;transportadora&lt;br&gt;numero_guia&lt;br&gt;total&lt;br&gt;fecha_creacion" style="text;html=1;strokeColor=#333333;fillColor=#ffffff;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=12;" vertex="1" parent="1">
+    <mxCell id="pedidos_label" value="&lt;b&gt;pedidos&lt;/b&gt;&lt;br&gt;id (PK)&lt;br&gt;usuario_id (FK)&lt;br&gt;estado&lt;br&gt;tipo&lt;br&gt;descripcion&lt;br&gt;transportadora&lt;br&gt;numero_guia&lt;br&gt;total&lt;br&gt;fecha_creacion&lt;br&gt;envio_departamento / ciudad / direccion / complemento&lt;br&gt;archivado&lt;br&gt;cantidad_personalizado · mug_base&lt;br&gt;transportadora_acordada · entrega_acordada" style="text;html=1;strokeColor=#333333;fillColor=#ffffff;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=12;" vertex="1" parent="1">
       <mxGeometry x="40" y="220" width="200" height="170" as="geometry" />
     </mxCell>
     <mxCell id="historial_label" value="&lt;b&gt;historial_estados_pedido&lt;/b&gt;&lt;br&gt;id (PK)&lt;br&gt;pedido_id (FK)&lt;br&gt;estado&lt;br&gt;fecha&lt;br&gt;usuario_id (FK)" style="text;html=1;strokeColor=#333333;fillColor=#ffffff;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=12;" vertex="1" parent="1">
@@ -54,7 +54,7 @@
     <mxCell id="rel5_label" value="1:N" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;resizable=0;" vertex="1" parent="1">
       <mxGeometry x="150" y="410" width="20" height="20" as="geometry" />
     </mxCell>
-    <mxCell id="estados_nota" value="Estados del pedido (ADR-004): pendiente → pagado → enviado → entregado; pendiente → cancelado.&lt;br&gt;tipo: catalogo | personalizado" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=11;fontStyle=2" vertex="1" parent="1">
+    <mxCell id="estados_nota" value="Estados del pedido (ADR-004): pendiente → pagado → enviado → entregado; pendiente → cancelado; pagado/enviado/entregado → reembolsado (CR-02).&lt;br&gt;tipo: catalogo | personalizado" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=11;fontStyle=2" vertex="1" parent="1">
       <mxGeometry x="300" y="450" width="420" height="50" as="geometry" />
     </mxCell>
     <mxCell id="detalles_pedido" value="detalles_pedido" style="text;html=1;strokeColor=#333333;fillColor=#ffffff;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1" vertex="1" parent="1">
@@ -110,5 +110,8 @@
     <mxCell id="rel4_label" value="1:N" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;resizable=0;points=[325,280];" vertex="1" parent="1">
       <mxGeometry x="315" y="270" width="20" height="20" as="geometry" />
     </mxCell>
-  </root>
+  <mxCell id="cr02tipos" value="&lt;b&gt;tipos_producto&lt;/b&gt;&lt;br&gt;id (PK)&lt;br&gt;nombre (UK)&lt;br&gt;descripcion" style="rounded=1;whiteSpace=wrap;html=1;align=left;spacingLeft=8;fillColor=#E6ECDD;strokeColor=#344B36;" vertex="1" parent="1"><mxGeometry x="40" y="760" width="220" height="90" as="geometry"/></mxCell>
+<mxCell id="cr02reemb" value="&lt;b&gt;reembolsos_pedido&lt;/b&gt;&lt;br&gt;id (PK)&lt;br&gt;pedido_id (FK)&lt;br&gt;tipo · monto · motivo · detalle&lt;br&gt;unidades_reingresadas&lt;br&gt;usuario_id (FK)&lt;br&gt;fecha" style="rounded=1;whiteSpace=wrap;html=1;align=left;spacingLeft=8;fillColor=#E6ECDD;strokeColor=#344B36;" vertex="1" parent="1"><mxGeometry x="300" y="760" width="260" height="130" as="geometry"/></mxCell>
+<mxCell id="cr02nota" value="CR-02 (v1.3.0): tipos_producto 1:N productos; pedidos 1:N reembolsos_pedido. Migración c7e3a1d9f204." style="text;html=1;whiteSpace=wrap;" vertex="1" parent="1"><mxGeometry x="600" y="780" width="360" height="60" as="geometry"/></mxCell>
+</root>
 </mxGraphModel>

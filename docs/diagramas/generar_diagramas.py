@@ -482,7 +482,7 @@ def uml_secuencia_pago():
 # =====================================================================
 @registrar
 def uml_estados_pedido():
-    d = Diagrama("uml_estados_pedido", 1120, 470, "UML: máquina de estados del pedido")
+    d = Diagrama("uml_estados_pedido", 1120, 600, "UML: máquina de estados del pedido")
 
     def estado(x, y, nombre, color):
         d.rect(x, y, 160, 62, C["blanco"], color, 26, 2)
@@ -495,7 +495,8 @@ def uml_estados_pedido():
     estado(760, 99, "enviado", "#2F6B3C")
     estado(760, 300, "entregado", C["verde"])
     estado(170, 300, "cancelado", C["gris"])
-    for cx, cy in [(1020, 331), (450, 331)]:
+    estado(470, 430, "reembolsado", C["texto"])
+    for cx, cy in [(1020, 331), (450, 331), (700, 461)]:
         d._add("cajas", f'<circle cx="{cx}" cy="{cy}" r="13" fill="none" stroke="{C["texto"]}" stroke-width="2"/>'
                         f'<circle cx="{cx}" cy="{cy}" r="7" fill="{C["texto"]}"/>')
     d.flecha([(61, 130), (170, 130)], "crear_pedido\n[stock suficiente]", 112, 82, tam=10.5)
@@ -510,9 +511,13 @@ def uml_estados_pedido():
              "cancelar (admin)\npago no concretado\no desistimiento", 250, 230, tam=10.5)
     d.flecha([(920, 331), (1007, 331)])
     d.flecha([(330, 331), (437, 331)])
-    d.nota(470, 390, 640,
+    d.flecha([(630, 461), (687, 461)])
+    d.flecha([(550, 161), (550, 430)],
+             "reembolso total (admin)\ndesde pagado, enviado\no entregado (RN22)", 610, 250, tam=10.5)
+    d.nota(40, 530, 1040,
            "Toda transición se valida contra TRANSICIONES en PedidoServicio y se registra en "
-           "historial_estados_pedido con fecha y usuario. Cualquier otra transición → 400.")
+           "historial_estados_pedido con fecha y usuario. Un reembolso parcial no cambia el estado "
+           "(queda como evento reembolso_parcial). Archivar no es un estado (CR-02).")
     return d
 
 
@@ -542,7 +547,7 @@ def despliegue():
                 "Flask-Migrate · 7 versiones; versión actual b4f2c8a91d3e")
     d.nodo(930, 110, 200, 300, "MySQL Server 8.0", "servidor de BD", relleno=C["blanco"])
     d.artefacto(946, 180, 168, 140, "mugly_db",
-                "InnoDB · utf8mb4_unicode_ci · 8 tablas")
+                "InnoDB · utf8mb4_unicode_ci · 10 tablas")
     d.caja(40, 470, 140, 100, "WhatsApp", "[Internet · wa.me]", relleno=C["gris"], tam_titulo=13)
     d.flecha([(110, 220), (240, 220)], "HTTP", 175, 208, capa="sobre")
     d.flecha([(375, 310), (375, 360)], "HTTP GET :5173\n(descarga la SPA)", 445, 335, tam=10.5, capa="sobre")
@@ -560,7 +565,7 @@ def despliegue():
 # =====================================================================
 @registrar
 def bd_logico():
-    d = Diagrama("bd_logico", 1120, 790, "Modelo lógico de la base de datos (entidad-relación)")
+    d = Diagrama("bd_logico", 1120, 960, "Modelo lógico de la base de datos (entidad-relación)")
 
     def entidad(x, y, nombre, attrs, w=230):
         h = 34 + len(attrs) * 21 + 10
@@ -577,15 +582,17 @@ def bd_logico():
     entidad(40, 40, "USUARIO", [("id", "PK"), ("correo", "UQ"), ("contrasena", None),
                                 ("rol", None), ("activo", None), ("fecha_creacion", None)])
     entidad(40, 350, "PERFIL", [("id", "PK"), ("usuario_id", "FK"), ("nombre", None),
-                               ("apellido", None), ("telefono", None)])
+                               ("apellido", None), ("telefono", None),
+                               ("tipo/número documento", None), ("dirección de envío (4)", None)])
     entidad(445, 40, "PEDIDO", [("id", "PK"), ("usuario_id", "FK"), ("estado", None),
                                ("tipo", None), ("descripcion", None), ("transportadora", None),
-                               ("numero_guia", None), ("total", None), ("fecha_creacion", None)])
+                               ("numero_guia", None), ("total", None), ("fecha_creacion", None),
+                               ("envio_* (copia de la dirección)", None), ("archivado", None)])
     entidad(445, 350, "DETALLE_PEDIDO", [("id", "PK"), ("pedido_id", "FK"), ("producto_id", "FK"),
                                         ("cantidad", None), ("precio_unitario", None)])
     entidad(850, 350, "PRODUCTO", [("id", "PK"), ("nombre", None), ("descripcion", None),
                                   ("precio", None), ("disponible", None), ("cantidad_stock", None),
-                                  ("imagen", None)])
+                                  ("imagen", None), ("referencia", "UQ"), ("tipo_id", "FK")])
     entidad(850, 40, "HISTORIAL_ESTADO", [("id", "PK"), ("pedido_id", "FK"), ("estado", None),
                                          ("fecha", None), ("usuario_id", "FK")])
     m = 12
@@ -607,10 +614,19 @@ def bd_logico():
                                           ("actualizado_por", "FK"), ("publicado_en", None)])
     rel([(40, 120), (20, 120), (20, 660), (40, 660)], "actualiza", 64, 540,
         "0..1", "N", (22, 108), (30, 648))
-    d.nota(445, 590, 640,
-           "Los reportes y el panel no tienen tablas propias: calculan sobre PEDIDO, "
-           "HISTORIAL_ESTADO, DETALLE_PEDIDO y PRODUCTO. CONTENIDO_BLOQUE guarda cada sección "
-           "de la tienda con dos versiones JSON {visible, orden, datos}: borrador y publicado.",
+    entidad(850, 640, "TIPO_PRODUCTO", [("id", "PK"), ("nombre", "UQ"), ("descripcion", None)])
+    rel([(965, 593), (965, 640)], "clasifica", 1010, 620, "1", "N", (978, 632), (978, 608))
+    entidad(445, 560, "REEMBOLSO_PEDIDO", [("id", "PK"), ("pedido_id", "FK"), ("tipo", None),
+                                           ("monto", None), ("motivo", None), ("detalle", None),
+                                           ("unidades_reingresadas", None), ("usuario_id", "FK"),
+                                           ("fecha", None)])
+    rel([(675, 250), (720, 250), (720, 640), (675, 640)], "reembolsa", 760, 450,
+        "1", "N", (688, 238), (688, 628))
+    d.nota(40, 830, 1040,
+           "Los reportes no tienen tablas propias: calculan sobre PEDIDO, HISTORIAL_ESTADO, "
+           "DETALLE_PEDIDO, REEMBOLSO_PEDIDO y PRODUCTO (ventas netas = confirmadas − reembolsos, RN23). "
+           "CONTENIDO_BLOQUE guarda cada sección con dos versiones JSON: borrador y publicado. "
+           "CR-02 (v1.3.0) agregó TIPO_PRODUCTO, REEMBOLSO_PEDIDO y los datos de envío.",
            tam=11)
     return d
 
@@ -620,9 +636,9 @@ def bd_logico():
 # =====================================================================
 @registrar
 def bd_fisico():
-    d = Diagrama("bd_fisico", 1300, 960, "Modelo físico de la base de datos en MySQL 8.0")
+    d = Diagrama("bd_fisico", 1340, 1180, "Modelo físico de la base de datos en MySQL 8.0")
 
-    def tabla(x, y, nombre, cols, w=360):
+    def tabla(x, y, nombre, cols, w=390):
         fila = 21
         h = 34 + len(cols) * fila + 10
         d.rect(x, y, w, h, C["blanco"], C["primario"], 6, 1.5)
@@ -637,7 +653,7 @@ def bd_fisico():
             clave = "PK" in flags or "FK" in flags
             d.texto(x + 10, cy, col, 11.5, C["acento"] if clave else C["texto"],
                     700 if clave else 400, "start", fuente="Consolas, monospace")
-            d.texto(x + 150, cy, tipo, 11, C["primario2"], 400, "start", fuente="Consolas, monospace")
+            d.texto(x + 178, cy, tipo, 11, C["primario2"], 400, "start", fuente="Consolas, monospace")
             d.texto(x + w - 10, cy, flags, 10.5, C["gris"], 600, "end")
         return h
 
@@ -648,14 +664,21 @@ def bd_fisico():
     tabla(30, 330, "perfiles", [
         ("id", "INT", "PK · AUTO_INCREMENT"), ("nombre", "VARCHAR(50)", "NULL"),
         ("apellido", "VARCHAR(50)", "NULL"), ("telefono", "VARCHAR(20)", "NULL"),
-        ("usuario_id", "INT", "FK · UNIQUE")])
+        ("usuario_id", "INT", "FK · UNIQUE"), ("tipo_documento", "VARCHAR(4)", "NULL"),
+        ("numero_documento", "VARCHAR(20)", "NULL"), ("departamento", "VARCHAR(60)", "NULL"),
+        ("ciudad", "VARCHAR(60)", "NULL"), ("direccion", "VARCHAR(120)", "NULL"),
+        ("complemento", "VARCHAR(80)", "NULL")])
     tabla(470, 40, "pedidos", [
         ("id", "INT", "PK · AUTO_INCREMENT"), ("usuario_id", "INT", "FK · NOT NULL · IDX"),
         ("estado", "VARCHAR(30)", "NOT NULL"), ("total", "DECIMAL(10,2)", "NOT NULL"),
         ("fecha_creacion", "DATETIME", "NOT NULL"), ("tipo", "VARCHAR(20)", "NOT NULL · DEF 'catalogo'"),
         ("descripcion", "TEXT", "NULL"), ("transportadora", "VARCHAR(100)", "NULL"),
-        ("numero_guia", "VARCHAR(100)", "NULL")])
-    tabla(470, 390, "detalles_pedido", [
+        ("numero_guia", "VARCHAR(100)", "NULL"), ("envio_departamento", "VARCHAR(60)", "NULL"),
+        ("envio_ciudad", "VARCHAR(60)", "NULL"), ("envio_direccion", "VARCHAR(120)", "NULL"),
+        ("envio_complemento", "VARCHAR(80)", "NULL"), ("archivado", "TINYINT(1)", "NOT NULL · DEF 0"),
+        ("cantidad_personalizado", "INT", "NULL"), ("mug_base", "VARCHAR(40)", "NULL"),
+        ("transportadora_acordada", "VARCHAR(100)", "NULL"), ("entrega_acordada", "DATE", "NULL")])
+    tabla(470, 500, "detalles_pedido", [
         ("id", "INT", "PK · AUTO_INCREMENT"), ("pedido_id", "INT", "FK · NOT NULL · IDX"),
         ("producto_id", "INT", "FK · NOT NULL · IDX"), ("cantidad", "INT", "NOT NULL"),
         ("precio_unitario", "DECIMAL(10,2)", "NOT NULL")])
@@ -667,33 +690,46 @@ def bd_fisico():
         ("id", "INT", "PK · AUTO_INCREMENT"), ("nombre", "VARCHAR(200)", "NOT NULL"),
         ("descripcion", "TEXT", "NOT NULL"), ("precio", "DECIMAL(10,2)", "NOT NULL"),
         ("disponible", "TINYINT(1)", "NOT NULL"), ("cantidad_stock", "INT", "NOT NULL"),
-        ("imagen", "VARCHAR(255)", "NULL")])
-    tabla(30, 560, "contenido_bloques", [
+        ("imagen", "VARCHAR(255)", "NULL"), ("referencia", "VARCHAR(30)", "NULL · UNIQUE"),
+        ("tipo_id", "INT", "FK · NULL · IDX")])
+    tabla(470, 700, "tipos_producto", [
+        ("id", "INT", "PK · AUTO_INCREMENT"), ("nombre", "VARCHAR(40)", "NOT NULL · UNIQUE"),
+        ("descripcion", "VARCHAR(120)", "NULL")])
+    tabla(910, 660, "reembolsos_pedido", [
+        ("id", "INT", "PK · AUTO_INCREMENT"), ("pedido_id", "INT", "FK · NOT NULL · IDX"),
+        ("tipo", "VARCHAR(20)", "NOT NULL"), ("monto", "DECIMAL(10,2)", "NOT NULL"),
+        ("motivo", "VARCHAR(120)", "NOT NULL"), ("detalle", "TEXT", "NULL"),
+        ("unidades_reingresadas", "INT", "NOT NULL · DEF 0"), ("usuario_id", "INT", "FK · NOT NULL"),
+        ("fecha", "DATETIME", "NOT NULL")])
+    tabla(30, 640, "contenido_bloques", [
         ("id", "INT", "PK · AUTO_INCREMENT"), ("clave", "VARCHAR(40)", "NOT NULL · UNIQUE"),
         ("borrador", "JSON", "NOT NULL"), ("publicado", "JSON", "NOT NULL"),
         ("actualizado_en", "DATETIME", "NOT NULL"), ("actualizado_por", "INT", "FK · NULL · IDX"),
         ("publicado_en", "DATETIME", "NULL")])
-    tabla(30, 800, "alembic_version", [("version_num", "VARCHAR(32)", "PK")])
+    tabla(30, 880, "alembic_version", [("version_num", "VARCHAR(32)", "PK")])
     k = dict(color=C["acento"], tam=10, color_texto=C["acento"], grosor=1.6)
     d.flecha([(210, 330), (210, 210)], "FK usuario_id", 210, 270, **k)
-    d.flecha([(470, 140), (390, 140)], "FK\nusuario_id", 430, 165, **k)
-    d.flecha([(650, 390), (650, 273)], "FK pedido_id", 650, 331, **k)
-    d.flecha([(830, 480), (910, 480)], "FK\nproducto_id", 870, 505, **k)
-    d.flecha([(910, 110), (830, 110)], "FK\npedido_id", 870, 135, **k)
+    d.flecha([(470, 140), (420, 140)], "FK\nusuario_id", 445, 165, **k)
+    d.flecha([(650, 500), (650, 462)], "FK pedido_id", 700, 482, **k)
+    d.flecha([(860, 560), (910, 560)], "FK\nproducto_id", 885, 585, **k)
+    d.flecha([(860, 740), (885, 740), (885, 600), (910, 600)], "FK tipo_id", 885, 680, **k)
+    d.flecha([(1300, 760), (1325, 760), (1325, 330), (860, 330)], "FK pedido_id", 1100, 318, **k)
+    d.flecha([(910, 110), (860, 110)], "FK\npedido_id", 885, 135, **k)
     d.flecha([(1090, 40), (1090, 16), (300, 16), (300, 40)], "FK usuario_id (quién hizo el cambio)",
              695, 16, **k)
-    d.flecha([(30, 680), (14, 680), (14, 120), (30, 120)], "FK\nactualizado_por\nSET NULL", 60, 520,
+    d.flecha([(30, 760), (14, 760), (14, 120), (30, 120)], "FK\nactualizado_por\nSET NULL", 60, 620,
              **k)
-    d.nota(910, 600, 360,
+    d.nota(910, 920, 360,
            "utf8mb4 · utf8mb4_unicode_ci. Las FK no usan ON DELETE CASCADE: por eso un "
            "producto con pedidos se retira de forma lógica (disponible = 0) y no se "
            "borra (RNF04).", tam=10.5)
-    d.nota(470, 560, 360,
+    d.nota(470, 820, 380,
            "Restricciones: perfiles_ibfk_1, pedidos_ibfk_1, detalles_pedido_ibfk_1 y _2, "
-           "historial_estados_pedido_ibfk_1 y _2, contenido_bloques_ibfk_1 (ON DELETE SET NULL).",
+           "historial_estados_pedido_ibfk_1 y _2, contenido_bloques_ibfk_1 (ON DELETE SET NULL), "
+           "fk_productos_tipo, uq_productos_referencia, reembolsos_pedido_ibfk_1 y _2.",
            tam=10.5)
-    d.nota(30, 880, 360,
-           "alembic_version guarda la revisión aplicada por Flask-Migrate (b4f2c8a91d3e).",
+    d.nota(30, 960, 360,
+           "alembic_version guarda la revisión aplicada por Flask-Migrate (c7e3a1d9f204, CR-02).",
            tam=10.5)
     return d
 

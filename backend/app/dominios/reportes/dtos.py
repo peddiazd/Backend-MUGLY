@@ -6,7 +6,7 @@ class RangoFechasDTO(Schema):
 
     desde = fields.Date(load_default=None)
     hasta = fields.Date(load_default=None)
-    agrupar = fields.String(load_default="dia", validate=validate.OneOf(["dia", "mes"]))
+    agrupar = fields.String(load_default="dia", validate=validate.OneOf(["dia", "semana", "mes"]))
 
     @validates_schema
     def validar_rango(self, datos, **kwargs):

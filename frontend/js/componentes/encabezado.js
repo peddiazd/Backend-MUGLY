@@ -100,7 +100,7 @@ function renderPie() {
           <a href="#/mis-pedidos">Sigue tu pedido</a>
         </div>
       </div>
-      <p class="small text-suave mt-4 mb-0">© ${new Date().getFullYear()} MUGLY · Tienda de mugs</p>
+      <p class="small text-suave mt-4 mb-0">© ${new Date().getFullYear()} ${esc(CONFIG.NOMBRE)} · Tienda de mugs</p>
     </div>`;
 }
 

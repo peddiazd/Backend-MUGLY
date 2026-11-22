@@ -1,103 +1,69 @@
-// Dashboard administrativo: cómo va el negocio y qué requiere atención.
-import { api } from '../../api.js';
+// Inicio del panel (RF24; v1.3.0 CR-02): indicadores del período elegido
+// (predefinido o personalizado), lo que requiere atención y lo más reciente.
+import { api, textoError } from '../../api.js';
 import { estado } from '../../estado.js';
-import { adminLayout, encabezadoAdmin, iconoAdmin } from '../../componentes/adminLayout.js';
-import { esc, moneda, fecha, cargando, alerta, insigniaEstado } from '../../componentes/ui.js';
-import { barrasVerticales, barrasHorizontales } from '../../componentes/graficos.js';
-
-const DIA = new Intl.DateTimeFormat('es-CO', { day: 'numeric', month: 'short', timeZone: 'UTC' });
-const etiquetaDia = (iso) => DIA.format(new Date(`${iso}T00:00:00Z`)).replace('.', '');
-
-function saludo() {
-  const h = new Date().getHours();
-  return h < 12 ? 'Buenos días' : h < 19 ? 'Buenas tardes' : 'Buenas noches';
-}
+import { CONFIG } from '../../config.js';
+import { adminLayout, encabezadoAdmin } from '../../componentes/adminLayout.js';
+import {
+  esc, moneda, ic, ib, vacio, sr, badge, fecha, fechaC, acciones, rango, periodoBtn, periodoPop, nomPeriodo, grafico, etiquetaPeriodo,
+} from '../../componentes/adminUI.js';
 
 export async function render(app) {
   const cont = adminLayout(app, '/admin');
-  cont.innerHTML = cargando('Cargando el resumen…');
 
-  let r;
-  try {
-    r = await api('/admin/resumen');
-  } catch (error) {
-    cont.innerHTML = alerta(error.message);
-    return;
-  }
+  async function pintar() {
+    const r = rango();
+    cont.innerHTML = '<div class="sk" style="height:26px;width:220px"></div>';
+    let ventas, resumen, pedidos;
+    try {
+      [ventas, resumen, pedidos] = await Promise.all([
+        api(`/admin/reportes/ventas?desde=${r.desde}&hasta=${r.hasta}&agrupar=${r.agrupar}`),
+        api('/admin/resumen'),
+        api('/admin/pedidos?vista=todos&por_pagina=6'),
+      ]);
+    } catch (error) {
+      cont.innerHTML = `${encabezadoAdmin('Inicio')}<div class="note err">${ic('alert', 16, 2)}<span>${esc(textoError(error))}</span></div>`;
+      return;
+    }
+    const ind = ventas.indicadores;
+    const serie = ventas.serie.map((s) => ({ l: etiquetaPeriodo(s.periodo), lt: s.periodo, v: s.ventas, n: s.pedidos }));
+    const bajos = resumen.productos.inventario_bajo;
+    const porEstado = pedidos.por_estado || {};
+    const top = ventas.por_producto.filter((x) => x.unidades > 0).slice(0, 5);
+    const maxU = Math.max(1, ...top.map((x) => x.unidades));
+    const fila = (href, n, color, texto) => `<li><a class="at-row" href="${href}"><span class="att-n" style="${color}">${n}</span><span class="grow">${texto}</span>${ic('chev-r', 16)}</a></li>`;
 
-  const m = r.mes.indicadores;
-  const bajo = r.productos.inventario_bajo;
-  const pendientes = r.atencion.pendientes;
-  const enviados = r.atencion.enviados;
-  const nombreMes = new Intl.DateTimeFormat('es-CO', { month: 'long' }).format(new Date(`${r.mes.desde}T12:00:00`));
-
-  const atencion = [
-    ...pendientes.map((p) => `
-      <li><span class="ic">${iconoAdmin('pedidos', 18)}</span>
-        <div><b>Pedido #${p.id} sin pago</b><span>${p.tipo === 'personalizado' ? 'Personalizado' : 'Catálogo'} · ${moneda(p.total)} · ${esc(p.cliente)}</span></div>
-        <a class="btn btn-primary btn-sm" href="#/admin/pedidos?q=${p.id}">Gestionar</a></li>`),
-    enviados.length ? `
-      <li><span class="ic verde">${iconoAdmin('pedidos', 18)}</span>
-        <div><b>${enviados.length} ${enviados.length === 1 ? 'pedido enviado' : 'pedidos enviados'}</b><span>${enviados.map((p) => `#${p.id}`).join(', ')} · márcalos como entregados al confirmar la entrega</span></div>
-        <a class="btn btn-outline-primary btn-sm" href="#/admin/pedidos?estado=enviado">Revisar</a></li>` : '',
-    ...bajo.map((p) => `
-      <li><span class="ic">${iconoAdmin('productos', 18)}</span>
-        <div><b>${esc(p.producto)}: ${p.stock} ${p.stock === 1 ? 'unidad' : 'unidades'}</b><span>Inventario bajo (umbral ${r.productos.umbral})</span></div>
-        <a class="btn btn-outline-primary btn-sm" href="#/admin/productos?bajo=1">Reponer</a></li>`),
-  ].join('');
-
-  cont.innerHTML = `
-    ${encabezadoAdmin(`${saludo()}`, `Resumen de MUGLY · ${esc(estado.usuario?.correo ?? '')}`)}
-    <div class="mg-kpis">
-      <div class="mg-kpi"><span>Ventas confirmadas de ${esc(nombreMes)}</span><b>${moneda(m.ventas_confirmadas.valor)}</b><small>${m.ventas_confirmadas.pedidos} ${m.ventas_confirmadas.pedidos === 1 ? 'pedido' : 'pedidos'} con pago confirmado</small></div>
-      <div class="mg-kpi ${r.pendiente_de_cobro.pedidos ? 'alerta' : ''}"><span>Pendiente de cobro</span><b>${moneda(r.pendiente_de_cobro.valor)}</b><small>${r.pendiente_de_cobro.pedidos} ${r.pendiente_de_cobro.pedidos === 1 ? 'pedido sin pago' : 'pedidos sin pago'}</small></div>
-      <div class="mg-kpi"><span>Ticket promedio del mes</span><b>${moneda(m.ticket_promedio)}</b><small>sobre pedidos confirmados</small></div>
-      <div class="mg-kpi"><span>Clientes</span><b>${r.clientes.total}</b><small>${r.clientes.activos} activos</small></div>
-      <div class="mg-kpi"><span>Productos activos</span><b>${r.productos.activos}</b><small>visibles en el catálogo</small></div>
-      <div class="mg-kpi ${bajo.length ? 'alerta' : ''}"><span>Inventario bajo</span><b>${bajo.length}</b><small>${r.productos.umbral} unidades o menos</small></div>
-    </div>
-
-    <div class="mg-paneles">
-      <section class="mg-panel" aria-labelledby="t-7d">
-        <div class="mg-panel-cab"><h2 id="t-7d">Ventas confirmadas · últimos 7 días</h2><a href="#/admin/finanzas">Ver finanzas</a></div>
-        <div id="g7"></div>
+    cont.innerHTML = `
+      ${encabezadoAdmin('Inicio', `Resumen de ${esc(CONFIG.NOMBRE)} · ${fecha(r.desde)} – ${fecha(r.hasta)}`, periodoBtn())}
+      <section class="card kpis" aria-label="Indicadores del período">
+        <div class="kpi"><div class="l">${ic('coin', 15)}Ventas confirmadas</div><div class="v">${moneda(ind.ventas_confirmadas.valor)}</div><div class="s">${ind.ventas_confirmadas.pedidos} pedidos con pago confirmado</div></div>
+        <div class="kpi"><div class="l">${ic('clock', 15)}Pendiente de cobro</div><div class="v">${moneda(resumen.pendiente_de_cobro.valor)}</div><div class="s">${resumen.pendiente_de_cobro.pedidos} pedidos sin pago confirmado · no es dinero recibido</div></div>
+        <div class="kpi"><div class="l">${ic('users', 15)}Clientes</div><div class="v">${resumen.clientes.total}</div><div class="s">${resumen.clientes.activos} activos</div></div>
+        <div class="kpi"><div class="l">${ic('mug', 15)}Productos en catálogo</div><div class="v">${resumen.productos.activos}</div><div class="s">alerta con ${resumen.productos.umbral} unidades o menos</div></div>
       </section>
-      <section class="mg-panel" aria-labelledby="t-at">
-        <div class="mg-panel-cab"><h2 id="t-at">Requiere atención</h2></div>
-        ${atencion ? `<ul class="mg-atencion">${atencion}</ul>` : '<div class="mg-vacio"><b>Todo al día</b>No hay pagos pendientes, envíos por cerrar ni productos con inventario bajo.</div>'}
-      </section>
-    </div>
-
-    <div class="mg-paneles">
-      <section class="mg-panel" aria-labelledby="t-rec">
-        <div class="mg-panel-cab"><h2 id="t-rec">Pedidos recientes</h2><a href="#/admin/pedidos">Ver todos</a></div>
-        ${r.recientes.length ? `<div class="table-responsive"><table class="table mb-0">
-          <thead class="table-light small"><tr><th scope="col">Pedido</th><th scope="col">Cliente</th><th scope="col">Fecha</th><th scope="col">Total</th><th scope="col">Estado</th></tr></thead>
-          <tbody>${r.recientes.map((p) => `<tr><td><a class="fw-bold" href="#/admin/pedidos?q=${p.id}">#${p.id}</a></td><td>${esc(p.cliente)}</td><td class="small">${fecha(p.fecha_creacion)}</td><td class="num">${moneda(p.total)}</td><td>${insigniaEstado(p.estado)}</td></tr>`).join('')}</tbody>
-        </table></div>` : '<div class="mg-vacio"><b>Sin pedidos todavía</b>Cuando un cliente compre, aparecerá aquí.</div>'}
-      </section>
-      <section class="mg-panel" aria-labelledby="t-top">
-        <div class="mg-panel-cab"><h2 id="t-top">Más vendidos</h2><span class="small text-suave">unidades en pedidos confirmados</span></div>
-        <div id="gtop">${r.mas_vendidos.length ? '' : '<div class="mg-vacio"><b>Sin ventas confirmadas</b>Aún no hay productos vendidos.</div>'}</div>
-      </section>
-    </div>
-
-    <section class="mg-panel" aria-labelledby="t-acc">
-      <div class="mg-panel-cab"><h2 id="t-acc">Accesos rápidos</h2></div>
-      <div class="mg-accesos">
-        <a href="#/admin/productos?nuevo=1">${iconoAdmin('productos')}Nuevo producto</a>
-        <a href="#/admin/pedidos?personalizado=1">${iconoAdmin('pedidos')}Registrar personalizado</a>
-        <a href="#/admin/contenido">${iconoAdmin('contenido')}Editar la portada</a>
-        <a href="#/admin/finanzas">${iconoAdmin('finanzas')}Reporte de ventas</a>
+      <div class="grid-2">
+        <section class="card"><div class="card-h"><h2>Ventas confirmadas · ${esc(nomPeriodo())}</h2><a class="lnk" href="#/admin/finanzas">Ver finanzas</a></div><div class="card-b">${grafico(serie)}</div></section>
+        <section class="card"><div class="card-h"><h2>Requiere atención</h2></div><div class="card-b">
+          <ul class="list">
+            ${fila('#/admin/pedidos?estado=pendiente', porEstado.pendiente || 0, 'background:var(--warn-bg);color:var(--warn)', 'Pedidos por confirmar pago')}
+            ${fila('#/admin/pedidos?estado=enviado', porEstado.enviado || 0, 'background:var(--verde);color:#fff', 'Enviados sin marcar como entregados')}
+            ${fila('#/admin/productos?bajo=1', bajos.length, 'background:var(--err-bg);color:var(--err)', `Productos con inventario bajo (≤ ${resumen.productos.umbral})`)}
+          </ul>
+          ${bajos.length ? `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px">${bajos.map((p) => `<span class="tag">${esc(p.producto)} · ${p.stock}</span>`).join('')}</div>` : ''}
+        </div></section>
       </div>
-    </section>`;
-
-  barrasVerticales(document.getElementById('g7'),
-    r.ultimos_7_dias.map((d) => ({ etiqueta: etiquetaDia(d.periodo), valor: d.ventas, detalle: `${d.pedidos} ${d.pedidos === 1 ? 'pedido' : 'pedidos'}` })),
-    { titulo: 'Ventas confirmadas de los últimos 7 días' });
-  if (r.mas_vendidos.length) {
-    barrasHorizontales(document.getElementById('gtop'),
-      r.mas_vendidos.map((p) => ({ etiqueta: p.producto, valor: p.unidades, texto: `${p.unidades} uds. · ${moneda(p.ingresos)}` })),
-      { titulo: 'Productos más vendidos' });
+      <div class="grid-2">
+        <section class="card"><div class="card-h"><h2>Pedidos recientes</h2><a class="lnk" href="#/admin/pedidos">Ver todos</a></div>
+          ${pedidos.items.length ? `<div class="tw" style="padding:6px 4px 4px"><table class="t"><thead><tr><th>Pedido</th><th>Fecha</th><th>Nombre</th><th>Apellido</th><th class="num">Total</th><th>Estado</th><th class="ac"><span class="sr">Ver</span></th></tr></thead><tbody>
+          ${pedidos.items.map((p) => `<tr><td class="id">#${p.id}</td><td class="tab-n">${fechaC(p.fecha_creacion)}</td><td>${esc(p.cliente_datos?.nombre) || sr}</td><td>${esc(p.cliente_datos?.apellido) || sr}</td><td class="num">${moneda(p.total)}</td><td>${badge(p.estado)}</td><td class="ac"><a class="ib" href="#/admin/pedidos?q=${p.id}" aria-label="Ver pedido #${p.id}" data-tip="Ver pedido #${p.id}">${ic('eye')}</a></td></tr>`).join('')}
+          </tbody></table></div>` : `<div class="card-b">${vacio('bag', 'Aún no hay pedidos', 'Aparecerán aquí cuando los clientes compren.')}</div>`}</section>
+        <section class="card"><div class="card-h"><h2>Más vendidos · ${esc(nomPeriodo())}</h2><a class="lnk" href="#/admin/finanzas?tab=productos">Ver análisis</a></div><div class="card-b">
+          ${top.length ? `<ul class="list">${top.map((x) => `<li><span class="grow">${esc(x.producto)}</span><span class="hbar"><i style="width:${(x.unidades / maxU) * 100}%"></i></span><span class="tab-n" style="width:28px;text-align:right;font-weight:600">${x.unidades}</span></li>`).join('')}</ul>` : vacio('mug', 'Sin ventas confirmadas', 'En este período no hay pedidos pagados.')}
+        </div></section>
+      </div>`;
   }
+
+  acciones({ 'periodo-pop': (el) => periodoPop(el, pintar) });
+  if (!estado.usuario) return;
+  await pintar();
 }

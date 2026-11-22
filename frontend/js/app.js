@@ -28,6 +28,7 @@ ruta('/carrito', pagina('./paginas/carrito.js'));
 ruta('/personalizados', pagina('./paginas/personalizados.js'));
 ruta('/ingresar', pagina('./paginas/ingresar.js'));
 ruta('/registro', pagina('./paginas/registro.js'));
+ruta('/restablecer', pagina('./paginas/restablecer.js'));
 ruta('/mis-pedidos', pagina('./paginas/misPedidos.js'), { auth: true });
 ruta('/mis-pedidos/:id', pagina('./paginas/misPedidos.js'), { auth: true });
 

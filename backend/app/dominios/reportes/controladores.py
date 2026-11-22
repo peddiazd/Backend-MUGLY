@@ -47,6 +47,17 @@ def reporte_ventas(usuario_id):
     return jsonify({"success": True, "message": "Reporte de ventas.", "data": reporte}), 200
 
 
+@admin_bp.route("/reportes/productos/<int:producto_id>", methods=["GET"])
+@requiere_admin
+def reporte_producto(usuario_id, producto_id):
+    """Análisis de ventas de un producto en el período (RF33)."""
+    datos, error = _rango()
+    if error:
+        return error
+    reporte = reporte_servicio.detalle_producto(producto_id, datos["desde"], datos["hasta"], datos["agrupar"])
+    return jsonify({"success": True, "message": "Análisis del producto.", "data": reporte}), 200
+
+
 @admin_bp.route("/reportes/ventas.csv", methods=["GET"])
 @requiere_admin
 def exportar_ventas(usuario_id):

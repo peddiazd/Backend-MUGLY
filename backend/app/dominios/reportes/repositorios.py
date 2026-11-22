@@ -6,6 +6,7 @@ from app.dominios.pedidos.modelos import (
     DetallePedido,
     HistorialEstadoPedido,
     Pedido,
+    ReembolsoPedido,
 )
 from app.dominios.productos.modelos import Producto
 from app.dominios.usuarios.modelos import Usuario
@@ -88,3 +89,38 @@ class ReporteRepositorio:
         if limite:
             consulta = consulta.limit(limite)
         return consulta.all()
+
+    # ------------------------------------------------------------ CR-02
+    @staticmethod
+    def reembolsos(inicio=None, fin=None):
+        """(pedido_id, monto, fecha) de los reembolsos registrados en [inicio, fin)."""
+        consulta = db.session.query(ReembolsoPedido.pedido_id, ReembolsoPedido.monto, ReembolsoPedido.fecha)
+        if inicio is not None:
+            consulta = consulta.filter(ReembolsoPedido.fecha >= inicio)
+        if fin is not None:
+            consulta = consulta.filter(ReembolsoPedido.fecha < fin)
+        return consulta.all()
+
+    @staticmethod
+    def lineas_vendidas(inicio=None, fin=None, producto_id=None):
+        """Detalles de pedidos confirmados con cliente y ciudad de envío (análisis por producto)."""
+        from app.dominios.usuarios.modelos import PerfilUsuario
+
+        consulta = (
+            db.session.query(
+                DetallePedido.producto_id, Pedido.id, Pedido.usuario_id, DetallePedido.cantidad,
+                DetallePedido.cantidad * DetallePedido.precio_unitario, Pedido.fecha_creacion,
+                Pedido.envio_ciudad, PerfilUsuario.nombre, PerfilUsuario.apellido, Usuario.correo, Pedido.estado,
+            )
+            .join(Pedido, Pedido.id == DetallePedido.pedido_id)
+            .join(Usuario, Usuario.id == Pedido.usuario_id)
+            .outerjoin(PerfilUsuario, PerfilUsuario.usuario_id == Usuario.id)
+            .filter(Pedido.estado.in_(ESTADOS_CONFIRMADOS))
+        )
+        if producto_id is not None:
+            consulta = consulta.filter(DetallePedido.producto_id == producto_id)
+        if inicio is not None:
+            consulta = consulta.filter(Pedido.fecha_creacion >= inicio)
+        if fin is not None:
+            consulta = consulta.filter(Pedido.fecha_creacion < fin)
+        return consulta.order_by(Pedido.fecha_creacion.desc()).all()

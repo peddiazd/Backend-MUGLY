@@ -22,7 +22,7 @@ function progreso(pedido) {
 }
 
 function detalle(p) {
-  const pagar = `Hola MUGLY, quiero pagar mi pedido #${p.id} por ${moneda(p.total)}.`;
+  const pagar = `Hola ${CONFIG.NOMBRE}, quiero pagar mi pedido #${p.id} por ${moneda(p.total)}.`;
   return `
     <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
       <h2 class="h4 mb-0">Pedido #${p.id}</h2>

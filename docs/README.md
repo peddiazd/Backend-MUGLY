@@ -396,3 +396,25 @@ Las imágenes de los productos de muestra están en
 
 Para editarlos, abre el archivo en [diagrams.net](https://app.diagrams.net/) (Archivo → Abrir desde → Dispositivo) o con la extensión de draw.io para VS Code.
 
+
+## Versión v1.3.0 · solicitud de cambio CR-02
+
+Rediseño del panel administrativo aprobado sobre un prototipo navegable y
+datos que faltaban para operar (MGL-CR-002, épica MUG-37).
+
+- **Base de datos** (migración `c7e3a1d9f204`): `tipos_producto`,
+  `reembolsos_pedido`; documento y dirección en `perfiles`; `referencia` y
+  `tipo_id` en `productos`; dirección de envío copiada, `archivado` y datos
+  acordados de personalizados en `pedidos`.
+- **Endpoints nuevos**: `POST/DELETE /admin/usuarios`,
+  `POST /admin/usuarios/{id}/enlace-acceso`, `POST /usuarios/restablecer-contrasena`,
+  `PATCH /usuarios/contrasena`, `/admin/tipos-producto` (CRUD),
+  `PATCH /admin/pedidos/{id}/archivo`, `POST /admin/pedidos/archivar-cerrados`,
+  `POST /admin/pedidos/{id}/reembolsos`, `GET /admin/reportes/productos/{id}`.
+- **Reglas nuevas**: RN22 (reembolsos), RN23 (ventas netas), RN24 (clientes con
+  pedidos no se borran), RN25 (archivo), RN26 (tipos en uso), RN27 (referencia única).
+- **Frontend**: `css/admin.css` (solo tokens `--mg-*` de `estilos.css`),
+  `js/componentes/adminUI.js`, `js/componentes/ajustes.js`,
+  `assets/img/iconos-admin.svg` y la página pública `#/restablecer`.
+- **Pendiente**: verificación de correo y celular, notificaciones, pasarela de
+  pagos (RF21) y configuración de envíos y pagos.

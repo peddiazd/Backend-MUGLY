@@ -209,7 +209,7 @@ dialog.visor img{display:block;max-width:100%;height:auto;margin:0 auto}
     <div>
       <div class="marca"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M8 15h20v10a9 9 0 0 1-9 9h-2a9 9 0 0 1-9-9z" fill="#fff"/><path d="M28 18h1.5a4.5 4.5 0 0 1 0 9H28" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/><path d="M18 29.5s-5.5-3.2-5.5-6.6a3 3 0 0 1 5.5-1.7 3 3 0 0 1 5.5 1.7c0 3.4-5.5 6.6-5.5 6.6z" fill="#F2C94C"/><path d="M14 5.5c-1.4 1.6 1.4 2.9 0 4.6M19 4c-1.4 1.6 1.4 2.9 0 4.6M24 5.5c-1.4 1.6 1.4 2.9 0 4.6" fill="none" stroke="#B7C5A4" stroke-width="2.2" stroke-linecap="round"/></svg>mugly</div>
       <h1>Informe del proyecto final</h1>
-      <p class="bajada">Análisis, diseño arquitectónico y desarrollo incremental de MUGLY, la tienda virtual de mugs: desde la atención inicial hasta la versión v1.2.0 en funcionamiento.</p>
+      <p class="bajada">Análisis, diseño arquitectónico y desarrollo incremental de MUGLY, la tienda virtual de mugs: desde la atención inicial hasta la versión v1.3.0 en funcionamiento.</p>
     </div>
     <figure class="pantalla">
       <div class="barra-nav" aria-hidden="true"><i></i><i></i><i></i></div>
@@ -223,7 +223,7 @@ dialog.visor img{display:block;max-width:100%;height:auto;margin:0 auto}
     <div><dt>Docente</dt><dd>Rodolfo Ortega Niño</dd></div>
     <div><dt>Institución</dt><dd>Universidad Cooperativa de Colombia</dd></div>
     <div><dt>Entrega</dt><dd>Sábado 21 de noviembre de 2026</dd></div>
-    <div><dt>Versión del software</dt><dd>v1.2.0 · migración b4f2c8a91d3e</dd></div>
+    <div><dt>Versión del software</dt><dd>v1.3.0 · migración c7e3a1d9f204</dd></div>
     <div><dt>Repositorio</dt><dd><a href="https://github.com/peddiazd/Backend-MUGLY">github.com/peddiazd/Backend-MUGLY</a></dd></div>
   </dl>
 </header>
@@ -286,6 +286,7 @@ dialog.visor img{display:block;max-width:100%;height:auto;margin:0 auto}
         <li><a href="#f5-trazabilidad">Diseño ↔ código</a></li>
         <li><a href="#f5-galeria">La aplicación en funcionamiento</a></li>
         <li><a href="#f5-panel">Incremento v1.2.0: panel administrativo</a></li>
+        <li><a href="#f5-v13">Incremento v1.3.0: rediseño del panel y datos de operación</a></li>
       </ol></li>
     <li><a href="#anexos">Anexos</a>
       <ol>
@@ -491,7 +492,7 @@ dialog.visor img{display:block;max-width:100%;height:auto;margin:0 auto}
   </div>
 
   <h3 id="f2-rf">2.3 Requisitos funcionales y trazabilidad</h3>
-  <p>La matriz MGL-REQ-002 relaciona cada requisito con su caso de uso, el acuerdo que lo precisa y su criterio de aceptación. La columna de implementación muestra dónde quedó cada uno en el código. RF23–RF28 se agregaron en la versión 1.1 de la matriz por la solicitud de cambio CR-01 (MGL-CR-001).</p>
+  <p>La matriz MGL-REQ-002 relaciona cada requisito con su caso de uso, el acuerdo que lo precisa y su criterio de aceptación. La columna de implementación muestra dónde quedó cada uno en el código. RF23–RF28 se agregaron en la versión 1.1 de la matriz por la solicitud de cambio CR-01 (MGL-CR-001), y RF29–RF35 en la versión 1.2 por la solicitud CR-02 (MGL-CR-002).</p>
   <div class="tabla-c ids"><table>
     <tr><th>RF</th><th>Requisito</th><th>CU</th><th>Acuerdo</th><th>Implementación</th><th>Estado</th></tr>
     <tr><td>RF01</td><td>Registrarse como cliente</td><td>CU01</td><td></td><td><code>POST /usuarios/registro</code> · página registro</td><td><span class="chip ok">Cumplido</span></td></tr>
@@ -523,6 +524,14 @@ dialog.visor img{display:block;max-width:100%;height:auto;margin:0 auto}
     <tr><td>RF26</td><td>Finanzas y reportes CSV</td><td>CU17</td><td>CR-01</td><td><code>/admin/reportes/*</code> · admin/finanzas</td><td><span class="chip ok">Cumplido</span></td></tr>
     <tr><td>RF27</td><td>Contenido de la tienda</td><td>CU16</td><td>CR-01</td><td>Dominio contenido · admin/contenido</td><td><span class="chip ok">Cumplido</span></td></tr>
     <tr><td>RF28</td><td>Configuración e inventario bajo</td><td>CU18, CU11</td><td>CR-01</td><td><code>/admin/configuracion</code> · admin/productos</td><td><span class="chip ok">Cumplido</span></td></tr>
+    <tr class="grupo"><td colspan="6">Solicitud de cambio CR-02 · versión v1.3.0</td></tr>
+    <tr><td>RF29</td><td>Datos de envío del cliente y gestión completa de clientes</td><td>CU13</td><td>CR-02</td><td><code>POST/DELETE /admin/usuarios</code> · enlace de acceso · <code>#/restablecer</code></td><td><span class="chip ok">Cumplido</span></td></tr>
+    <tr><td>RF30</td><td>Referencia y tipos de mug; estado de inventario</td><td>CU10, CU11</td><td>CR-02</td><td><code>/admin/tipos-producto</code> · admin/productos</td><td><span class="chip ok">Cumplido</span></td></tr>
+    <tr><td>RF31</td><td>Dirección en el pedido, archivo y personalizado completo</td><td>CU09, CU12</td><td>CR-02</td><td><code>/admin/pedidos/{id}/archivo</code> · personalizados</td><td><span class="chip ok">Cumplido</span></td></tr>
+    <tr><td>RF32</td><td>Reembolsos y devoluciones</td><td>CU12</td><td>CR-02</td><td><code>POST /admin/pedidos/{id}/reembolsos</code></td><td><span class="chip ok">Cumplido</span></td></tr>
+    <tr><td>RF33</td><td>Ventas por período y análisis por producto</td><td>CU17</td><td>CR-02</td><td><code>/admin/reportes/ventas</code> · <code>/admin/reportes/productos/{id}</code></td><td><span class="chip ok">Cumplido</span></td></tr>
+    <tr><td>RF34</td><td>Ajustes ordenados; nombre de la tienda aplicado; contraseña del administrador</td><td>CU18</td><td>CR-02</td><td><code>PATCH /usuarios/contrasena</code> · admin/configuracion · admin/cuenta</td><td><span class="chip ok">Cumplido</span></td></tr>
+    <tr><td>RF35</td><td>Panel compacto, filtros unificados y colores únicos</td><td>CU10–CU18</td><td>CR-02</td><td><code>css/admin.css</code> · <code>adminUI.js</code></td><td><span class="chip ok">Cumplido</span></td></tr>
   </table></div>
 
   <h3 id="f2-rnf">2.4 Requisitos no funcionales y reglas de negocio</h3>
@@ -543,6 +552,7 @@ dialog.visor img{display:block;max-width:100%;height:auto;margin:0 auto}
     <div class="tarjeta"><h4>Inventario (RN10–RN12)</h4><p>El stock refleja la disponibilidad, la compra confirmada lo descuenta y su gestión corresponde al administrador.</p></div>
     <div class="tarjeta"><h4>Personalizados (RN13–RN16)</h4><p>Siguen un proceso distinto: inician en MUGLY, se definen por WhatsApp fuera del sistema y el administrador registra el resultado.</p></div>
     <div class="tarjeta"><h4>Administración (RN17–RN18)</h4><p>El administrador gestiona productos, pedidos, clientes e inventario con funciones diferenciadas de las del cliente.</p></div>
+    <div class="tarjeta"><h4>Operación (RN22–RN27, CR-02)</h4><p>Solo se reembolsa un pedido pagado y nunca más de lo pagado; el reembolso total lo deja en «reembolsado». Ventas netas = confirmadas − reembolsos. Un cliente con pedidos no se borra, se desactiva. Archivar no cambia estado ni cifras. Un tipo de mug con productos no se elimina y la referencia es única.</p></div>
     <div class="tarjeta"><h4>Panel (RN19–RN21, CR-01)</h4><p>Las ventas confirmadas son los pedidos pagados, enviados o entregados, y los cancelados nunca suman. No se calcula utilidad sin costos registrados. Los clientes solo ven el contenido publicado.</p></div>
   </div>
   <p><strong>Restricciones y supuestos (MUGS.pdf §9):</strong> la pasarela y la transportadora no están seleccionadas; la conversación de WhatsApp ocurre fuera de MUGLY; el procesamiento del pago y la operación física de los envíos son responsabilidad de terceros. La pregunta abierta sobre la tecnología quedó resuelta por los requisitos de la asignatura (ADR-002), y la del mecanismo de confirmación del pago por el acuerdo D3.</p>
@@ -620,7 +630,7 @@ dialog.visor img{display:block;max-width:100%;height:auto;margin:0 auto}
     <div class="tarjeta"><h4>Herramientas</h4><ul><li><strong>Jira</strong> (proyecto MUG): backlog y Sprint</li><li><strong>GitHub</strong>: código, ramas y Pull Requests</li><li><strong>Google Drive</strong>: expediente documental</li><li><strong>Claude Code</strong>: asistente de IA, con toda salida revisada por el equipo</li></ul></div>
     <div class="tarjeta"><h4>Sprint</h4><p>Por el plazo se ejecutó un único Sprint corto, «MUGLY Sprint 1», del 19 al 21/11/2026, en lugar de Sprints de dos semanas. El tablero tenía las columnas Por hacer → En curso → En revisión → Listo, con un máximo de 2 tarjetas en curso.</p></div>
   </div>
-  <p>El backlog (MGL-BKL-001) se cargó en Jira con <strong>7 épicas</strong> (MUG-2 a MUG-8) y <strong>20 historias</strong> (MUG-9 a MUG-28). Las historias MUG-9 a MUG-12 ya estaban construidas antes del Sprint; las otras 16 se desarrollaron en él. La ampliación del panel administrativo de la versión v1.2.0 se registró como la solicitud de cambio <strong>CR-01</strong> (sección 5.9).</p>
+  <p>El backlog (MGL-BKL-001) se cargó en Jira con <strong>7 épicas</strong> (MUG-2 a MUG-8) y <strong>20 historias</strong> (MUG-9 a MUG-28). Las historias MUG-9 a MUG-12 ya estaban construidas antes del Sprint; las otras 16 se desarrollaron en él. La ampliación del panel administrativo de la versión v1.2.0 se registró como la solicitud de cambio <strong>CR-01</strong> (sección 5.9), y el rediseño de la versión v1.3.0 como la <strong>CR-02</strong>: épica MUG-37 con las historias MUG-38 a MUG-45 (sección 5.10).</p>
   <div class="tabla-c"><table>
     <tr><th>Épica</th><th>Historias</th><th>Ejemplo de criterio de aceptación</th></tr>
     <tr><td>Cuentas y clientes · MUG-2</td><td>MUG-9, MUG-17</td><td>Un cliente desactivado no puede iniciar sesión ni usar su token</td></tr>
@@ -744,7 +754,7 @@ dialog.visor img{display:block;max-width:100%;height:auto;margin:0 auto}
     <div class="lienzo">{{svg:bd_fisico}}</div>
     <figcaption><span><b>Figura 11. Modelo físico en MySQL 8.0.46.</b> Tipos, claves, índices y llaves foráneas tomados de <code>SHOW CREATE TABLE</code> sobre la base <code>mugly_db</code>.</span><button class="ampliar" type="button">Ampliar</button></figcaption>
   </figure>
-  <p><strong>Decisiones de modelado:</strong> el precio se copia en <code>detalles_pedido.precio_unitario</code> para que un cambio posterior de precio no altere pedidos antiguos (RN07). Los montos usan <code>DECIMAL(10,2)</code> para evitar errores de redondeo. El estado se guarda como texto validado por el servicio, en lugar de un ENUM de MySQL, para que añadir estados solo requiera cambiar código. El correo es único a nivel de base de datos. En v1.2.0 se agregó <code>contenido_bloques</code>: cada sección de la tienda guarda su <strong>borrador</strong> y su versión <strong>publicada</strong> en columnas JSON con la forma <code>{visible, orden, datos}</code>, porque cada sección tiene campos distintos y así una sección nueva no exige otra migración (ADR-009). Su llave foránea a <code>usuarios</code> usa <code>ON DELETE SET NULL</code> para no perder el contenido si se elimina al administrador que lo editó. Los reportes no crearon tablas: se calculan sobre los pedidos (ADR-010).</p>
+  <p><strong>Decisiones de modelado:</strong> el precio se copia en <code>detalles_pedido.precio_unitario</code> para que un cambio posterior de precio no altere pedidos antiguos (RN07). Los montos usan <code>DECIMAL(10,2)</code> para evitar errores de redondeo. El estado se guarda como texto validado por el servicio, en lugar de un ENUM de MySQL, para que añadir estados solo requiera cambiar código. El correo es único a nivel de base de datos. En v1.2.0 se agregó <code>contenido_bloques</code>: cada sección de la tienda guarda su <strong>borrador</strong> y su versión <strong>publicada</strong> en columnas JSON con la forma <code>{visible, orden, datos}</code>, porque cada sección tiene campos distintos y así una sección nueva no exige otra migración (ADR-009). Su llave foránea a <code>usuarios</code> usa <code>ON DELETE SET NULL</code> para no perder el contenido si se elimina al administrador que lo editó. Los reportes no crearon tablas: se calculan sobre los pedidos (ADR-010). En v1.3.0 (migración <code>c7e3a1d9f204</code>) se agregaron <code>tipos_producto</code> y <code>reembolsos_pedido</code>, el documento y la dirección en <code>perfiles</code>, la referencia y el tipo en <code>productos</code>, y en <code>pedidos</code> una copia de la dirección de envío (para que el pedido conserve a dónde se envió aunque el cliente cambie su perfil), la marca <code>archivado</code> y los datos acordados de los personalizados.</p>
 
   <h3 id="f3-api">3.8 Diseño de la API REST y comunicación entre componentes</h3>
   <div class="rejilla">
@@ -790,6 +800,23 @@ dialog.visor img{display:block;max-width:100%;height:auto;margin:0 auto}
   </table></div>
   <p><strong>Búsqueda paginada sin endpoints nuevos.</strong> <code>GET /admin/usuarios</code> y <code>GET /admin/pedidos</code> aceptan ahora parámetros (<code>q</code>, <code>estado</code>, <code>tipo</code>, <code>desde</code>, <code>hasta</code>, <code>orden</code>, <code>pagina</code>, <code>por_pagina</code>) validados con <code>BusquedaClientesDTO</code> y <code>BusquedaPedidosDTO</code>, y responden <code>{items, total, pagina, paginas}</code>. Sin parámetros siguen devolviendo la lista completa, así que los clientes anteriores de la API no se rompieron.</p>
   <p>En total son <strong>39 operaciones</strong>: 37 bajo <code>/api/v1</code> y 2 sin prefijo. La comunicación es <strong>síncrona</strong> (ADR-003): la SPA espera la respuesta de cada <code>fetch</code> y actualiza el DOM con el resultado. No hay colas ni eventos de servidor porque todas las operaciones son cortas y no existen integraciones asíncronas en esta versión.</p>
+
+  <h4>Endpoints agregados en v1.3.0 (CR-02)</h4>
+  <div class="tabla-c"><table>
+    <tr><th>Método</th><th>Ruta</th><th>Acceso</th><th>Uso</th><th>Respuestas</th></tr>
+    <tr><td><span class="metodo POST">POST</span></td><td><code>/admin/usuarios</code></td><td><span class="chip adm">Admin</span></td><td>Crear un cliente que compra por WhatsApp; devuelve el enlace de activación</td><td>201 · 400 · 401 · 403</td></tr>
+    <tr><td><span class="metodo DELETE">DELETE</span></td><td><code>/admin/usuarios/{id}</code></td><td><span class="chip adm">Admin</span></td><td>Eliminar un cliente sin pedidos (RN24)</td><td>204 · 400 · 404</td></tr>
+    <tr><td><span class="metodo POST">POST</span></td><td><code>/admin/usuarios/{id}/enlace-acceso</code></td><td><span class="chip adm">Admin</span></td><td>Enlace de un solo uso para crear o restablecer la contraseña</td><td>201 · 404</td></tr>
+    <tr><td><span class="metodo POST">POST</span></td><td><code>/usuarios/restablecer-contrasena</code></td><td><span class="chip pub">Público</span></td><td>El cliente guarda su contraseña con el enlace</td><td>200 · 400</td></tr>
+    <tr><td><span class="metodo PATCH">PATCH</span></td><td><code>/usuarios/contrasena</code></td><td><span class="chip cli">Token</span></td><td>Cambiar la contraseña propia</td><td>200 · 400 · 401</td></tr>
+    <tr><td><span class="metodo GET">GET</span> <span class="metodo POST">POST</span></td><td><code>/admin/tipos-producto</code></td><td><span class="chip adm">Admin</span></td><td>Listar y crear tipos de mug</td><td>200 · 201 · 409</td></tr>
+    <tr><td><span class="metodo PATCH">PATCH</span> <span class="metodo DELETE">DELETE</span></td><td><code>/admin/tipos-producto/{id}</code></td><td><span class="chip adm">Admin</span></td><td>Renombrar o eliminar un tipo sin productos (RN26)</td><td>200 · 204 · 409</td></tr>
+    <tr><td><span class="metodo PATCH">PATCH</span></td><td><code>/admin/pedidos/{id}/archivo</code></td><td><span class="chip adm">Admin</span></td><td>Archivar o restaurar un pedido cerrado (RN25)</td><td>200 · 400 · 404</td></tr>
+    <tr><td><span class="metodo POST">POST</span></td><td><code>/admin/pedidos/archivar-cerrados</code></td><td><span class="chip adm">Admin</span></td><td>Archivar todos los pedidos cerrados</td><td>200</td></tr>
+    <tr><td><span class="metodo POST">POST</span></td><td><code>/admin/pedidos/{id}/reembolsos</code></td><td><span class="chip adm">Admin</span></td><td>Registrar un reembolso o devolución (RN22)</td><td>201 · 400 · 404</td></tr>
+    <tr><td><span class="metodo GET">GET</span></td><td><code>/admin/reportes/productos/{id}</code></td><td><span class="chip adm">Admin</span></td><td>Análisis de ventas de un producto en el período</td><td>200 · 400 · 404</td></tr>
+  </table></div>
+  <p>Además, <code>GET /admin/pedidos</code> acepta <code>vista</code>, <code>estados</code>, <code>ciudad</code> y <code>tipo_mug</code>; <code>GET /admin/usuarios</code> acepta <code>ciudad</code> y busca por documento; y <code>GET /admin/reportes/ventas</code> agrupa por semana y devuelve el período anterior, los reembolsos y las ventas netas.</p>
 
   <h3 id="f3-seguridad">3.9 Diseño de seguridad</h3>
   <figure class="diagrama" data-titulo="Diseño de seguridad">
@@ -959,7 +986,7 @@ dialog.visor img{display:block;max-width:100%;height:auto;margin:0 auto}
     <li><strong>Ramas:</strong> <code>feature/MUG-&lt;n&gt;-&lt;resumen&gt;</code> por historia; integración con Pull Request a <code>main</code>.</li>
     <li><strong>Commits:</strong> estilo convencional (<code>feat</code>, <code>fix</code>, <code>refactor</code>, <code>docs</code>) con la clave de Jira, por ejemplo <code>feat(frontend): carrito, confirmacion del pedido y mis pedidos (MUG-22, MUG-23)</code>.</li>
     <li><strong>Código:</strong> nombres en español alineados con el dominio (pedido, producto, estado), sin dependencias innecesarias.</li>
-    <li><strong>Versionado:</strong> etiquetas semánticas: <code>v1.0.0</code> (funcionalidad del Sprint 1), <code>v1.1.0</code> (rediseño visual) y <code>v1.2.0</code> (panel administrativo).</li>
+    <li><strong>Versionado:</strong> etiquetas semánticas: <code>v1.0.0</code> (funcionalidad del Sprint 1), <code>v1.1.0</code> (rediseño visual), <code>v1.2.0</code> (panel administrativo) y <code>v1.3.0</code> (rediseño del panel y datos de operación).</li>
   </ul>
 
   <h3 id="f4-ejecucion">4.5 Instalación y ejecución</h3>
@@ -982,7 +1009,7 @@ dialog.visor img{display:block;max-width:100%;height:auto;margin:0 auto}
       <p>Cómo se construyó MUGLY por incrementos y cómo el código implementa la arquitectura diseñada.</p>
     </div>
   </div>
-  <div class="evidencia"><span class="doc">Jira · MUGLY Sprint 1</span><span class="doc">PR #1</span><span class="doc">PR #2</span><span class="doc">PR #5</span><span class="doc">PR #6</span><span class="doc">v1.0.0</span><span class="doc">v1.1.0</span><span class="doc">v1.2.0</span><span class="doc">MGL-TST-001</span><span class="doc">MGL-CR-001</span><span class="doc">MGL-REL-002</span></div>
+  <div class="evidencia"><span class="doc">Jira · MUGLY Sprint 1</span><span class="doc">PR #1</span><span class="doc">PR #2</span><span class="doc">PR #5</span><span class="doc">PR #6</span><span class="doc">v1.0.0</span><span class="doc">v1.1.0</span><span class="doc">v1.2.0</span><span class="doc">MGL-TST-001</span><span class="doc">MGL-CR-001</span><span class="doc">MGL-REL-002</span><span class="doc">v1.3.0</span><span class="doc">MGL-CR-002</span><span class="doc">MGL-REL-003</span></div>
 
   <h3 id="f5-incrementos">5.1 Incrementos</h3>
   <ol class="linea-tiempo">
@@ -995,6 +1022,7 @@ dialog.visor img{display:block;max-width:100%;height:auto;margin:0 auto}
     <li><time>20/11</time><div>Informe del proyecto y diagramas de arquitectura · <b>PR #3</b>; limpieza de código sin uso · <b>PR #4</b>.</div></li>
     <li><time>20/11</time><div><b>Rediseño visual y presentación del producto con scroll</b>: paleta oficial, Catálogo y Nosotros como páginas propias, escenas con scroll en Inicio y Personalizados, mockups de producto y tarjeta reutilizable · <b>PR #5</b> (<code>c57a3b4</code>) · versión <b>v1.1.0</b>.</div></li>
     <li class="nuevo"><time>21/11</time><div><b>Panel administrativo completo</b> (CR-01): dominios <b>contenido</b> y <b>reportes</b>, búsqueda paginada, finanzas internas, contenido con borrador y publicación, configuración y experiencia de administrador separada · <b>PR #6</b> (<code>445cbf3</code>) · versión <b>v1.2.0</b>.</div></li>
+      <li class="nuevo"><time>21/11</time><div><b>Rediseño del panel y datos de operación</b> (CR-02): prototipo navegable aprobado en siete rondas, datos de envío, tipos de mug, archivo, reembolsos, análisis de ventas, ajustes y una sola paleta de color para tienda y panel · versión <b>v1.3.0</b>.</div></li>
   </ol>
 
   <h3 id="f5-sprint">5.2 Historias del Sprint y su resultado</h3>
@@ -1022,8 +1050,8 @@ dialog.visor img{display:block;max-width:100%;height:auto;margin:0 auto}
   <h3 id="f5-recorrido">5.3 Recorrido completo de una funcionalidad: confirmar el pago</h3>
   <p>Esta funcionalidad atraviesa todas las capas y aplica las reglas más importantes del negocio (D1, D3, RF16 y RNF05). Sigue la secuencia de la <a href="#f3-uml">figura 8</a>.</p>
   <ol class="pasos">
-    <li><strong>Interfaz (SPA).</strong> En <code>admin/pedidos.js</code> el administrador pulsa «Confirmar pago». Un modal reutilizable (<code>confirmar()</code> de <code>ui.js</code>) pide confirmación y luego se llama a <code>api()</code> con <code>PATCH</code> y <code>{estado: 'pagado'}</code>.
-{{codigo:js:frontend/js/paginas/admin/pedidos.js:case 'pagar':=>break;}}</li>
+    <li><strong>Interfaz (SPA).</strong> En <code>admin/pedidos.js</code> el administrador abre el menú ⋯ del pedido y elige «Confirmar pago». Un diálogo reutilizable (<code>confirmarAccion()</code> de <code>adminUI.js</code>, v1.3.0) pide confirmación y luego se llama a <code>api()</code> con <code>PATCH</code> y <code>{estado: 'pagado'}</code>.
+{{codigo:js:frontend/js/paginas/admin/pedidos.js:    pagar:=>marcado como pagado}}</li>
     <li><strong>Cliente HTTP.</strong> <code>api.js</code> agrega el token Bearer, serializa el cuerpo, hace el <code>fetch</code> asíncrono y convierte los errores en <code>ApiError</code>. Ante un 401 emite el evento que cierra la sesión.
 {{codigo:js:frontend/js/api.js:export async function api(=>return datos?.data}}</li>
     <li><strong>Seguridad.</strong> El decorador valida el JWT, busca al usuario en la base y exige el rol de administrador. Si no lo es, la excepción se traduce en 403.
@@ -1133,7 +1161,7 @@ dialog.visor img{display:block;max-width:100%;height:auto;margin:0 auto}
 {{codigo:python:backend/app/dominios/contenido/servicios.py:def publicar(self, admin_id):=>return self.listar_admin()}}
   <h4>Frontend: búsqueda con espera de 300 ms</h4>
   <p>La página de clientes no consulta con cada tecla: reinicia un temporizador y consulta 300 ms después de la última. Los selectores consultan de inmediato.</p>
-{{codigo:js:frontend/js/paginas/admin/clientes.js:// Filtros: escribir espera 300 ms=>espera = setTimeout(buscar}}
+{{codigo:js:frontend/js/paginas/admin/clientes.js:cont.querySelector('#cq').addEventListener=>espera = setTimeout(}}
   <div class="nota verde"><b>Cómo se ve en la pestaña Network.</b> Al escribir «cliente» en Clientes aparece una sola petición <code>GET /api/v1/admin/usuarios?q=cliente&amp;pagina=1&amp;por_pagina=20…</code> con <code>Authorization: Bearer …</code>; la respuesta <code>200</code> trae <code>items</code>, <code>total</code> y <code>paginas</code>, sin contraseñas. En Finanzas, «Consultar» envía <code>GET /api/v1/admin/reportes/ventas?desde=2026-11-01&amp;hasta=2026-11-21&amp;agrupar=dia</code>; con fechas invertidas la respuesta es <code>400</code>.</div>
   <div class="nota ambar"><b>Limitaciones conocidas.</b> El pago sigue confirmándose a mano (no hay pasarela). Las imágenes que se quitan del contenido no se borran de <code>uploads/</code>. El bloqueo de compra del administrador es de interfaz: la API aún le permite crear pedidos con su token.</div>
   <h4>El panel en funcionamiento</h4>
@@ -1145,6 +1173,30 @@ dialog.visor img{display:block;max-width:100%;height:auto;margin:0 auto}
     <figure class="captura"><img src="{{img:18-admin-inventario.jpg}}" alt="Panel · productos e inventario: Filtro de inventario bajo y aviso por producto según el umbral configurado." width="1152" height="548" loading="lazy"><figcaption><span><b>Captura 18. Panel · productos e inventario.</b> Filtro de inventario bajo y aviso por producto según el umbral configurado.</span></figcaption></figure>
     <figure class="captura"><img src="{{img:19-admin-configuracion.jpg}}" alt="Panel · configuración: Nombre, WhatsApp y umbral de inventario, aplicados de inmediato." width="1152" height="548" loading="lazy"><figcaption><span><b>Captura 19. Panel · configuración.</b> Nombre, WhatsApp y umbral de inventario, aplicados de inmediato.</span></figcaption></figure>
     <figure class="captura"><img src="{{img:20-tienda-como-admin.jpg}}" alt="La tienda vista por el administrador: Barra de regreso al panel y sin carrito: el administrador gestiona, no compra." width="1152" height="548" loading="lazy"><figcaption><span><b>Captura 20. La tienda vista por el administrador.</b> Barra de regreso al panel y sin carrito: el administrador gestiona, no compra.</span></figcaption></figure>
+  </div>
+
+  <h3 id="f5-v13">5.10 Incremento v1.3.0: rediseño del panel y datos de operación</h3>
+  <p>Al usar el panel v1.2.0 los propietarios pidieron un panel más compacto y datos que faltaban para operar: documento y dirección del cliente, tipos de mug, devoluciones, archivo de pedidos y un análisis de ventas más completo. Se registró como la <strong>solicitud de cambio CR-02</strong> (MGL-CR-002) y se aplicó el mismo método: auditoría del panel, un <strong>prototipo navegable</strong> revisado en siete rondas y, con la aprobación, la implementación sobre la misma arquitectura.</p>
+  <div class="dos-col">
+    <div class="tarjeta"><h4>Hallazgos de la auditoría</h4><ul><li>El perfil no guardaba documento ni dirección, y el pedido no guardaba a dónde se envió</li><li>No había reembolsos ni forma de sacar de la vista los pedidos cerrados</li><li>El nombre de la tienda se guardaba pero la tienda no lo usaba</li><li>Los colores de estado del panel no coincidían con los de la tienda</li><li>Botones grandes con texto y acciones repetidas en fila y ficha</li></ul></div>
+    <div class="tarjeta primario"><h4>Qué se construyó</h4><ul><li>Acciones en menú ⋯, filtros en un solo botón y período personalizado</li><li>Clientes con datos de envío, alta por WhatsApp y enlaces de contraseña</li><li>Referencia, tipos de mug y columna de inventario</li><li>Archivo de pedidos y reembolsos con reingreso al inventario</li><li>Ventas por período, comparación y análisis por producto</li><li>Ajustes ordenados y una sola paleta para tienda y panel</li></ul></div>
+  </div>
+  <h4>Backend: el reembolso respeta lo pagado</h4>
+  <p>El servicio bloquea la fila del pedido, solo acepta pedidos con pago confirmado, no deja reembolsar más de lo disponible y, si se reembolsa todo, cambia el estado a «reembolsado». La devolución puede reingresar las unidades al inventario (RN22).</p>
+{{codigo:python:backend/app/dominios/pedidos/servicios.py:def reembolsar(self, pedido_id, admin_id, datos):=>db.session.commit()}}
+  <h4>Backend: enlaces de un solo uso sin servicio de correo</h4>
+  <p>El enlace es un token firmado que incluye una huella del hash actual de la contraseña: al cambiarla, la huella deja de coincidir y el enlace ya no sirve. El administrador lo copia y lo envía por WhatsApp, como el resto de la atención (D3).</p>
+{{codigo:python:backend/app/dominios/usuarios/servicios.py:def generar_enlace_acceso(self, usuario_id, tipo="restablecer"):=>"vence": vence.isoformat()}}
+  <div class="nota verde"><b>Una sola paleta.</b> <code>css/admin.css</code> no define colores propios: usa los tokens <code>--mg-*</code> de <code>estilos.css</code>, los mismos de la tienda. Se agregaron tokens para los tonos que estaban escritos a mano (amarillo 800, tinta tenue, neutro y error) y el estado «reembolsado». Todos los pares de texto pasan el contraste mínimo de 4,5:1.</div>
+  <div class="nota ambar"><b>Pendiente (fuera del alcance).</b> Verificación de correo y celular con código, notificaciones por correo, pasarela de pagos (RF21, D8) y configuración de envíos y pagos: necesitan servicios que no están aprobados. El costo de envío se sigue acordando por WhatsApp.</div>
+  <h4>El panel v1.3.0 en funcionamiento</h4>
+  <div class="galeria">
+    <figure class="captura"><img src="{{img:21-admin-inicio-v13.jpg}}" alt="Panel v1.3.0 · inicio con selector de período" width="1152" height="548" loading="lazy"><figcaption><span><b>Captura 21. Inicio.</b> Indicadores del período elegido y lo que requiere atención.</span><button class="ampliar" type="button">Ampliar</button></figcaption></figure>
+    <figure class="captura"><img src="{{img:22-admin-pedidos-v13.jpg}}" alt="Panel v1.3.0 · pedidos con el detalle en panel lateral" width="1152" height="548" loading="lazy"><figcaption><span><b>Captura 22. Pedidos.</b> Tabla compacta, vistas Activos y Archivo y detalle con pestaña de reembolsos.</span><button class="ampliar" type="button">Ampliar</button></figcaption></figure>
+    <figure class="captura"><img src="{{img:23-admin-productos-v13.jpg}}" alt="Panel v1.3.0 · productos con referencia y columna de inventario" width="1152" height="548" loading="lazy"><figcaption><span><b>Captura 23. Productos.</b> Referencia, tipo, stock con − / + y estado de inventario propio.</span><button class="ampliar" type="button">Ampliar</button></figcaption></figure>
+    <figure class="captura"><img src="{{img:24-admin-clientes-v13.jpg}}" alt="Panel v1.3.0 · clientes con documento y ciudad" width="1152" height="548" loading="lazy"><figcaption><span><b>Captura 24. Clientes.</b> Documento, ciudad, alta por WhatsApp y acciones en el menú ⋯.</span><button class="ampliar" type="button">Ampliar</button></figcaption></figure>
+    <figure class="captura"><img src="{{img:25-admin-finanzas-v13.jpg}}" alt="Panel v1.3.0 · ventas por período con comparación" width="1152" height="548" loading="lazy"><figcaption><span><b>Captura 25. Finanzas.</b> Ventas por período comparadas con el período anterior.</span><button class="ampliar" type="button">Ampliar</button></figcaption></figure>
+    <figure class="captura"><img src="{{img:26-admin-configuracion-v13.jpg}}" alt="Panel v1.3.0 · configuración, guía de color" width="1152" height="548" loading="lazy"><figcaption><span><b>Captura 26. Configuración.</b> Estructura de ajustes y guía de color única para tienda y panel.</span><button class="ampliar" type="button">Ampliar</button></figcaption></figure>
   </div>
 </section>
 

@@ -44,7 +44,7 @@ class UsuarioRepositorio:
         db.session.commit()
 
     @staticmethod
-    def buscar_clientes(q="", estado="todos", pedidos="todos", registro="todos", orden="recientes"):
+    def buscar_clientes(q="", estado="todos", pedidos="todos", registro="todos", orden="recientes", ciudad=""):
         """Consulta de clientes con su número de pedidos y su compra confirmada.
 
         Filtra y ordena en la base (no en el navegador) para que escale con
@@ -81,11 +81,16 @@ class UsuarioRepositorio:
                 PerfilUsuario.nombre.ilike(patron),
                 PerfilUsuario.apellido.ilike(patron),
                 PerfilUsuario.telefono.ilike(patron),
+                PerfilUsuario.numero_documento.ilike(patron),
+                PerfilUsuario.ciudad.ilike(patron),
                 (PerfilUsuario.nombre + " " + PerfilUsuario.apellido).ilike(patron),
             ]
             if texto.lstrip("#").isdigit():
                 condiciones.append(Usuario.id == int(texto.lstrip("#")))
             consulta = consulta.filter(or_(*condiciones))
+
+        if ciudad:
+            consulta = consulta.filter(PerfilUsuario.ciudad == ciudad)
 
         if estado == "activos":
             consulta = consulta.filter(Usuario.activo.is_(True))
@@ -111,3 +116,14 @@ class UsuarioRepositorio:
             consulta = consulta.order_by(Usuario.fecha_creacion.desc(), Usuario.id.desc())
 
         return consulta
+
+    @staticmethod
+    def eliminar_usuario(usuario):
+        """Borra un usuario y su perfil (solo clientes sin pedidos, RN24)."""
+        db.session.delete(usuario)
+        db.session.commit()
+
+    @staticmethod
+    def contar_pedidos(usuario_id):
+        from app.dominios.pedidos.modelos import Pedido
+        return db.session.query(Pedido).filter_by(usuario_id=usuario_id).count()

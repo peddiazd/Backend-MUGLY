@@ -3,6 +3,8 @@ from decimal import Decimal
 
 from marshmallow import Schema, fields, validate
 
+REFERENCIA = validate.Regexp(r"^[A-Za-z0-9-]{2,30}$", error="Use letras, números y guiones (2 a 30).")
+
 
 class CrearProductoDTO(Schema):
     """DTO para validar la creación de un producto."""
@@ -28,6 +30,10 @@ class CrearProductoDTO(Schema):
         load_default=0,
         validate=validate.Range(min=0),
     )
+
+    # RF30 (CR-02): referencia única y tipo de mug
+    referencia = fields.String(load_default=None, allow_none=True, validate=REFERENCIA)
+    tipo_id = fields.Integer(load_default=None, allow_none=True, validate=validate.Range(min=1))
 
 
 class ActualizarProductoDTO(Schema):
@@ -61,3 +67,13 @@ class ActualizarProductoDTO(Schema):
         validate=validate.Range(min=0),
         allow_none=True,
     )
+
+    referencia = fields.String(load_default=None, allow_none=True, validate=REFERENCIA)
+    tipo_id = fields.Integer(load_default=None, allow_none=True, validate=validate.Range(min=1))
+
+
+class TipoProductoDTO(Schema):
+    """Crear o editar un tipo de mug (RF30)."""
+
+    nombre = fields.String(required=True, validate=validate.Length(min=1, max=40))
+    descripcion = fields.String(load_default=None, allow_none=True, validate=validate.Length(max=120))

@@ -19,6 +19,8 @@ export async function cargarConfiguracionTienda() {
   try {
     const c = await obtenerContenido();
     if (c?.tienda?.whatsapp) CONFIG.WHATSAPP = c.tienda.whatsapp;
+    if (c?.tienda?.nombre) CONFIG.NOMBRE = c.tienda.nombre;
+    document.title = `${CONFIG.NOMBRE} · Tienda de mugs`;
   } catch {
     /* la tienda sigue funcionando con los valores por defecto */
   }

@@ -44,3 +44,38 @@ class ProductoRepositorio:
         """Elimina un producto de la base de datos."""
         db.session.delete(producto)
         db.session.commit()
+
+
+class TipoProductoRepositorio:
+    """Acceso a datos de los tipos de mug (RF30)."""
+
+    @staticmethod
+    def listar():
+        from app.dominios.productos.modelos import TipoProducto
+        return db.session.query(TipoProducto).order_by(TipoProducto.id).all()
+
+    @staticmethod
+    def obtener(tipo_id):
+        from app.dominios.productos.modelos import TipoProducto
+        return db.session.get(TipoProducto, tipo_id)
+
+    @staticmethod
+    def por_nombre(nombre):
+        from sqlalchemy import func
+        from app.dominios.productos.modelos import TipoProducto
+        return db.session.query(TipoProducto).filter(func.lower(TipoProducto.nombre) == nombre.lower()).first()
+
+    @staticmethod
+    def contar_productos(tipo_id):
+        return db.session.query(Producto).filter_by(tipo_id=tipo_id).count()
+
+    @staticmethod
+    def guardar(tipo):
+        db.session.add(tipo)
+        db.session.commit()
+        return tipo
+
+    @staticmethod
+    def eliminar(tipo):
+        db.session.delete(tipo)
+        db.session.commit()

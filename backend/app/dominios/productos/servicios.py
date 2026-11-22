@@ -3,11 +3,33 @@ import os
 
 from app.archivos import EXTENSIONES_IMAGEN, ImagenInvalidaError, guardar_imagen  # noqa: F401
 from app.dominios.productos.modelos import Producto
-from app.dominios.productos.repositorios import ProductoRepositorio
+from app.dominios.productos.modelos import TipoProducto
+from app.dominios.productos.repositorios import ProductoRepositorio, TipoProductoRepositorio
 
 
 class ProductoNoEncontradoError(Exception):
     """Error cuando un producto no existe."""
+
+
+class DatoDuplicadoError(Exception):
+    """Referencia o nombre de tipo ya usado (RN27)."""
+
+
+class TipoEnUsoError(Exception):
+    """Un tipo de mug con productos no se puede eliminar (RN26)."""
+
+
+def _validar_producto(datos, producto_id=None):
+    """Referencia única (RN27) y tipo existente."""
+    from app import db
+    ref = (datos.get("referencia") or "").strip().upper() or None
+    if ref:
+        otro = db.session.query(Producto).filter_by(referencia=ref).first()
+        if otro and otro.id != producto_id:
+            raise DatoDuplicadoError(f"La referencia {ref} ya existe.")
+        datos["referencia"] = ref
+    if datos.get("tipo_id") is not None and not TipoProductoRepositorio.obtener(datos["tipo_id"]):
+        raise ProductoNoEncontradoError(f"El tipo de mug {datos['tipo_id']} no existe.")
 
 
 class ProductoServicio:
@@ -15,7 +37,10 @@ class ProductoServicio:
 
     def crear_producto(self, datos):
         """Crea un producto nuevo."""
+        _validar_producto(datos)
         producto = Producto(
+            referencia=datos.get("referencia"),
+            tipo_id=datos.get("tipo_id"),
             nombre=datos["nombre"],
             descripcion=datos["descripcion"],
             precio=datos["precio"],
@@ -49,8 +74,11 @@ class ProductoServicio:
     def actualizar_producto(self, producto_id, datos):
         """Actualiza parcialmente un producto."""
         producto = self._obtener(producto_id)
+        _validar_producto(datos, producto_id)
 
         for campo in (
+            "referencia",
+            "tipo_id",
             "nombre",
             "descripcion",
             "precio",
@@ -118,3 +146,41 @@ class ProductoServicio:
             )
 
         return producto
+
+
+class TipoProductoServicio:
+    """Tipos de mug administrables (RF30, RN26)."""
+
+    def listar(self):
+        return [dict(t.to_dict(), productos=TipoProductoRepositorio.contar_productos(t.id))
+                for t in TipoProductoRepositorio.listar()]
+
+    def _unico(self, nombre, tipo_id=None):
+        otro = TipoProductoRepositorio.por_nombre(nombre)
+        if otro and otro.id != tipo_id:
+            raise DatoDuplicadoError(f"Ya existe el tipo “{nombre}”.")
+
+    def crear(self, datos):
+        nombre = datos["nombre"].strip()
+        self._unico(nombre)
+        tipo = TipoProductoRepositorio.guardar(TipoProducto(nombre=nombre, descripcion=datos.get("descripcion")))
+        return dict(tipo.to_dict(), productos=0)
+
+    def actualizar(self, tipo_id, datos):
+        tipo = TipoProductoRepositorio.obtener(tipo_id)
+        if not tipo:
+            raise ProductoNoEncontradoError(f"El tipo de mug {tipo_id} no existe.")
+        nombre = datos["nombre"].strip()
+        self._unico(nombre, tipo_id)
+        tipo.nombre, tipo.descripcion = nombre, datos.get("descripcion")
+        TipoProductoRepositorio.guardar(tipo)
+        return dict(tipo.to_dict(), productos=TipoProductoRepositorio.contar_productos(tipo_id))
+
+    def eliminar(self, tipo_id):
+        tipo = TipoProductoRepositorio.obtener(tipo_id)
+        if not tipo:
+            raise ProductoNoEncontradoError(f"El tipo de mug {tipo_id} no existe.")
+        n = TipoProductoRepositorio.contar_productos(tipo_id)
+        if n:
+            raise TipoEnUsoError(f"No se puede eliminar: lo usan {n} producto(s).")
+        TipoProductoRepositorio.eliminar(tipo)

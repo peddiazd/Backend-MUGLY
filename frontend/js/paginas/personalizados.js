@@ -52,7 +52,7 @@ export async function render(app, { query = {} } = {}) {
   desmontarEscena();
   instalarDefinicionesMug();
   const estilo = ESTILOS.find((e) => e.id === query.estilo && e.id !== 'personalizado');
-  const base = estilo ? `Hola MUGLY, me interesa un mug estilo ${estilo.nombre} (${estilo.diseno}).` : 'Hola MUGLY, quiero un mug personalizado.';
+  const base = estilo ? `Hola ${CONFIG.NOMBRE}, me interesa un mug estilo ${estilo.nombre} (${estilo.diseno}).` : `Hola ${CONFIG.NOMBRE}, quiero un mug personalizado.`;
   const mensaje = estado.usuario ? `${base} Mi cuenta es ${estado.usuario.correo}.` : base;
   const whatsapp = esc(enlaceWhatsApp(CONFIG.WHATSAPP, mensaje));
   const fin = INICIO + SECUENCIA.length * PASO;

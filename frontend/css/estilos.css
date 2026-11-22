@@ -27,6 +27,15 @@
   --mg-tinta-suave: #575C54;
   --mg-borde: #E3E8DC;
 
+  /* Tonos con nombre propio (CR-02): antes estaban escritos a mano */
+  --mg-amarillo-800: #6B5208;  /* texto sobre fondos amarillos */
+  --mg-tinta-tenue: #6B7067;   /* fechas, ayudas */
+  --mg-neutro-50: #F1F1EF;     /* estados cerrados: cancelado, retirado, desactivado */
+  /* Único color fuera de la paleta: errores, eliminar y "agotado" */
+  --mg-error: #9F4642;
+  --mg-error-50: #FBE9E6;
+  --mg-error-hover: #8E3B3B;
+
   /* Nombres usados por páginas existentes */
   --mg-primario: var(--mg-verde);
   --mg-texto: var(--mg-tinta);
@@ -243,14 +252,14 @@ a.mg-tarjeta.border-primary { background: var(--mg-salvia-50); }
 .table-hover > tbody > tr:hover > * { --bs-table-bg-state: var(--mg-salvia-50); }
 .table-responsive { border-radius: 18px; }
 .alert { border-radius: 16px; border: 0; }
-.alert-danger { background: #FBE9E6; color: #8E3B3B; }
-.alert-warning { background: var(--mg-amarillo-50); color: #6B5208; }
+.alert-danger { background: var(--mg-error-50); color: var(--mg-error-hover); }
+.alert-warning { background: var(--mg-amarillo-50); color: var(--mg-amarillo-800); }
 .alert-info, .alert-primary { background: var(--mg-salvia-50); color: var(--mg-verde); }
 .alert-success { background: var(--mg-salvia-100); color: var(--mg-verde-700); }
 .toast { border-radius: 16px; box-shadow: var(--mg-sombra-alta); border: 0 !important; font-weight: 600; }
 .toast.text-bg-success { background: var(--mg-verde) !important; color: #fff !important; }
 .toast.text-bg-warning { background: var(--mg-amarillo-50) !important; color: var(--mg-tinta) !important; }
-.toast.text-bg-danger { background: #FBE9E6 !important; color: #8E3B3B !important; }
+.toast.text-bg-danger { background: var(--mg-error-50) !important; color: var(--mg-error-hover) !important; }
 .toast.text-bg-warning .btn-close-white, .toast.text-bg-danger .btn-close-white { filter: none; }
 .modal-content { border: 0; border-radius: 24px; box-shadow: 0 30px 80px rgba(41, 41, 41, .25); }
 .modal-header, .modal-footer { border-color: var(--mg-borde); }
@@ -261,122 +270,21 @@ a.mg-tarjeta.border-primary { background: var(--mg-salvia-50); }
 /* ---------------------------------------------------------------- Estados del pedido */
 .estado { display: inline-flex; align-items: center; gap: .45rem; font-size: .82rem; font-weight: 700; padding: .38rem .8rem; border-radius: 999px; }
 .estado::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
-.estado-pendiente { background: var(--mg-amarillo-50); color: #6B5208; }
+.estado-pendiente { background: var(--mg-amarillo-50); color: var(--mg-amarillo-800); }
 .estado-pagado { background: var(--mg-salvia-100); color: var(--mg-verde); }
 .estado-enviado { background: var(--mg-verde); color: #fff; }
 .estado-entregado { background: var(--mg-salvia); color: var(--mg-verde-700); }
-.estado-cancelado { background: #F1F1EF; color: var(--mg-tinta-suave); }
+.estado-cancelado { background: var(--mg-neutro-50); color: var(--mg-tinta-suave); }
+.estado-reembolsado { background: var(--mg-blanco); color: var(--mg-tinta); box-shadow: inset 0 0 0 1px var(--mg-salvia-300); }
 .mg-progreso { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .5rem; list-style: none; padding: 0; margin: 0; }
 .mg-progreso .barra { height: 8px; border-radius: 4px; background: var(--mg-salvia-100); }
 .mg-progreso .hecho .barra { background: var(--mg-verde); }
 
 /* ---------------------------------------------------------------- Administración
- * Experiencia propia del administrador: sin el menú ni el pie de la tienda.
- * body.modo-admin se activa en las rutas /admin.
- */
-body.modo-admin #encabezado, body.modo-admin #pie { display: none; }
-body.modo-admin { background: #F6F8F2; }
-.mg-admin { display: grid; grid-template-columns: 252px minmax(0, 1fr); min-height: 100vh; }
-.mg-admin-menu { background: var(--mg-verde); color: #E5ECDD; display: flex; flex-direction: column; padding: 1.1rem .75rem; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
-.mg-admin-marca { display: flex; align-items: center; gap: .5rem; padding: .25rem .6rem 1.2rem; color: #fff; text-decoration: none; font: 800 1.5rem/1 var(--mg-fuente-titulos); letter-spacing: -.035em; }
-.mg-admin-marca:hover { color: #fff; }
-.mg-admin-marca svg { width: 34px; height: 34px; }
-.mg-admin-marca small { font: 800 .68rem var(--mg-fuente-texto); letter-spacing: 0; background: var(--mg-amarillo); color: var(--mg-tinta); border-radius: 6px; padding: .15rem .4rem; }
-.mg-admin-menu .mg-admin-titulo { font-size: .74rem; font-weight: 700; color: #A9BCA0; padding: .9rem .75rem .35rem; margin: 0; }
-.mg-admin-menu a.mg-admin-enlace { display: flex; align-items: center; gap: .7rem; color: #DDE5D3; text-decoration: none; padding: .62rem .8rem; border-radius: 12px; margin-bottom: .15rem; font-weight: 600; font-size: .98rem; transition: background-color 150ms ease, color 150ms ease; }
-.mg-admin-menu a.mg-admin-enlace svg { width: 19px; height: 19px; flex: none; }
-@media (hover: hover) and (pointer: fine) { .mg-admin-menu a.mg-admin-enlace:hover { background: rgba(255, 255, 255, .09); color: #fff; } }
-.mg-admin-menu a.mg-admin-enlace.active { background: #fff; color: var(--mg-verde); }
-.mg-admin-menu .mg-admin-pie { margin-top: auto; border-top: 1px solid rgba(255, 255, 255, .14); padding-top: .6rem; }
-.mg-admin-menu button.mg-admin-enlace { all: unset; box-sizing: border-box; display: flex; align-items: center; gap: .7rem; width: 100%; color: #DDE5D3; padding: .62rem .8rem; border-radius: 12px; font-weight: 600; cursor: pointer; }
-.mg-admin-menu button.mg-admin-enlace svg { width: 19px; height: 19px; }
-.mg-admin-menu button.mg-admin-enlace:hover, .mg-admin-menu button.mg-admin-enlace:focus-visible { background: rgba(255, 255, 255, .09); color: #fff; }
-.mg-admin-principal { min-width: 0; display: flex; flex-direction: column; }
-.mg-admin-cabecera { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; gap: 1rem; padding: .75rem clamp(1rem, 2.5vw, 2rem); background: #fff; border-bottom: 1px solid var(--mg-borde); }
-.mg-admin-cabecera form { flex: 1; max-width: 460px; }
-.mg-admin-cabecera input[type=search] { min-height: 42px; border-radius: 999px; padding-left: 2.6rem; background: var(--mg-salvia-50) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='17' height='17' fill='none' stroke='%23575C54' stroke-width='2' stroke-linecap='round' viewBox='0 0 24 24'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m20 20-3.5-3.5'/%3E%3C/svg%3E") no-repeat 1rem center; font-size: .95rem; }
-.mg-admin-cabecera .mg-admin-acciones { margin-left: auto; display: flex; align-items: center; gap: .6rem; }
-.mg-admin-menu-movil { display: none; }
-.mg-admin-contenido { padding: 1.6rem clamp(1rem, 2.5vw, 2rem) 3rem; min-width: 0; }
-.mg-admin-contenido h1 { font-size: clamp(1.7rem, 1.4rem + 1vw, 2.1rem); margin: 0; }
-.mg-admin-encabezado { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: .8rem 1rem; margin-bottom: 1.25rem; }
-.mg-admin-encabezado p { margin: .25rem 0 0; color: var(--mg-tinta-suave); }
-.mg-admin table td, .mg-admin table th { vertical-align: middle; }
-.mg-admin .table-responsive { background: #fff; border: 1px solid var(--mg-borde); padding: .3rem .5rem; }
-.mg-admin .table > :not(caption) > * > * { background-color: transparent; }
-
-/* Tarjetas de indicadores y paneles */
-.mg-kpis { display: grid; grid-template-columns: repeat(auto-fill, minmax(175px, 1fr)); gap: .8rem; margin-bottom: 1rem; }
-.mg-kpi { background: #fff; border: 1px solid var(--mg-borde); border-radius: 16px; padding: .9rem 1rem; }
-.mg-kpi span { font-size: .84rem; color: var(--mg-tinta-suave); font-weight: 600; }
-.mg-kpi b { display: block; font: 800 1.5rem/1.15 var(--mg-fuente-titulos); color: var(--mg-tinta); margin: .25rem 0 .1rem; font-variant-numeric: tabular-nums; }
-.mg-kpi small { color: var(--mg-tinta-suave); font-size: .8rem; }
-.mg-kpi.alerta { background: var(--mg-amarillo-50); border-color: #F1E3B3; }
-.mg-paneles { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 1rem; margin-bottom: 1rem; }
-.mg-panel { background: #fff; border: 1px solid var(--mg-borde); border-radius: 18px; padding: 1.1rem 1.2rem; min-width: 0; }
-.mg-panel-cab { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .5rem; margin-bottom: .8rem; }
-.mg-panel-cab h2 { font-size: 1.12rem; margin: 0; }
-.mg-panel-cab a, .mg-panel-cab .btn-link { font-weight: 700; font-size: .88rem; }
-.mg-atencion { list-style: none; margin: 0; padding: 0; }
-.mg-atencion li { display: flex; gap: .8rem; align-items: center; padding: .65rem 0; border-bottom: 1px solid #EEF2E9; }
-.mg-atencion li:last-child { border-bottom: 0; }
-.mg-atencion .ic { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; flex: none; background: var(--mg-amarillo-50); color: #6B5208; }
-.mg-atencion .ic.verde { background: var(--mg-salvia-100); color: var(--mg-verde); }
-.mg-atencion div { flex: 1; min-width: 0; }
-.mg-atencion b { display: block; font-size: .94rem; }
-.mg-atencion span { font-size: .85rem; color: var(--mg-tinta-suave); }
-.mg-vacio { border: 1.5px dashed var(--mg-salvia); border-radius: 14px; padding: 1rem; color: var(--mg-tinta-suave); background: #FBFCF9; font-size: .92rem; }
-.mg-vacio b { display: block; color: var(--mg-verde); font-family: var(--mg-fuente-titulos); font-size: 1.05rem; }
-.mg-nota { font-size: .86rem; color: var(--mg-tinta-suave); background: var(--mg-salvia-50); border: 1px solid var(--mg-borde); border-radius: 12px; padding: .65rem .9rem; margin-top: .8rem; }
-.mg-accesos { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: .6rem; }
-.mg-accesos a { display: flex; gap: .6rem; align-items: center; padding: .75rem .9rem; border: 1px solid var(--mg-borde); border-radius: 14px; text-decoration: none; color: var(--mg-tinta); font-weight: 700; background: #fff; transition: border-color 150ms ease; }
-.mg-accesos a:hover { border-color: var(--mg-verde); color: var(--mg-tinta); }
-.mg-accesos svg { color: var(--mg-verde); }
-
-/* Filtros, paginación y ficha */
-.mg-filtros { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; margin-bottom: .9rem; }
-.mg-filtros .form-control, .mg-filtros .form-select { min-height: 42px; width: auto; font-size: .92rem; }
-.mg-filtros input[type=search] { min-width: min(340px, 100%); border-radius: 999px; }
-.mg-paginacion { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: .6rem; padding: .7rem .3rem .2rem; font-size: .88rem; color: var(--mg-tinta-suave); }
-.mg-ficha { position: sticky; top: 84px; }
-.mg-ficha dl { display: grid; grid-template-columns: auto 1fr; gap: .35rem .9rem; margin: .6rem 0 1rem; font-size: .92rem; }
-.mg-ficha dt { color: var(--mg-tinta-suave); font-weight: 500; }
-.mg-ficha dd { margin: 0; font-weight: 600; overflow-wrap: anywhere; }
-tr.mg-seleccionada > * { background: var(--mg-salvia-50) !important; }
-tr[data-fila] { cursor: pointer; }
-
-/* Gráficos (un solo color validado: #4A8048) */
-.mg-grafico { position: relative; }
-.mg-grafico svg { display: block; width: 100%; height: auto; overflow: visible; }
-.mg-grafico .tip { position: absolute; pointer-events: none; background: var(--mg-tinta); color: #fff; font-size: .82rem; font-weight: 600; padding: .3rem .6rem; border-radius: 8px; white-space: nowrap; opacity: 0; transform: translate(-50%, -115%); transition: opacity 120ms ease; z-index: 2; }
-
-/* Contenido de la tienda */
-.mg-contenido { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 1rem; align-items: start; }
-.mg-secciones { list-style: none; margin: 0; padding: 0; }
-.mg-secciones li { display: flex; align-items: center; gap: .5rem; padding: .55rem .6rem; border: 1px solid var(--mg-borde); border-radius: 12px; margin-bottom: .45rem; background: #fff; }
-.mg-secciones li.sel { border-color: var(--mg-verde); background: var(--mg-salvia-50); }
-.mg-secciones li > button.nombre { all: unset; flex: 1; cursor: pointer; font-weight: 700; padding: .2rem .25rem; border-radius: 6px; }
-.mg-secciones li > button.nombre:focus-visible { outline: 3px solid var(--mg-verde); }
-.mg-secciones .mover { min-height: 30px; min-width: 30px; padding: 0; border-radius: 8px; }
-.mg-secciones .form-switch .form-check-input { width: 2.4em; height: 1.3em; cursor: pointer; }
-.mg-secciones .punto { width: 8px; height: 8px; border-radius: 50%; background: var(--mg-amarillo); flex: none; }
-.mg-imagen-campo { display: flex; flex-wrap: wrap; gap: .8rem; align-items: center; border: 1.5px dashed var(--mg-salvia); border-radius: 14px; padding: .7rem; background: #FBFCF9; }
-.mg-imagen-campo img, .mg-imagen-campo .sin { width: 110px; height: 76px; border-radius: 10px; object-fit: contain; background: var(--mg-salvia-50); display: grid; place-items: center; font-size: .8rem; color: var(--mg-tinta-suave); }
-.mg-borrador { display: inline-flex; align-items: center; gap: .4rem; font-size: .82rem; font-weight: 700; background: var(--mg-amarillo-50); color: #6B5208; border-radius: 999px; padding: .25rem .7rem; }
-.mg-borrador.ok { background: var(--mg-salvia-100); color: var(--mg-verde); }
+ * El panel (v1.3.0) tiene su propia hoja: css/admin.css, con estos mismos tokens.
+ * Aquí solo queda el aviso que ve el administrador cuando navega la tienda. */
 .mg-tienda-admin { position: sticky; top: 0; z-index: 1035; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: .5rem 1rem; background: var(--mg-amarillo); color: var(--mg-tinta); font-weight: 600; font-size: .92rem; padding: .45rem 1rem; }
 .mg-tienda-admin a { color: var(--mg-tinta); font-weight: 800; }
-
-@media (max-width: 1100px) {
-  .mg-paneles, .mg-contenido { grid-template-columns: 1fr; }
-  .mg-ficha { position: static; }
-}
-@media (max-width: 860px) {
-  .mg-admin { grid-template-columns: 1fr; }
-  .mg-admin-menu { position: fixed; inset: 0 auto 0 0; width: 270px; z-index: 1050; transform: translateX(-100%); transition: transform 240ms var(--mg-ease-out); }
-  .mg-admin.menu-abierto .mg-admin-menu { transform: none; box-shadow: 0 0 0 100vmax rgba(20, 30, 22, .45); }
-  .mg-admin-menu-movil { display: inline-flex; }
-}
 
 /* ---------------------------------------------------------------- Pie */
 footer#pie { background: #fff; border-top: 1px solid var(--mg-borde); }

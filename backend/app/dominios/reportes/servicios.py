@@ -9,7 +9,10 @@ Definiciones (iguales en la API, el panel y las exportaciones):
     pasarela que lo certifique (D1, D8).
   - Pendiente de cobro: pedidos en estado pendiente.
   - Cancelados: se informan aparte y nunca suman a las ventas.
-  - No existen reembolsos ni costos registrados: no se calcula utilidad.
+  - Reembolsos (CR-02, RN22-RN23): un pedido reembolsado se pagó, así que
+    cuenta en ventas confirmadas; los reembolsos registrados en el período se
+    restan aparte para obtener las ventas netas.
+  - No hay costos registrados: no se calcula utilidad (RN20).
 
 Esto es control financiero interno, no contabilidad formal ni facturación.
 """
@@ -19,9 +22,9 @@ from collections import OrderedDict
 from datetime import timedelta
 
 from app.dominios.contenido.servicios import ContenidoServicio
-from app.dominios.pedidos.modelos import ESTADOS_CONFIRMADOS, ESTADOS_PEDIDO
+from app.dominios.pedidos.modelos import ESTADOS_CONFIRMADOS, ESTADOS_PEDIDO, ESTADOS_VENDIDOS
 from app.dominios.reportes.repositorios import ReporteRepositorio
-from app.fechas import dia_local, hoy_local, inicio_de_mes, rango_utc
+from app.fechas import dia_local, hora_local, hoy_local, inicio_de_mes, rango_utc
 
 
 def _num(valor):
@@ -40,8 +43,8 @@ class ReporteServicio:
         return desde or inicio_de_mes(hoy), hasta or hoy
 
     @staticmethod
-    def _indicadores(pedidos, pagos):
-        confirmados = [p for p in pedidos if p.estado in ESTADOS_CONFIRMADOS]
+    def _indicadores(pedidos, pagos, reembolsos=()):
+        confirmados = [p for p in pedidos if p.estado in ESTADOS_VENDIDOS]
         pendientes = [p for p in pedidos if p.estado == "pendiente"]
         cancelados = [p for p in pedidos if p.estado == "cancelado"]
         ventas = sum(_num(p.total) for p in confirmados)
@@ -52,38 +55,65 @@ class ReporteServicio:
             "cancelados": {"valor": sum(_num(p.total) for p in cancelados), "pedidos": len(cancelados)},
             "pedidos": len(pedidos),
             "ticket_promedio": round(ventas / len(confirmados), 2) if confirmados else 0.0,
+            "reembolsos": {"valor": sum(_num(r[1]) for r in reembolsos), "cantidad": len(reembolsos)},
+            "ventas_netas": ventas - sum(_num(r[1]) for r in reembolsos),
         }
 
     @staticmethod
     def _serie(pedidos, desde, hasta, agrupar):
-        """Ventas confirmadas por día o por mes, con los períodos vacíos en cero."""
+        """Ventas confirmadas por día, semana (desde el primer día) o mes, con los vacíos en cero."""
+        def clave_de(dia):
+            if agrupar == "dia":
+                return dia.isoformat()
+            if agrupar == "semana":
+                return (desde + timedelta(days=((dia - desde).days // 7) * 7)).isoformat()
+            return dia.strftime("%Y-%m")
+
         cubetas = OrderedDict()
         dia = desde
         while dia <= hasta:
-            clave = dia.isoformat() if agrupar == "dia" else dia.strftime("%Y-%m")
+            clave = clave_de(dia)
             cubetas.setdefault(clave, {"periodo": clave, "ventas": 0.0, "pedidos": 0})
             dia += timedelta(days=1)
         for p in pedidos:
-            if p.estado not in ESTADOS_CONFIRMADOS:
+            if p.estado not in ESTADOS_VENDIDOS:
                 continue
             local = dia_local(p.fecha_creacion)
-            clave = local.isoformat() if agrupar == "dia" else local.strftime("%Y-%m")
+            clave = clave_de(local)
             if clave in cubetas:
                 cubetas[clave]["ventas"] += _num(p.total)
                 cubetas[clave]["pedidos"] += 1
         return list(cubetas.values())
 
-    def _por_producto(self, inicio=None, fin=None):
+    def _por_producto(self, inicio=None, fin=None, anterior=None):
         vendidos = {pid: (int(u or 0), _num(i)) for pid, u, i in ReporteRepositorio.ventas_por_producto(inicio, fin)}
+        previos = {}
+        if anterior:
+            previos = {pid: int(u or 0) for pid, u, _ in ReporteRepositorio.ventas_por_producto(*anterior)}
+        lineas = {}
+        for pid, pedido_id, uid, *_resto in ReporteRepositorio.lineas_vendidas(inicio, fin):
+            info = lineas.setdefault(pid, {"pedidos": set(), "clientes": set(), "ultima": None})
+            info["pedidos"].add(pedido_id)
+            info["clientes"].add(uid)
+            fecha = _resto[2]
+            if info["ultima"] is None or fecha > info["ultima"]:
+                info["ultima"] = fecha
         umbral = self.contenido.umbral_inventario_bajo()
         filas = []
         for prod in ReporteRepositorio.productos():
             unidades, ingresos = vendidos.get(prod.id, (0, 0.0))
+            info = lineas.get(prod.id, {"pedidos": set(), "clientes": set(), "ultima": None})
             filas.append({
                 "producto_id": prod.id,
                 "producto": prod.nombre,
+                "referencia": prod.referencia,
+                "tipo": prod.tipo.nombre if prod.tipo else None,
                 "unidades": unidades,
+                "unidades_anterior": previos.get(prod.id, 0),
                 "ingresos": ingresos,
+                "pedidos": len(info["pedidos"]),
+                "clientes": len(info["clientes"]),
+                "ultima_venta": info["ultima"].isoformat() if info["ultima"] else None,
                 "stock": prod.cantidad_stock,
                 "disponible": prod.disponible,
                 "inventario_bajo": prod.disponible and prod.cantidad_stock <= umbral,
@@ -108,17 +138,93 @@ class ReporteServicio:
         inicio, fin = rango_utc(desde, hasta)
         pedidos = ReporteRepositorio.pedidos_creados(inicio, fin)
         pagos = ReporteRepositorio.pagos_confirmados(inicio, fin)
+        reembolsos = ReporteRepositorio.reembolsos(inicio, fin)
         por_estado = {e: 0 for e in ESTADOS_PEDIDO}
         for p in pedidos:
             por_estado[p.estado] += 1
+        # Período anterior de la misma duración (comparación, RF33)
+        dias = (hasta - desde).days + 1
+        a_hasta = desde - timedelta(days=1)
+        a_desde = a_hasta - timedelta(days=dias - 1)
+        a_inicio, a_fin = rango_utc(a_desde, a_hasta)
+        anteriores = ReporteRepositorio.pedidos_creados(a_inicio, a_fin)
         return {
             "desde": desde.isoformat(),
             "hasta": hasta.isoformat(),
             "agrupar": agrupar,
-            "indicadores": self._indicadores(pedidos, pagos),
+            "indicadores": self._indicadores(pedidos, pagos, reembolsos),
+            "anterior": {
+                "desde": a_desde.isoformat(),
+                "hasta": a_hasta.isoformat(),
+                "indicadores": self._indicadores(
+                    anteriores, ReporteRepositorio.pagos_confirmados(a_inicio, a_fin),
+                    ReporteRepositorio.reembolsos(a_inicio, a_fin)),
+            },
             "serie": self._serie(pedidos, desde, hasta, agrupar),
             "por_estado": por_estado,
-            "por_producto": self._por_producto(inicio, fin),
+            "por_producto": self._por_producto(inicio, fin, (a_inicio, a_fin)),
+        }
+
+    def detalle_producto(self, producto_id, desde=None, hasta=None, agrupar="dia"):
+        """Análisis de un producto en el período (RF33): ritmo, hora, día, compradores y ciudades."""
+        from app.dominios.productos.servicios import ProductoNoEncontradoError
+        from app import db
+        from app.dominios.productos.modelos import Producto
+
+        prod = db.session.get(Producto, producto_id)
+        if not prod:
+            raise ProductoNoEncontradoError(f"Producto con ID {producto_id} no encontrado.")
+        desde, hasta = self._rango_por_defecto(desde, hasta)
+        inicio, fin = rango_utc(desde, hasta)
+        lineas = ReporteRepositorio.lineas_vendidas(inicio, fin, producto_id)
+        unidades = sum(int(l[3]) for l in lineas)
+        dias = (hasta - desde).days + 1
+        horas = {h: 0 for h in range(24)}
+        semana = {d: 0 for d in range(7)}  # 0 = lunes
+        compradores, ciudades = {}, {}
+        for _pid, _ped, uid, cant, sub, fecha, ciudad, nom, ape, correo, _est in lineas:
+            local = hora_local(fecha)
+            horas[local.hour] += int(cant)
+            semana[local.weekday()] += int(cant)
+            c = compradores.setdefault(uid, {"cliente": " ".join(x for x in (nom, ape) if x) or correo, "unidades": 0, "ingresos": 0.0, "pedidos": set()})
+            c["unidades"] += int(cant)
+            c["ingresos"] += _num(sub)
+            c["pedidos"].add(_ped)
+            if ciudad:
+                ciudades[ciudad] = ciudades.get(ciudad, 0) + int(cant)
+        cubetas = OrderedDict()
+        dia = desde
+        while dia <= hasta:
+            clave = dia.isoformat() if agrupar == "dia" else (desde + timedelta(days=((dia - desde).days // 7) * 7)).isoformat() if agrupar == "semana" else dia.strftime("%Y-%m")
+            cubetas.setdefault(clave, {"periodo": clave, "unidades": 0})
+            dia += timedelta(days=1)
+        for l in lineas:
+            d = dia_local(l[5])
+            clave = d.isoformat() if agrupar == "dia" else (desde + timedelta(days=((d - desde).days // 7) * 7)).isoformat() if agrupar == "semana" else d.strftime("%Y-%m")
+            if clave in cubetas:
+                cubetas[clave]["unidades"] += int(l[3])
+        ritmo = unidades / dias if dias else 0
+        return {
+            "producto": prod.to_dict(),
+            "desde": desde.isoformat(), "hasta": hasta.isoformat(), "agrupar": agrupar,
+            "unidades": unidades,
+            "ingresos": sum(_num(l[4]) for l in lineas),
+            "clientes": len(compradores),
+            "recompra": sum(1 for c in compradores.values() if len(c["pedidos"]) > 1),
+            "ritmo_semanal": round(ritmo * 7, 2),
+            "dias_de_stock": round(prod.cantidad_stock / ritmo) if ritmo else None,
+            "serie": list(cubetas.values()),
+            "por_hora": [{"hora": h, "unidades": u} for h, u in horas.items()],
+            "por_dia_semana": [{"dia": d, "unidades": u} for d, u in semana.items()],
+            "compradores": sorted(
+                [{"cliente": c["cliente"], "unidades": c["unidades"], "ingresos": c["ingresos"]} for c in compradores.values()],
+                key=lambda x: -x["unidades"])[:10],
+            "ciudades": sorted([{"ciudad": k, "unidades": v} for k, v in ciudades.items()], key=lambda x: -x["unidades"]),
+            "ventas": [
+                {"pedido": ped, "fecha": fecha.isoformat(), "cliente": " ".join(x for x in (nom, ape) if x) or correo,
+                 "ciudad": ciudad, "cantidad": int(cant), "valor": _num(sub), "estado": est}
+                for _pid, ped, _uid, cant, sub, fecha, ciudad, nom, ape, correo, est in lineas[:50]
+            ],
         }
 
     def resumen(self):
@@ -179,6 +285,8 @@ class ReporteServicio:
             ["Ventas confirmadas", f"{i['ventas_confirmadas']['valor']:.0f}", i["ventas_confirmadas"]["pedidos"]],
             ["Pendiente de cobro", f"{i['pendiente_de_cobro']['valor']:.0f}", i["pendiente_de_cobro"]["pedidos"]],
             ["Cancelados", f"{i['cancelados']['valor']:.0f}", i["cancelados"]["pedidos"]],
+            ["Reembolsos", f"{i['reembolsos']['valor']:.0f}", i["reembolsos"]["cantidad"]],
+            ["Ventas netas", f"{i['ventas_netas']:.0f}"],
         ]
         return self._csv(["Producto", "Unidades vendidas", "Ingresos confirmados (COP)", "Stock actual"], filas)
 

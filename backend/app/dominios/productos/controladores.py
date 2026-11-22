@@ -4,7 +4,9 @@ from marshmallow import ValidationError
 from app.dominios.productos.dtos import (
     CrearProductoDTO,
     ActualizarProductoDTO,
+    TipoProductoDTO,
 )
+from app.dominios.productos.servicios import TipoProductoServicio
 from app.dominios.usuarios.controladores import admin_bp
 from app.seguridad import requiere_admin
 
@@ -190,3 +192,50 @@ def listar_productos_admin(usuario_id):
         ),
         200,
     )
+
+
+# ============================================================
+# Tipos de mug (RF30, CR-02)
+# ============================================================
+tipo_servicio = TipoProductoServicio()
+
+
+def _tipo_datos():
+    return TipoProductoDTO().load(request.get_json(silent=True) or {})
+
+
+def _invalido(err):
+    return jsonify({"success": False, "error": {"message": "Datos de entrada inválidos.", "details": err.messages}}), 400
+
+
+@admin_bp.route("/tipos-producto", methods=["GET"])
+@requiere_admin
+def listar_tipos(usuario_id):
+    return jsonify({"success": True, "message": "Tipos de mug.", "data": tipo_servicio.listar()}), 200
+
+
+@admin_bp.route("/tipos-producto", methods=["POST"])
+@requiere_admin
+def crear_tipo(usuario_id):
+    try:
+        datos = _tipo_datos()
+    except ValidationError as err:
+        return _invalido(err)
+    return jsonify({"success": True, "message": "Tipo creado.", "data": tipo_servicio.crear(datos)}), 201
+
+
+@admin_bp.route("/tipos-producto/<int:tipo_id>", methods=["PATCH"])
+@requiere_admin
+def editar_tipo(usuario_id, tipo_id):
+    try:
+        datos = _tipo_datos()
+    except ValidationError as err:
+        return _invalido(err)
+    return jsonify({"success": True, "message": "Tipo actualizado.", "data": tipo_servicio.actualizar(tipo_id, datos)}), 200
+
+
+@admin_bp.route("/tipos-producto/<int:tipo_id>", methods=["DELETE"])
+@requiere_admin
+def eliminar_tipo(usuario_id, tipo_id):
+    tipo_servicio.eliminar(tipo_id)
+    return "", 204

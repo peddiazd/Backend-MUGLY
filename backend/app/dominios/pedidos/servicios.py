@@ -3,9 +3,12 @@ from decimal import Decimal
 
 from app import db
 from app.dominios.pedidos.modelos import (
+    ESTADOS_CERRADOS,
+    ESTADOS_CONFIRMADOS,
     Pedido,
     DetallePedido,
     HistorialEstadoPedido,
+    ReembolsoPedido,
 )
 from app.dominios.pedidos.repositorios import PedidoRepositorio
 from app.dominios.productos.modelos import Producto
@@ -25,6 +28,21 @@ class TransicionEstadoInvalidaError(Exception):
 
 class DatosEnvioRequeridosError(Exception):
     """Error cuando se envía un pedido sin transportadora o guía."""
+
+
+class OperacionPedidoInvalidaError(Exception):
+    """Archivo o reembolso que no cumple las reglas RN22 o RN25."""
+
+
+def _copiar_envio(pedido, usuario_id):
+    """El pedido guarda la dirección del perfil al crearse (RF31)."""
+    from app.dominios.usuarios.repositorios import UsuarioRepositorio
+    perfil = UsuarioRepositorio.obtener_perfil_por_usuario_id(usuario_id)
+    if perfil:
+        pedido.envio_departamento = perfil.departamento
+        pedido.envio_ciudad = perfil.ciudad
+        pedido.envio_direccion = perfil.direccion
+        pedido.envio_complemento = perfil.complemento
 
 
 # Transiciones permitidas (MGL-REQ-002, RF17)
@@ -54,6 +72,7 @@ class PedidoServicio:
             tipo="catalogo",
             total=Decimal("0.00"),
         )
+        _copiar_envio(pedido, usuario_id)
 
         total = Decimal("0.00")
 
@@ -111,10 +130,19 @@ class PedidoServicio:
             tipo="personalizado",
             descripcion=datos["descripcion"],
             total=datos["total"],
+            cantidad_personalizado=datos.get("cantidad", 1),
+            mug_base=datos.get("mug_base"),
+            transportadora_acordada=datos.get("transportadora_acordada"),
+            entrega_acordada=datos.get("entrega_acordada"),
         )
+        _copiar_envio(pedido, datos["usuario_id"])
         pedido.historial.append(
             HistorialEstadoPedido(estado="pendiente", usuario_id=admin_id)
         )
+        # Pago ya verificado por WhatsApp (D3): queda registrado como pagado
+        if datos.get("pagado"):
+            pedido.estado = "pagado"
+            pedido.historial.append(HistorialEstadoPedido(estado="pagado", usuario_id=admin_id))
         PedidoRepositorio.guardar(pedido)
         return self._serializar_pedido(pedido)
 
@@ -218,7 +246,12 @@ class PedidoServicio:
                 f"Pedido con ID {pedido_id} no encontrado."
             )
 
-        return self._serializar_pedido(pedido)
+        datos = self._serializar_pedido(pedido)
+        from app.dominios.usuarios.repositorios import UsuarioRepositorio
+        usuario = UsuarioRepositorio.obtener_por_id(pedido.usuario_id)
+        datos["cliente"] = usuario.correo if usuario else None
+        datos["cliente_datos"] = self._cliente(usuario.correo if usuario else None, usuario.perfil if usuario else None)
+        return datos
 
     def listar_pedidos_usuario(self, usuario_id):
         """Lista únicamente los pedidos del usuario autenticado."""
@@ -251,21 +284,94 @@ class PedidoServicio:
             hasta = parametros["hasta"] or parametros["desde"]
             inicio, fin = rango_utc(min(desde, hasta), max(desde, hasta))
 
+        estados = [e for e in (parametros.get("estados") or "").split(",") if e]
         consulta = PedidoRepositorio.buscar(
             q=parametros["q"],
             estado=parametros["estado"],
             tipo=parametros["tipo"],
             inicio=inicio,
             fin=fin,
+            estados=estados,
+            vista=parametros.get("vista", "todos"),
+            ciudad=parametros.get("ciudad", ""),
+            tipo_mug=parametros.get("tipo_mug"),
         )
         filas, meta = paginar(consulta, parametros["pagina"], parametros["por_pagina"])
         items = []
-        for pedido, correo in filas:
+        for pedido, correo, perfil in filas:
             item = self._serializar_pedido(pedido)
             item["cliente"] = correo
+            item["cliente_datos"] = self._cliente(correo, perfil)
             items.append(item)
-        conteo = PedidoRepositorio.contar_por_estado()
-        return {"items": items, "por_estado": conteo, **meta}
+        vista = parametros.get("vista", "todos")
+        conteo = PedidoRepositorio.contar_por_estado(vista)
+        archivo = PedidoRepositorio.contar_archivo()
+        return {"items": items, "por_estado": conteo, "activos": int(archivo.get(False, 0)),
+                "archivados": int(archivo.get(True, 0)), "ciudades": PedidoRepositorio.ciudades(), **meta}
+
+    @staticmethod
+    def _cliente(correo, perfil):
+        p = perfil
+        return {
+            "correo": correo,
+            "nombre": p.nombre if p else None, "apellido": p.apellido if p else None,
+            "telefono": p.telefono if p else None,
+            "tipo_documento": p.tipo_documento if p else None, "numero_documento": p.numero_documento if p else None,
+        }
+
+    # ------------------------------------------------------------ CR-02
+    def archivar(self, pedido_id, archivado):
+        """Archiva o restaura un pedido cerrado (RN25). No cambia el estado."""
+        pedido = PedidoRepositorio.obtener_por_id(pedido_id)
+        if pedido is None:
+            raise PedidoNoEncontradoError(f"Pedido con ID {pedido_id} no encontrado.")
+        if archivado and pedido.estado not in ESTADOS_CERRADOS:
+            raise OperacionPedidoInvalidaError("Solo se archivan pedidos entregados, cancelados o reembolsados.")
+        pedido.archivado = archivado
+        db.session.commit()
+        return self._serializar_pedido(pedido)
+
+    def archivar_cerrados(self):
+        pedidos = PedidoRepositorio.cerrados_activos()
+        for p in pedidos:
+            p.archivado = True
+        db.session.commit()
+        return {"archivados": len(pedidos)}
+
+    def reembolsar(self, pedido_id, admin_id, datos):
+        """Registra un reembolso o devolución (RF32, RN22). MUGLY no mueve dinero."""
+        try:
+            pedido = db.session.query(Pedido).filter_by(id=pedido_id).with_for_update().first()
+            if pedido is None:
+                raise PedidoNoEncontradoError(f"Pedido con ID {pedido_id} no encontrado.")
+            if pedido.estado not in ESTADOS_CONFIRMADOS:
+                raise OperacionPedidoInvalidaError("Solo se reembolsa un pedido con pago confirmado.")
+            ya = sum((r.monto for r in pedido.reembolsos), Decimal("0"))
+            disponible = Decimal(pedido.total) - ya
+            monto = Decimal(datos["monto"]) if datos.get("monto") is not None else disponible
+            if monto <= 0 or monto > disponible:
+                raise OperacionPedidoInvalidaError(f"El monto debe estar entre $1 y lo disponible ({disponible:.0f}).")
+            reingresadas = 0
+            if datos["tipo"] == "devolucion" and datos.get("reingresar") and pedido.tipo == "catalogo":
+                for d in pedido.detalles:
+                    prod = db.session.query(Producto).filter_by(id=d.producto_id).with_for_update().first()
+                    if prod:
+                        prod.cantidad_stock += d.cantidad
+                        reingresadas += d.cantidad
+            pedido.reembolsos.append(ReembolsoPedido(
+                tipo=datos["tipo"], monto=monto, motivo=datos["motivo"], detalle=datos.get("detalle"),
+                unidades_reingresadas=reingresadas, usuario_id=admin_id,
+            ))
+            total = monto == disponible
+            if total:
+                pedido.estado = "reembolsado"
+            pedido.historial.append(HistorialEstadoPedido(
+                estado="reembolsado" if total else "reembolso_parcial", usuario_id=admin_id))
+            db.session.commit()
+            return self._serializar_pedido(pedido)
+        except Exception:
+            db.session.rollback()
+            raise
 
     @staticmethod
     def _serializar_pedido(pedido):
@@ -278,6 +384,21 @@ class PedidoServicio:
             "descripcion": pedido.descripcion,
             "transportadora": pedido.transportadora,
             "numero_guia": pedido.numero_guia,
+            "envio": {
+                "departamento": pedido.envio_departamento, "ciudad": pedido.envio_ciudad,
+                "direccion": pedido.envio_direccion, "complemento": pedido.envio_complemento,
+            },
+            "archivado": bool(pedido.archivado),
+            "cantidad_personalizado": pedido.cantidad_personalizado,
+            "mug_base": pedido.mug_base,
+            "transportadora_acordada": pedido.transportadora_acordada,
+            "entrega_acordada": pedido.entrega_acordada.isoformat() if pedido.entrega_acordada else None,
+            "reembolsado": float(sum((r.monto for r in pedido.reembolsos), Decimal("0"))),
+            "reembolsos": [
+                {"id": r.id, "tipo": r.tipo, "monto": float(r.monto), "motivo": r.motivo, "detalle": r.detalle,
+                 "unidades_reingresadas": r.unidades_reingresadas, "fecha": r.fecha.isoformat() if r.fecha else None}
+                for r in pedido.reembolsos
+            ],
             "total": float(pedido.total),
             "fecha_creacion": (
                 pedido.fecha_creacion.isoformat()
@@ -290,6 +411,8 @@ class PedidoServicio:
                     "producto": detalle.producto.nombre,
                     "cantidad": detalle.cantidad,
                     "precio_unitario": float(detalle.precio_unitario),
+                    "referencia": detalle.producto.referencia,
+                    "tipo_mug": detalle.producto.tipo.nombre if detalle.producto.tipo else None,
                     "subtotal": float(
                         detalle.precio_unitario * detalle.cantidad
                     ),

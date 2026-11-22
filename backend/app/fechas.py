@@ -20,6 +20,11 @@ def rango_utc(desde, hasta):
     return inicio, fin
 
 
+def hora_local(fecha_utc):
+    """Fecha y hora de Colombia (para análisis por hora y día de la semana)."""
+    return fecha_utc + DESFASE
+
+
 def dia_local(fecha_utc):
     return (fecha_utc + DESFASE).date()
 
